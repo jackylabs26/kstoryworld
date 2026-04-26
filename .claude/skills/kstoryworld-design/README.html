@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>KStoryWorld · README</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&family=Noto+Serif+KR:wght@400;500;700&display=swap">
+<style>
+  :root {
+    --ink: #010120;
+    --paper: #ffffff;
+    --muted: rgba(1,1,32,0.55);
+    --line: rgba(1,1,32,0.10);
+    --pink: #ffd6e0;
+    --teal: #7fd1c7;
+    --ochre: #f4a261;
+    --indigo: #3a4a7d;
+    --warn: #fc4c02;
+    --display: 'Space Grotesk', 'Noto Sans KR', 'Noto Sans JP', 'Noto Sans SC', 'Noto Sans TC', system-ui, sans-serif;
+    --mono: 'JetBrains Mono', 'Noto Sans KR', monospace;
+  }
+  * { box-sizing: border-box }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--display);
+    color: var(--ink);
+    background: var(--paper);
+    line-height: 1.55;
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+  /* Locale font overrides — these ensure each script renders with the right typeface */
+  :lang(ko), [lang="ko"] { font-family: 'Noto Sans KR', 'Pretendard', 'Apple SD Gothic Neo', 'Space Grotesk', sans-serif; }
+  :lang(ja), [lang="ja"] { font-family: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', 'Space Grotesk', sans-serif; }
+  :lang(zh-Hans), [lang="zh-Hans"] { font-family: 'Noto Sans SC', 'PingFang SC', 'Space Grotesk', sans-serif; }
+  :lang(zh-Hant), [lang="zh-Hant"] { font-family: 'Noto Sans TC', 'PingFang TC', 'Space Grotesk', sans-serif; }
+  :lang(vi), [lang="vi"] { font-family: 'Space Grotesk', 'Noto Sans', sans-serif; line-height: 1.6; }
+
+  /* General CJK fallback inside Latin paragraphs — the system finds the right glyph automatically */
+  .doc { max-width: 820px; margin: 0 auto; padding: 64px 32px 120px; }
+  .doc-header { padding-bottom: 28px; border-bottom: 1px solid var(--line); margin-bottom: 36px; }
+  .eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+  h1 { font-size: 44px; font-weight: 600; letter-spacing: -1.32px; line-height: 1.05; margin: 0; }
+  h1 .ko { font-weight: 500; color: var(--muted); margin-left: 14px; font-size: 36px; letter-spacing: -1.08px; }
+  h2 { font-size: 28px; font-weight: 600; letter-spacing: -0.56px; line-height: 1.15; margin: 56px 0 16px; padding-top: 24px; border-top: 1px solid var(--line); }
+  h2:first-of-type { border-top: 0; padding-top: 0; }
+  h3 { font-size: 18px; font-weight: 600; letter-spacing: -0.18px; margin: 28px 0 10px; }
+  h4 { font-size: 14px; font-weight: 500; font-family: var(--mono); letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); margin: 24px 0 8px; }
+  p, li { font-size: 15px; line-height: 1.7; color: rgba(1,1,32,0.82); }
+  strong { color: var(--ink); font-weight: 600; }
+  em { font-style: italic; color: rgba(1,1,32,0.72); }
+  a { color: var(--ink); text-underline-offset: 3px; }
+  code { font-family: var(--mono); font-size: 0.88em; background: rgba(1,1,32,0.06); padding: 1px 6px; border-radius: 3px; color: var(--ink); }
+  pre { background: var(--ink); color: #fff; padding: 20px 24px; border-radius: 8px; font-family: var(--mono); font-size: 13px; line-height: 1.6; overflow-x: auto; }
+  pre code { background: transparent; padding: 0; color: inherit; font-size: inherit; }
+  ul { padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  blockquote { margin: 20px 0; padding: 16px 20px; background: rgba(252,76,2,0.06); border-left: 3px solid var(--warn); border-radius: 0 4px 4px 0; }
+  blockquote p { margin: 0; font-size: 14.5px; }
+  hr { border: 0; border-top: 1px solid var(--line); margin: 56px 0; }
+
+  /* Locale table — each Native cell gets its lang attribute so the right font is used */
+  table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; font-size: 14px; }
+  th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-family: var(--mono); font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); font-weight: 500; background: rgba(1,1,32,0.025); }
+  td.code-cell { font-family: var(--mono); font-size: 13px; color: var(--ink); white-space: nowrap; }
+  td.native-cell { font-size: 17px; font-weight: 500; }
+
+  /* Season swatch row */
+  .seasons { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 16px 0 24px; }
+  .season { padding: 16px 18px; border-radius: 8px; border: 1px solid var(--line); }
+  .season .ko { font-size: 22px; font-weight: 500; letter-spacing: -0.4px; }
+  .season .en { font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-top: 4px; }
+  .season .colors { display: flex; gap: 6px; margin-top: 12px; }
+  .swatch { width: 28px; height: 28px; border-radius: 4px; border: 1px solid var(--line); }
+
+  /* Visual demo of every script rendering correctly */
+  .glyph-demo { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; margin: 16px 0 24px; }
+  .glyph { background: #fff; padding: 18px 14px; text-align: center; }
+  .glyph .big { font-size: 28px; line-height: 1.1; font-weight: 500; letter-spacing: -0.4px; min-height: 70px; display: flex; align-items: center; justify-content: center; }
+  .glyph .label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); margin-top: 8px; }
+
+  .tone-list li { line-height: 1.9; }
+  .tone-list .quote { color: rgba(1,1,32,0.72); font-style: italic; }
+
+  @media (max-width: 600px) {
+    .doc { padding: 32px 20px 80px; }
+    h1 { font-size: 32px; letter-spacing: -0.96px; }
+    h1 .ko { font-size: 24px; display: block; margin: 6px 0 0; }
+    h2 { font-size: 22px; }
+    .seasons { grid-template-columns: 1fr; }
+    .glyph-demo { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+<main class="doc">
+  <header class="doc-header">
+    <p class="eyebrow">Design system · v1</p>
+    <h1>KStoryWorld<span class="ko" lang="ko">케이스토리월드</span></h1>
+    <p style="margin: 18px 0 0; color: var(--muted); font-size: 16px;">
+      A Korean storytelling and content platform. The system blends sharp typography &amp; pastel-gradient aesthetics with the color rhythms of <span lang="ko">사계 (사계절)</span> — Korea's four seasons.
+    </p>
+  </header>
+
+  <h2>Glyph rendering check</h2>
+  <p>Every script the platform supports must render with its proper typeface. Below is a visual sanity-check that this README itself displays each language correctly.</p>
+  <div class="glyph-demo">
+    <div class="glyph"><div class="big" lang="ko">한국어</div><div class="label">Korean · ko</div></div>
+    <div class="glyph"><div class="big" lang="ja">日本語</div><div class="label">Japanese · ja</div></div>
+    <div class="glyph"><div class="big" lang="zh-Hans">简体中文</div><div class="label">Chinese · zh-Hans</div></div>
+    <div class="glyph"><div class="big" lang="zh-Hant">繁體中文</div><div class="label">Chinese · zh-Hant</div></div>
+    <div class="glyph"><div class="big" lang="vi">Tiếng&nbsp;Việt</div><div class="label">Vietnamese · vi</div></div>
+    <div class="glyph"><div class="big">Español</div><div class="label">Spanish · es</div></div>
+    <div class="glyph"><div class="big">Français</div><div class="label">French · fr</div></div>
+    <div class="glyph"><div class="big">English</div><div class="label">English · en</div></div>
+  </div>
+
+  <h2>Brand snapshot</h2>
+  <p>KStoryWorld is a storytelling-led brand: Korean folk tales, K-drama narratives, K-pop documentaries, and modern Korean voices, all under one roof. The platform sits between <strong>enterprise-clean infrastructure</strong> (catalog, partner network, dashboards) and <strong>emotional, human storytelling</strong> (literary, cinematic, atmospheric).</p>
+
+  <h3>The three pillars</h3>
+  <ul>
+    <li><strong>Geometry &amp; type discipline</strong> — sharp 4&nbsp;px corners, "The Future" display, PP Neue Montreal Mono labels, midnight-blue dark mode (<code>#010120</code>).</li>
+    <li><strong>Korean four-seasons palette</strong> — pastels named for <span lang="ko">봄·여름·가을·겨울</span> (spring, summer, autumn, winter) layered over white canvas.</li>
+    <li><strong>Editorial restraint</strong> — generous whitespace, mono labels as signposts, oversized stats and oversized hangul wordmarks as closing brand moments.</li>
+  </ul>
+
+  <div class="seasons">
+    <div class="season">
+      <div class="ko" lang="ko">봄 Spring</div>
+      <div class="en">Cherry blossom · peach · lavender</div>
+      <div class="colors">
+        <div class="swatch" style="background:#ffd6e0"></div>
+        <div class="swatch" style="background:#ffb7a0"></div>
+        <div class="swatch" style="background:#bdbbff"></div>
+      </div>
+    </div>
+    <div class="season">
+      <div class="ko" lang="ko">여름 Summer</div>
+      <div class="en">Pale sky · ocean teal · soft mint</div>
+      <div class="colors">
+        <div class="swatch" style="background:#cfe9ff"></div>
+        <div class="swatch" style="background:#7fd1c7"></div>
+        <div class="swatch" style="background:#d8f3dc"></div>
+      </div>
+    </div>
+    <div class="season">
+      <div class="ko" lang="ko">가을 Autumn</div>
+      <div class="en">Persimmon · maple · straw</div>
+      <div class="colors">
+        <div class="swatch" style="background:#f4a261"></div>
+        <div class="swatch" style="background:#e76f51"></div>
+        <div class="swatch" style="background:#f6e0b5"></div>
+      </div>
+    </div>
+    <div class="season">
+      <div class="ko" lang="ko">겨울 Winter</div>
+      <div class="en">Snow blue · ink indigo · bone white</div>
+      <div class="colors">
+        <div class="swatch" style="background:#dbe7ff"></div>
+        <div class="swatch" style="background:#3a4a7d"></div>
+        <div class="swatch" style="background:#f4f4f7"></div>
+      </div>
+    </div>
+  </div>
+
+  <blockquote><p><strong>Caveat.</strong> No real KStoryWorld codebase or Figma was available. Replace the logo, illustrations, and product copy with the real ones when you have them.</p></blockquote>
+
+  <h2>Multilingual support <span lang="ko" style="color:var(--muted);font-weight:500;">· 다국어</span></h2>
+  <p>KStoryWorld is a <strong>multilingual-first platform</strong>. Every screen must support at minimum the eight languages below, and copy &amp; typography are designed so any one of them can be the primary surface.</p>
+
+  <table>
+    <thead>
+      <tr><th>Code</th><th>Language</th><th>Native</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+      <tr><td class="code-cell">ko</td><td>Korean</td><td class="native-cell" lang="ko">한국어</td><td>Source language. Hangul-first display.</td></tr>
+      <tr><td class="code-cell">en</td><td>English</td><td class="native-cell">English</td><td>Default international.</td></tr>
+      <tr><td class="code-cell">ja</td><td>Japanese</td><td class="native-cell" lang="ja">日本語</td><td>Mixed kanji/kana; vertical mode optional.</td></tr>
+      <tr><td class="code-cell">zh-Hans</td><td>Chinese (Simplified)</td><td class="native-cell" lang="zh-Hans">简体中文</td><td>Mainland market.</td></tr>
+      <tr><td class="code-cell">zh-Hant</td><td>Chinese (Traditional)</td><td class="native-cell" lang="zh-Hant">繁體中文</td><td>Taiwan / HK.</td></tr>
+      <tr><td class="code-cell">es</td><td>Spanish</td><td class="native-cell">Español</td><td>Latin script, longer strings (~+25%).</td></tr>
+      <tr><td class="code-cell">fr</td><td>French</td><td class="native-cell">Français</td><td>Latin script, longer strings (~+15%).</td></tr>
+      <tr><td class="code-cell">vi</td><td>Vietnamese</td><td class="native-cell" lang="vi">Tiếng Việt</td><td>Latin + diacritics; bump line-height to 1.6.</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Type stack per locale</h3>
+  <p>Every text style in <code>colors_and_type.css</code> falls back through a CJK-aware stack. The <code>--font-display</code> variable already chains Latin → Hangul → CJK fallbacks. Recommended additions per locale:</p>
+  <ul>
+    <li><code>ko</code> — Pretendard → Apple SD Gothic Neo → Noto Sans KR → system Hangul</li>
+    <li><code>ja</code> — Inter → Noto Sans JP → Hiragino Sans → system JP</li>
+    <li><code>zh-Hans</code> — Inter → Noto Sans SC → PingFang SC → system SC</li>
+    <li><code>zh-Hant</code> — Inter → Noto Sans TC → PingFang TC → system TC</li>
+    <li><code>es</code> · <code>fr</code> · <code>vi</code> — Space Grotesk → Inter → system sans</li>
+  </ul>
+  <blockquote><p>Set <code>&lt;html lang="…"&gt;</code> and add <code>:lang(ko)</code>, <code>:lang(ja)</code> font-family overrides in <code>colors_and_type.css</code> so each locale picks the correct stack automatically.</p></blockquote>
+
+  <h3>Layout rules for i18n</h3>
+  <ul>
+    <li><strong>String budget</strong> — design layouts assuming text can grow up to <strong>+30%</strong> (German / French) or shrink <strong>−20%</strong> (CJK). Never hard-cap a headline to its English length.</li>
+    <li><strong>Line-height</strong> — bump to 1.6 for <code>vi</code> (diacritics), 1.30 for CJK display, 1.40 for Latin body.</li>
+    <li><strong>Letter-spacing</strong> — negative tracking on "The Future" applies to Latin only. CJK display uses <code>letter-spacing: 0</code>; never apply negative tracking to hangul, kana, or hanzi.</li>
+    <li><strong>Mono labels</strong> — ALL CAPS only applies to Latin. For CJK, render mono labels in their natural case at the same size and color.</li>
+    <li><strong>Bilingual pairings</strong> like <span lang="ko">봄</span> · spring become trilingual or single depending on locale. The <code>·</code> separator stays.</li>
+    <li><strong>RTL</strong> — not currently in scope, but layouts use <code>padding-inline</code>, <code>margin-inline</code>, and other logical properties so adding Arabic / Hebrew later requires no rework.</li>
+  </ul>
+
+  <h3>Locale switcher</h3>
+  <p>A locale switcher lives top-right in the header — rendered as a mono-label dropdown:<br><code>EN · <span lang="ko">한국어</span> · <span lang="ja">日本語</span> · <span lang="zh-Hans">中文</span> · ES · FR · VI</code>.<br>Never a flag-icon row (flags ≠ languages).</p>
+
+  <h3>Translation workflow</h3>
+  <ul>
+    <li>Source strings are <strong>Korean (ko)</strong>; English is the working pivot.</li>
+    <li>Each story carries a translator credit (<em>"Translated by …"</em>). The same convention applies to UI strings — translators are credited in the colophon page.</li>
+    <li>Keys live in <code>i18n/&lt;locale&gt;.json</code> (suggested layout, not yet built).</li>
+  </ul>
+
+  <hr>
+
+  <h2>Content fundamentals</h2>
+
+  <h3>Voice</h3>
+  <ul>
+    <li><strong>Multilingual-first</strong>, with hangul as the source language and visual anchor (section labels, big display moments, proper nouns). On any locale, pair the local language with hangul where it adds meaning: <span lang="ko">봄</span> — Spring · <span lang="ko">봄</span> — <span lang="ja">春</span> · <span lang="ko">봄</span> — Primavera. Never replace hangul entirely on cultural concepts (<span lang="ko">정 (jeong)</span>, <span lang="ko">한 (han)</span>, p'ansori).</li>
+    <li><strong>Warm, literary, slightly cinematic.</strong> Not corporate. Not playful in a startup-mascot way.</li>
+    <li><strong>First person plural</strong> ("we") for the platform, <strong>second person</strong> ("you") for the reader. Never "I."</li>
+    <li>Sentences are short, declarative, image-rich. Verbs do the heavy lifting.</li>
+  </ul>
+
+  <h3>Casing</h3>
+  <ul>
+    <li><strong>Display headlines</strong> — sentence case. Never ALL CAPS in display.</li>
+    <li><strong>Mono labels</strong> — ALL CAPS with positive letter-spacing. The only uppercase moments.</li>
+    <li><strong>Buttons</strong> — sentence case ("Read the story", "Listen now"). Never Title Case.</li>
+    <li><strong>Korean text</strong> — rendered as-is; never forced uppercase (hangul has no case).</li>
+  </ul>
+
+  <h3>Tone examples</h3>
+  <ul class="tone-list">
+    <li>Hero headline — <span class="quote">"Every Korean story, told with care."</span></li>
+    <li>Section opener — <span class="quote">"From p'ansori to K-drama, the thread of <span lang="ko">정 (jeong)</span> runs through everything."</span></li>
+    <li>CTA — <span class="quote">"Start with a tale →"</span> &nbsp;/&nbsp; <span class="quote" lang="ko">"이야기 시작하기 →"</span></li>
+    <li>Stat caption — <span class="quote">"Stories told this season"</span> · <strong>3,200+</strong></li>
+    <li>Section label — <code lang="ko">봄</code> &nbsp;/&nbsp; <code>SPRING COLLECTION</code></li>
+  </ul>
+
+  <h3>Vibe</h3>
+  <p>Editorial, atmospheric, quietly proud. Closer to <em>The Paris Review × Apple Newsroom</em> than <em>Duolingo × Memrise</em>.</p>
+
+  <hr>
+
+  <h2>Visual foundations</h2>
+
+  <h3>Color system — four layers</h3>
+  <ul>
+    <li><strong>Canvas</strong> — Pure White (<code>#ffffff</code>) and Midnight Blue (<code>#010120</code>). White for business / discovery, Midnight for stories / research / footer. The light-dark duality is core.</li>
+    <li><strong>Seasonal accents</strong> — four pastel-led palettes (see swatches above), used as decorative gradients, mood backgrounds, and tag colors. Never UI chrome.</li>
+    <li><strong>Brand accents</strong> — Magenta (<code>#ef2cc1</code>) and hanji-orange (<code>#fc4c02</code>) appear in illustrations and gradient endpoints only. <strong>Never</strong> as button fill or text color.</li>
+    <li><strong>Neutrals</strong> — pure black, pure white, <code>rgba(0,0,0,0.08)</code> borders on light, <code>rgba(255,255,255,0.12)</code> borders on dark.</li>
+  </ul>
+
+  <h3>Typography</h3>
+  <ul>
+    <li><strong>Display &amp; body</strong> — "The Future" (TTF). Substitute: Inter / system sans. Hangul fallback: Pretendard.</li>
+    <li><strong>Mono labels</strong> — "PP Neue Montreal Mono". Substitute: JetBrains Mono. Hangul mono fallback: D2 Coding.</li>
+    <li><strong>Negative tracking</strong> on The Future (−1.92px → −0.16px, scaled by size).</li>
+    <li><strong>Mono is always uppercase</strong> with positive tracking (+0.05–0.08em).</li>
+    <li><strong>Weights</strong> — 400 and 500 only. Never 600+.</li>
+    <li><strong>Line-height tight</strong> — 1.00 (display) → 1.30 (body).</li>
+  </ul>
+  <blockquote><p><strong>Font substitution.</strong> We don't have license files for "The Future" or "PP Neue Montreal Mono". The system falls back to <strong>Space Grotesk</strong> (display) and <strong>JetBrains Mono</strong> (labels). Drop the real TTFs into <code>fonts/</code> and uncomment the <code>@font-face</code> block in <code>colors_and_type.css</code> to switch back.</p></blockquote>
+
+  <h3>Spacing</h3>
+  <ul>
+    <li>8&nbsp;px base unit. Scale: <code>1, 2, 4, 8, 12, 16, 20, 24, 32, 44, 48, 80, 100, 120</code>.</li>
+    <li>Section vertical rhythm: 80–120&nbsp;px (non-negotiable; the open feeling is the brand).</li>
+    <li>Card internal padding: 24–32&nbsp;px.</li>
+    <li>Button / badge padding: 2&nbsp;px × 8&nbsp;px (compact).</li>
+  </ul>
+
+  <h3>Backgrounds</h3>
+  <ul>
+    <li>Light canvas + soft seasonal gradient blooms — abstract painterly forms (cloud, feather, brush stroke), never literal flowers or mountains.</li>
+    <li>Dark canvas (<code>#010120</code>) is <em>flat</em> — no gradients on dark, ever. Density comes from content.</li>
+    <li>No repeating patterns in production UI. Hangul wordmarks at giant scale are the only "texture."</li>
+  </ul>
+
+  <h3>Animation</h3>
+  <ul>
+    <li>Easing — <code>cubic-bezier(0.2, 0.8, 0.2, 1)</code> (gentle ease-out). Default duration <strong>240&nbsp;ms</strong>.</li>
+    <li>Hover / focus is opacity + a subtle 2&nbsp;px Y translate, never a hard color flip.</li>
+    <li>No bounces, no springs — the brand feels composed, not cute.</li>
+    <li>Page transitions: 320&nbsp;ms cross-fade. Image lazy-loads use 400&nbsp;ms blur-up.</li>
+  </ul>
+
+  <h3>Borders, radii, shadow</h3>
+  <ul>
+    <li>Light surfaces: <code>1px solid rgba(0,0,0,0.08)</code>. Dark surfaces: <code>1px solid rgba(255,255,255,0.12)</code>.</li>
+    <li>Radii — <strong>4&nbsp;px</strong> (buttons, badges, tags, inputs), <strong>8&nbsp;px</strong> (cards, modals), <strong>0&nbsp;px</strong> (full-bleed sections, dividers). No pills, no 16&nbsp;px, no 24&nbsp;px.</li>
+    <li>One shadow only — <code>rgba(1,1,32,0.10) 0px 4px 10px</code>, tinted midnight blue, never gray. Hover deepens to <code>0.16</code>.</li>
+  </ul>
+
+  <h3>Layout rules</h3>
+  <ul>
+    <li>Max content width: <strong>1240&nbsp;px</strong>, centered, 32&nbsp;px gutters.</li>
+    <li>Sticky header: 64&nbsp;px tall, becomes glass-blurred on scroll (<code>backdrop-filter: blur(12px)</code>, <code>background: rgba(255,255,255,0.72)</code>).</li>
+    <li>Footer — full-bleed midnight blue, with the giant <code>kstoryworld</code> wordmark at scale.</li>
+  </ul>
+
+  <hr>
+
+  <h2>Iconography</h2>
+  <p>KStoryWorld's iconography is <strong>lean and editorial</strong>. We don't use illustrative or filled-color icon sets.</p>
+  <ul>
+    <li><strong>Primary set</strong> — <a href="https://lucide.dev">Lucide</a> via CDN. Stroke 1.5&nbsp;px, 24&nbsp;px box. Their humanist, slightly literary stroke matches "The Future."</li>
+    <li><strong>Mono symbol labels</strong> — we often substitute icons entirely with PP Neue Montreal Mono characters (<code>★ → ↗ ·</code>). They read as typography, not chrome.</li>
+    <li><strong>Hangul as glyph</strong> — section markers like <span lang="ko">봄 여름 가을 겨울</span> ARE the icons for season-themed surfaces. Rendered in The Future at the size of an icon.</li>
+    <li><strong>No emoji</strong> in product UI.</li>
+    <li><strong>Brand marks</strong> — a custom KStoryWorld wordmark (<code>assets/logo-kstoryworld.svg</code>) and a square <code>K·</code> lockup for favicon / app icon.</li>
+  </ul>
+
+  <hr>
+
+  <h2>Project manifest</h2>
+<pre><code>README.html               ← you are here (rendered)
+README.md                 ← markdown source
+SKILL.md                  ← skill metadata
+colors_and_type.css       ← design tokens + semantic CSS vars
+fonts/                    ← webfont files (substituted; see flag)
+assets/                   ← logos, illustrations, brand imagery
+preview/                  ← per-card design-system specimens
+ui_kits/
+  marketing/              ← marketing site (homepage + responsive view)
+  app/                    ← reader app (browse + story reader)
+slides/                   ← deck templates</code></pre>
+
+  <h3>UI kits</h3>
+  <ul>
+    <li><code>ui_kits/marketing/</code> — Homepage, story index, story detail. Public-facing, light canvas + seasonal gradient blooms. Includes <code>responsive.html</code> (desktop + mobile preview).</li>
+    <li><code>ui_kits/app/</code> — Reader app: discover, story reader, library. Mixes light browse with dark story-reader mode.</li>
+  </ul>
+
+  <h3>Slide templates · 1280×720 · 16:9</h3>
+  <ul>
+    <li><code>slides/01-title.html</code> — Title with pastel blooms</li>
+    <li><code>slides/02-section.html</code> — Dark section divider with giant hangul</li>
+    <li><code>slides/03-big-stat.html</code> — Oversized seasonal stat</li>
+    <li><code>slides/04-big-quote.html</code> — Editorial pull-quote</li>
+    <li><code>slides/05-comparison.html</code> — Four-season grid</li>
+    <li><code>slides/06-closing.html</code> — Multilingual thanks</li>
+  </ul>
+
+  <hr>
+
+  <p style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); margin-top: 48px;">
+    KStoryWorld design system · v1 · <span lang="ko">사계 · FOUR SEASONS · ISSUE 04</span>
+  </p>
+</main>
+</body>
+</html>

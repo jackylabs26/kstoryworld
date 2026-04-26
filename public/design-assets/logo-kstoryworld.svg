@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 64" width="360" height="64" role="img" aria-label="kstoryworld">
+  <defs>
+    <linearGradient id="ksw-bubble" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffd6e0"></stop>
+      <stop offset="55%" stop-color="#ffb7a0"></stop>
+      <stop offset="100%" stop-color="#bdbbff"></stop>
+    </linearGradient>
+  </defs>
+  
+  <g transform="translate(2, 6)">
+    <rect x="0" y="0" width="52" height="52" rx="14" fill="url(#ksw-bubble)"></rect>
+    
+    <path d="M16 12 L16 40" stroke="#010120" stroke-width="5" stroke-linecap="round"></path>
+    <path d="M36 20 Q24 26 22 28 Q24 30 36 40" stroke="#010120" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+    
+    <circle cx="42" cy="14" r="1.8" fill="#010120"></circle>
+    <circle cx="46" cy="18" r="1.4" fill="#010120"></circle>
+  </g>
+  
+  <text x="68" y="42" font-family="&#39;Space Grotesk&#39;,&#39;The Future&#39;,&#39;Pretendard&#39;,system-ui,sans-serif" font-size="28" font-weight="500" fill="currentColor" letter-spacing="-0.4">kstoryworld</text>
+  
+  <circle cx="293" cy="40" r="4" fill="#fc4c02"></circle>
+</svg>

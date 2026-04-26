@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>KStoryWorld · Home</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="../../colors_and_type.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body data-screen-label="Marketing · Homepage">
+<div id="root"></div>
+<script type="text/babel" src="Components.jsx"></script>
+<script type="text/babel">
+const { Header, Hero, Stats, SeasonRow, ResearchSection, Footer } = window.MK;
+
+const SPRING = [
+  {label:'봄 · STORY 01', num:'01', title:"The cherry tree at Donghwasa", sub:"A monk, a sparrow, and one perfect afternoon in April."},
+  {label:'봄 · STORY 02', num:'02', title:"Spring rain in Bukchon", sub:"Two letters, three umbrellas, and a long-overdue apology."},
+  {label:'봄 · STORY 03', num:'03', title:"My grandmother's azaleas", sub:"How a recipe outlived a war and crossed an ocean."},
+];
+const SUMMER = [
+  {label:'여름 · STORY 04', num:'04', title:"Bingsu at midnight, Hongdae", sub:"A taxi driver, an art student, and the longest July."},
+  {label:'여름 · STORY 05', num:'05', title:"Letters from Jeju", sub:"What the haenyeo divers told the visiting biologist."},
+  {label:'여름 · STORY 06', num:'06', title:"Cicadas at the seonbi's house", sub:"A child's summer with the last calligrapher in town."},
+];
+const AUTUMN = [
+  {label:'가을 · STORY 07', num:'07', title:"Persimmons on the windowsill", sub:"How a single jar of jam taught my grandmother to forgive."},
+  {label:'가을 · STORY 08', num:'08', title:"Songpyeon for an only son", sub:"A Chuseok story told entirely in the kitchen."},
+  {label:'가을 · STORY 09', num:'09', title:"The maple road to Seoraksan", sub:"Three friends, one bus ticket, and a quiet revelation."},
+];
+const WINTER = [
+  {label:'겨울 · STORY 10', num:'10', title:"Snow on the Daedong River", sub:"A boy who skated, a war that stopped him, and what came next."},
+  {label:'겨울 · STORY 11', num:'11', title:"Tteokguk for two", sub:"How New Year's soup became a small act of repair."},
+  {label:'겨울 · STORY 12', num:'12', title:"The lantern keeper of Jeonju", sub:"What he learned in forty winters of paper and flame."},
+];
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <>
+    <Header/>
+    <Hero/>
+    <Stats/>
+    <SeasonRow season="spring" kor="봄" label="01 · SPRING COLLECTION" grad="linear-gradient(135deg,#ffd6e0 0%,#ffb7a0 50%,#bdbbff 100%)" stories={SPRING}/>
+    <div style={{borderTop:'1px solid rgba(0,0,0,0.08)'}}/>
+    <SeasonRow season="summer" kor="여름" label="02 · SUMMER COLLECTION" grad="linear-gradient(135deg,#cfe9ff 0%,#7fd1c7 50%,#d8f3dc 100%)" stories={SUMMER}/>
+    <div style={{borderTop:'1px solid rgba(0,0,0,0.08)'}}/>
+    <SeasonRow season="autumn" kor="가을" label="03 · AUTUMN COLLECTION" grad="linear-gradient(135deg,#f6e0b5 0%,#f4a261 55%,#e76f51 100%)" stories={AUTUMN}/>
+    <div style={{borderTop:'1px solid rgba(0,0,0,0.08)'}}/>
+    <SeasonRow season="winter" kor="겨울" label="04 · WINTER COLLECTION" grad="linear-gradient(135deg,#f4f4f7 0%,#dbe7ff 60%,#3a4a7d 100%)" stories={WINTER}/>
+    <ResearchSection/>
+    <Footer/>
+  </>
+);
+</script>
+</body>
+</html>

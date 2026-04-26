@@ -1,0 +1,197 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
+
+/* ====================================================
+   KStoryWorld Design Tokens — Korean four-seasons (사계절)
+   Adapted from Claude Design handoff bundle (2026-04-26)
+   ==================================================== */
+
+:root {
+  /* Canvas */
+  --canvas-light: #ffffff;
+  --canvas-dark: #010120;
+
+  /* Foreground */
+  --fg-on-light: #000000;
+  --fg-on-light-2: rgba(0, 0, 0, 0.6);
+  --fg-on-light-3: rgba(0, 0, 0, 0.4);
+  --fg-on-dark: #ffffff;
+  --fg-on-dark-2: rgba(255, 255, 255, 0.7);
+  --fg-on-dark-3: rgba(255, 255, 255, 0.5);
+
+  /* Border */
+  --border-light: rgba(0, 0, 0, 0.08);
+  --border-dark: rgba(255, 255, 255, 0.12);
+
+  /* Glass */
+  --glass-light: rgba(255, 255, 255, 0.72);
+  --glass-dark: rgba(255, 255, 255, 0.12);
+
+  /* Brand accents */
+  --brand-magenta: #ef2cc1;
+  --brand-orange: #fc4c02;
+  --brand-lavender: #bdbbff;
+
+  /* Seasons — 봄 Spring */
+  --spring-1: #ffd6e0;
+  --spring-2: #ffb7a0;
+  --spring-3: #bdbbff;
+  --spring-ink: #c2185b;
+  --spring-grad: linear-gradient(135deg, #ffd6e0 0%, #ffb7a0 50%, #bdbbff 100%);
+
+  /* 여름 Summer */
+  --summer-1: #cfe9ff;
+  --summer-2: #7fd1c7;
+  --summer-3: #d8f3dc;
+  --summer-ink: #1e6f6a;
+  --summer-grad: linear-gradient(135deg, #cfe9ff 0%, #7fd1c7 50%, #d8f3dc 100%);
+
+  /* 가을 Autumn */
+  --autumn-1: #f6e0b5;
+  --autumn-2: #f4a261;
+  --autumn-3: #e76f51;
+  --autumn-ink: #8a3a1a;
+  --autumn-grad: linear-gradient(135deg, #f6e0b5 0%, #f4a261 55%, #e76f51 100%);
+
+  /* 겨울 Winter (default) */
+  --winter-1: #f4f4f7;
+  --winter-2: #dbe7ff;
+  --winter-3: #3a4a7d;
+  --winter-ink: #1c2750;
+  --winter-grad: linear-gradient(135deg, #f4f4f7 0%, #dbe7ff 60%, #3a4a7d 100%);
+
+  /* Active season (default winter) */
+  --season-grad: var(--winter-grad);
+  --season-accent: #3a4a7d;
+  --season-ink: #1c2750;
+
+  /* Shadow */
+  --shadow-1: 0 4px 10px rgba(1, 1, 32, 0.10);
+  --shadow-2: 0 8px 24px rgba(1, 1, 32, 0.16);
+
+  /* Radius */
+  --radius-sharp: 4px;
+  --radius-card: 8px;
+
+  /* Type */
+  --font-display: 'Space Grotesk', 'Pretendard', 'Noto Sans KR', system-ui, sans-serif;
+  --font-body: 'Space Grotesk', 'Pretendard', 'Noto Sans KR', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'D2 Coding', ui-monospace, monospace;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur: 240ms;
+
+  /* Layout */
+  --container-max: 1240px;
+  --gutter: 32px;
+  --header-h: 72px;
+}
+
+[data-season="spring"] { --season-grad: var(--spring-grad); --season-accent: #ffb7a0; --season-ink: var(--spring-ink); }
+[data-season="summer"] { --season-grad: var(--summer-grad); --season-accent: #7fd1c7; --season-ink: var(--summer-ink); }
+[data-season="autumn"] { --season-grad: var(--autumn-grad); --season-accent: #f4a261; --season-ink: var(--autumn-ink); }
+[data-season="winter"] { --season-grad: var(--winter-grad); --season-accent: #3a4a7d; --season-ink: var(--winter-ink); }
+
+/* CJK locale tweaks: avoid negative tracking on display type */
+:lang(ko) .t-display, :lang(ko) h1, :lang(ko) h2 { letter-spacing: 0; line-height: 1.30; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--canvas-light);
+  color: var(--fg-on-light);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.30;
+  letter-spacing: -0.16px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body[data-dark="true"] {
+  background: var(--canvas-dark);
+  color: var(--fg-on-dark);
+}
+
+/* ===================== Type ===================== */
+.t-display { font-family: var(--font-display); font-size: 64px; font-weight: 500; line-height: 1.05; letter-spacing: -1.92px; }
+.t-h1 { font-family: var(--font-display); font-size: 48px; font-weight: 500; line-height: 1.10; letter-spacing: -1.20px; }
+.t-h2 { font-family: var(--font-display); font-size: 40px; font-weight: 500; line-height: 1.20; letter-spacing: -0.80px; }
+.t-h3 { font-family: var(--font-display); font-size: 28px; font-weight: 500; line-height: 1.15; letter-spacing: -0.42px; }
+.t-h4 { font-family: var(--font-display); font-size: 22px; font-weight: 500; line-height: 1.15; letter-spacing: -0.22px; }
+.t-body-l { font-size: 18px; line-height: 1.45; letter-spacing: -0.18px; }
+.t-body { font-size: 16px; line-height: 1.30; letter-spacing: -0.16px; }
+.t-caption { font-size: 14px; line-height: 1.40; letter-spacing: -0.07px; }
+.t-mono { font-family: var(--font-mono); font-size: 16px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08px; line-height: 1; }
+.t-mono-sm { font-family: var(--font-mono); font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.55px; line-height: 1; }
+.t-mono-xs { font-family: var(--font-mono); font-size: 10px; font-weight: 400; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.4; }
+
+/* ===================== Buttons ===================== */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-display);
+  font-size: 16px; font-weight: 500;
+  letter-spacing: -0.16px;
+  border-radius: var(--radius-sharp);
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: background var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out), transform var(--dur) var(--ease-out);
+  border: 1px solid transparent;
+  text-decoration: none;
+}
+.btn-dark { background: var(--canvas-dark); color: var(--fg-on-dark); }
+.btn-dark:hover { background: #14143a; }
+.btn-outline { background: transparent; color: var(--fg-on-light); border-color: var(--border-light); }
+.btn-outline:hover { background: rgba(0,0,0,0.04); }
+
+body[data-dark="true"] .btn-dark { background: #fff; color: var(--canvas-dark); }
+body[data-dark="true"] .btn-outline { color: #fff; border-color: rgba(255,255,255,0.18); }
+
+/* ===================== Badge ===================== */
+.badge {
+  display: inline-flex; align-items: center;
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.55px;
+  padding: 2px 8px;
+  background: rgba(0,0,0,0.04);
+  color: var(--fg-on-light);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sharp);
+}
+body[data-dark="true"] .badge {
+  background: rgba(255,255,255,0.08);
+  color: var(--fg-on-dark);
+  border-color: var(--border-dark);
+}
+
+/* ===================== Card ===================== */
+.ksw-card {
+  background: var(--canvas-light);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-1);
+  transition: box-shadow var(--dur) var(--ease-out), transform var(--dur) var(--ease-out);
+  overflow: hidden;
+}
+.ksw-card:hover { box-shadow: var(--shadow-2); transform: translateY(-3px); }
+body[data-dark="true"] .ksw-card { background: #0a0a2e; border-color: rgba(255,255,255,0.10); color: #fff; }
+
+/* Hero blooms (background blurred ovals) */
+.bloom { position: absolute; border-radius: 50%; pointer-events: none; }
+
+/* Container utility */
+.ksw-container { max-width: var(--container-max); margin: 0 auto; padding: 0 var(--gutter); }
+
+/* Scrollbars */
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.18); border-radius: 4px; }
+body[data-dark="true"] *::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.18); }
+
+input::placeholder { color: rgba(0,0,0,0.4); }
+body[data-dark="true"] input::placeholder { color: rgba(255,255,255,0.4); }
+
+/* Fade animation */
+@keyframes ksw-fade-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.ksw-fade-in { animation: ksw-fade-in 600ms var(--ease-out) both; }

@@ -1,0 +1,259 @@
+/* =========================================================
+   KStoryWorld Design Tokens
+   Inspired by Together AI · Korean four-seasons (사계절)
+   ========================================================= */
+
+/* ---------- Fonts (substituted; see README) ---------- */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Pretendard:wght@400;500;600&display=swap');
+
+/* If you have the real fonts, drop them in /fonts and uncomment:
+@font-face { font-family: 'The Future'; src: url('./fonts/TheFuture-Regular.woff2') format('woff2'); font-weight: 400; }
+@font-face { font-family: 'The Future'; src: url('./fonts/TheFuture-Medium.woff2') format('woff2'); font-weight: 500; }
+@font-face { font-family: 'PP Neue Montreal Mono'; src: url('./fonts/PPNeueMontrealMono-Medium.woff2') format('woff2'); font-weight: 500; }
+*/
+
+:root {
+  /* ============ CANVAS ============ */
+  --canvas-light: #ffffff;
+  --canvas-dark: #010120;          /* Midnight blue. Never gray-black. */
+
+  /* ============ FOREGROUND ============ */
+  --fg-on-light: #000000;
+  --fg-on-light-2: rgba(0, 0, 0, 0.6);
+  --fg-on-light-3: rgba(0, 0, 0, 0.4);
+  --fg-on-dark: #ffffff;
+  --fg-on-dark-2: rgba(255, 255, 255, 0.7);
+  --fg-on-dark-3: rgba(255, 255, 255, 0.5);
+
+  /* ============ BORDER ============ */
+  --border-light: rgba(0, 0, 0, 0.08);
+  --border-dark: rgba(255, 255, 255, 0.12);
+
+  /* ============ GLASS ============ */
+  --glass-light: rgba(255, 255, 255, 0.72);
+  --glass-dark: rgba(255, 255, 255, 0.12);
+  --glass-tint: rgba(0, 0, 0, 0.08);
+
+  /* ============ BRAND ACCENTS (illustration only) ============ */
+  --brand-magenta: #ef2cc1;
+  --brand-orange: #fc4c02;
+  --brand-lavender: #bdbbff;
+
+  /* ============ SEASONS — 사계절 ============ */
+  /* 봄 — Spring (cherry-blossom, soft peach, lavender) */
+  --spring-1: #ffd6e0;   /* cherry blossom */
+  --spring-2: #ffb7a0;   /* soft peach */
+  --spring-3: #bdbbff;   /* lavender */
+  --spring-ink: #c2185b; /* dark text accent (for tags only) */
+  --spring-grad: linear-gradient(135deg, #ffd6e0 0%, #ffb7a0 50%, #bdbbff 100%);
+
+  /* 여름 — Summer (pale sky, ocean teal, mint) */
+  --summer-1: #cfe9ff;
+  --summer-2: #7fd1c7;
+  --summer-3: #d8f3dc;
+  --summer-ink: #1e6f6a;
+  --summer-grad: linear-gradient(135deg, #cfe9ff 0%, #7fd1c7 50%, #d8f3dc 100%);
+
+  /* 가을 — Autumn (persimmon, maple, straw) */
+  --autumn-1: #f6e0b5;
+  --autumn-2: #f4a261;
+  --autumn-3: #e76f51;
+  --autumn-ink: #8a3a1a;
+  --autumn-grad: linear-gradient(135deg, #f6e0b5 0%, #f4a261 55%, #e76f51 100%);
+
+  /* 겨울 — Winter (snow blue, ink indigo, bone) */
+  --winter-1: #f4f4f7;
+  --winter-2: #dbe7ff;
+  --winter-3: #3a4a7d;
+  --winter-ink: #1c2750;
+  --winter-grad: linear-gradient(135deg, #f4f4f7 0%, #dbe7ff 60%, #3a4a7d 100%);
+
+  /* ============ SHADOW ============ */
+  --shadow-1: 0 4px 10px rgba(1, 1, 32, 0.10);
+  --shadow-2: 0 8px 24px rgba(1, 1, 32, 0.16);
+
+  /* ============ RADIUS ============ */
+  --radius-sharp: 4px;     /* buttons, badges, tags, inputs */
+  --radius-card: 8px;      /* cards, modals */
+  --radius-flat: 0px;
+
+  /* ============ SPACING (8px base) ============ */
+  --sp-1: 1px;  --sp-2: 2px;   --sp-4: 4px;   --sp-8: 8px;
+  --sp-12: 12px; --sp-16: 16px; --sp-20: 20px; --sp-24: 24px;
+  --sp-32: 32px; --sp-44: 44px; --sp-48: 48px; --sp-80: 80px;
+  --sp-100: 100px; --sp-120: 120px;
+
+  /* ============ TYPE FAMILIES ============ */
+  --font-display: 'Space Grotesk', 'The Future', 'Pretendard', 'Noto Sans JP', 'Noto Sans SC', 'Noto Sans TC', system-ui, sans-serif;
+  --font-body: 'Space Grotesk', 'The Future', 'Pretendard', 'Noto Sans JP', 'Noto Sans SC', 'Noto Sans TC', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'PP Neue Montreal Mono', 'D2 Coding', ui-monospace, monospace;
+
+  /* ============ MOTION ============ */
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-fast: 120ms;
+  --dur: 240ms;
+  --dur-slow: 320ms;
+
+  /* ============ LAYOUT ============ */
+  --container-max: 1240px;
+  --gutter: 32px;
+  --header-h: 64px;
+}
+
+/* ===================== i18n / LOCALE FONT STACKS ===================== */
+:lang(ko) { font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Space Grotesk', system-ui, sans-serif; }
+:lang(ja) { font-family: 'Inter', 'Noto Sans JP', 'Hiragino Sans', system-ui, sans-serif; }
+:lang(zh-Hans), :lang(zh-CN) { font-family: 'Inter', 'Noto Sans SC', 'PingFang SC', system-ui, sans-serif; }
+:lang(zh-Hant), :lang(zh-TW) { font-family: 'Inter', 'Noto Sans TC', 'PingFang TC', system-ui, sans-serif; }
+:lang(vi) { font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif; line-height: 1.45; }
+
+/* CJK should never use the negative-tracking optimised for Latin display */
+:lang(ko) .t-display, :lang(ja) .t-display, :lang(zh-Hans) .t-display, :lang(zh-Hant) .t-display,
+:lang(ko) h1, :lang(ja) h1, :lang(zh-Hans) h1, :lang(zh-Hant) h1,
+:lang(ko) h2, :lang(ja) h2, :lang(zh-Hans) h2, :lang(zh-Hant) h2 {
+  letter-spacing: 0;
+  line-height: 1.30;
+}
+
+/* ===================== BASE ===================== */
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--canvas-light);
+  color: var(--fg-on-light);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.30;
+  letter-spacing: -0.16px;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ===================== SEMANTIC TYPE ===================== */
+.t-display, h1.display {
+  font-family: var(--font-display);
+  font-size: 64px;
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -1.92px;
+}
+.t-h1, h1 {
+  font-family: var(--font-display);
+  font-size: 48px; font-weight: 500;
+  line-height: 1.10; letter-spacing: -1.20px;
+}
+.t-h2, h2 {
+  font-family: var(--font-display);
+  font-size: 40px; font-weight: 500;
+  line-height: 1.20; letter-spacing: -0.80px;
+}
+.t-h3, h3 {
+  font-family: var(--font-display);
+  font-size: 28px; font-weight: 500;
+  line-height: 1.15; letter-spacing: -0.42px;
+}
+.t-h4, h4 {
+  font-family: var(--font-display);
+  font-size: 22px; font-weight: 500;
+  line-height: 1.15; letter-spacing: -0.22px;
+}
+.t-body-l {
+  font-size: 18px; font-weight: 400;
+  line-height: 1.30; letter-spacing: -0.18px;
+}
+.t-body, p {
+  font-size: 16px; font-weight: 400;
+  line-height: 1.30; letter-spacing: -0.16px;
+}
+.t-caption, small {
+  font-size: 14px; font-weight: 400;
+  line-height: 1.40; letter-spacing: -0.07px;
+}
+
+/* mono labels — always uppercase, always positive tracking */
+.t-mono {
+  font-family: var(--font-mono);
+  font-size: 16px; font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08px;
+  line-height: 1.0;
+}
+.t-mono-sm {
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.55px;
+  line-height: 1.0;
+}
+.t-mono-xs {
+  font-family: var(--font-mono);
+  font-size: 10px; font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1.4;
+}
+
+/* ===================== BUTTONS ===================== */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: var(--font-display);
+  font-size: 16px; font-weight: 500;
+  letter-spacing: -0.16px;
+  border-radius: var(--radius-sharp);
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: background var(--dur) var(--ease-out), box-shadow var(--dur) var(--ease-out), transform var(--dur) var(--ease-out);
+  border: 1px solid transparent;
+  text-decoration: none;
+}
+.btn-dark {
+  background: var(--canvas-dark);
+  color: var(--fg-on-dark);
+}
+.btn-dark:hover { background: #14143a; }
+.btn-outline {
+  background: transparent;
+  color: var(--fg-on-light);
+  border-color: var(--border-light);
+}
+.btn-outline:hover { background: rgba(0,0,0,0.04); }
+.btn-glass {
+  background: var(--glass-dark);
+  color: var(--fg-on-dark);
+  backdrop-filter: blur(12px);
+}
+.btn-glass:hover { background: rgba(255,255,255,0.20); }
+
+/* ===================== BADGE ===================== */
+.badge {
+  display: inline-flex; align-items: center;
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.55px;
+  padding: 2px 8px;
+  background: rgba(0,0,0,0.04);
+  color: var(--fg-on-light);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sharp);
+}
+.badge-dark {
+  background: rgba(255,255,255,0.12);
+  color: var(--fg-on-dark);
+  border-color: var(--border-dark);
+}
+
+/* ===================== CARD ===================== */
+.card {
+  background: var(--canvas-light);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-1);
+  padding: 24px;
+  transition: box-shadow var(--dur) var(--ease-out), transform var(--dur) var(--ease-out);
+}
+.card:hover { box-shadow: var(--shadow-2); transform: translateY(-2px); }
+.card-dark {
+  background: var(--canvas-dark);
+  color: var(--fg-on-dark);
+  border-color: var(--border-dark);
+}

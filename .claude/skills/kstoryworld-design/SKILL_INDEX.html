@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>KStoryWorld · Design Skill</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+KR:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --ink: #010120; --paper: #fff; --muted: rgba(1,1,32,0.55); --line: rgba(1,1,32,0.1);
+    --display: 'Space Grotesk', 'Noto Sans KR', system-ui, sans-serif;
+    --mono: 'JetBrains Mono', 'Noto Sans KR', monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:#fafafa;font-family:var(--display);color:var(--ink);line-height:1.55}
+  :lang(ko),[lang=ko]{font-family:'Noto Sans KR','Pretendard',var(--display)}
+  .wrap{max-width:920px;margin:0 auto;padding:48px 28px 96px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 12px}
+  h1{font-size:48px;font-weight:600;letter-spacing:-1.44px;line-height:1.05;margin:0}
+  h1 .ko{display:block;font-size:24px;font-weight:500;color:var(--muted);margin-top:6px;letter-spacing:-.6px}
+  .lede{font-size:17px;color:rgba(1,1,32,.78);max-width:620px;margin:18px 0 36px;line-height:1.6}
+  .blooms{position:relative;height:140px;margin:32px 0;border-radius:12px;overflow:hidden;background:#fff;border:1px solid var(--line)}
+  .b{position:absolute;border-radius:50%;filter:blur(40px);opacity:.85}
+  .b1{width:200px;height:200px;background:#ffd6e0;left:-30px;top:-50px}
+  .b2{width:180px;height:180px;background:#7fd1c7;left:30%;top:-20px}
+  .b3{width:200px;height:200px;background:#f4a261;right:25%;top:-30px}
+  .b4{width:200px;height:200px;background:#3a4a7d;right:-30px;top:0;opacity:.5}
+  .blooms .label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:24px;font-size:32px;font-weight:500;letter-spacing:-.5px}
+  .blooms .label span{padding:6px 14px;background:rgba(255,255,255,.7);backdrop-filter:blur(8px);border-radius:6px}
+
+  h2{font-size:22px;margin:48px 0 14px;font-weight:600;letter-spacing:-.44px;padding-top:24px;border-top:1px solid var(--line)}
+  .files{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;margin-top:14px}
+  .file{padding:14px 16px;background:#fff;border:1px solid var(--line);border-radius:8px;display:flex;flex-direction:column;gap:4px}
+  .file .name{font-family:var(--mono);font-size:12px;letter-spacing:.02em;color:var(--ink)}
+  .file .desc{font-size:13px;color:var(--muted);line-height:1.4}
+  ol.steps{padding-left:0;list-style:none;counter-reset:step;display:grid;gap:14px;margin-top:14px}
+  ol.steps li{counter-increment:step;padding:16px 18px 16px 56px;background:#fff;border:1px solid var(--line);border-radius:8px;position:relative;font-size:14.5px;line-height:1.6}
+  ol.steps li::before{content:counter(step);position:absolute;left:16px;top:14px;width:28px;height:28px;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px}
+  ol.steps li b{font-weight:600}
+  code{font-family:var(--mono);font-size:.86em;background:rgba(1,1,32,.06);padding:1px 6px;border-radius:3px}
+  .meta{margin-top:28px;display:flex;gap:10px;flex-wrap:wrap}
+  .pill{font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;padding:6px 10px;border:1px solid var(--line);border-radius:4px;color:var(--muted);background:#fff}
+  .frontmatter{background:var(--ink);color:#fff;padding:20px 24px;border-radius:8px;font-family:var(--mono);font-size:12.5px;line-height:1.7;overflow-x:auto;margin-top:14px;white-space:pre}
+  a.btn{display:inline-flex;gap:8px;align-items:center;padding:10px 16px;background:var(--ink);color:#fff;text-decoration:none;border-radius:4px;font-size:14px;letter-spacing:-.14px}
+  a.btn.outline{background:#fff;color:var(--ink);border:1px solid var(--line)}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+  @media(max-width:600px){h1{font-size:34px;letter-spacing:-1.02px}.blooms{height:100px}.blooms .label{font-size:22px;gap:10px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <p class="eyebrow">SKILL · v1 · APRIL 2026</p>
+  <h1>kstoryworld-design <span class="ko" lang="ko">스킬</span></h1>
+  <p class="lede">A reusable design skill for the KStoryWorld brand. It teaches an agent how to design slides, marketing pages, reader-app screens, and prototypes that match the system — Korean four-seasons palette, sharp typography, multilingual-first layouts.</p>
+
+  <div class="meta">
+    <span class="pill">user-invocable</span>
+    <span class="pill">multilingual</span>
+    <span class="pill">design system</span>
+    <span class="pill">8 locales</span>
+  </div>
+
+  <div class="blooms">
+    <div class="b b1"></div><div class="b b2"></div><div class="b b3"></div><div class="b b4"></div>
+    <div class="label" lang="ko"><span>봄</span><span>여름</span><span>가을</span><span>겨울</span></div>
+  </div>
+
+  <h2>Frontmatter</h2>
+  <div class="frontmatter">---
+name: kstoryworld-design
+description: KStoryWorld design system skill —
+  Korean four-seasons palette, sharp typography,
+  multilingual-first (ko · en · ja · zh · es · fr · vi).
+user-invocable: true
+---</div>
+
+  <h2>How an agent uses this skill</h2>
+  <ol class="steps">
+    <li><b>Orient.</b> Read <code>README.html</code> (or <code>README.md</code>) — voice, color, type, multilingual rules.</li>
+    <li><b>Pick a season.</b> Ask the user or infer from content: 봄 · 여름 · 가을 · 겨울. Use the matching <code>--*-grad</code> CSS variable.</li>
+    <li><b>Pick output mode.</b> For prototypes/mocks, link <code>colors_and_type.css</code> + reuse components in <code>ui_kits/</code>. For production code, lift the tokens.</li>
+    <li><b>Set the locale.</b> Wire <code>&lt;html lang=…&gt;</code>. Never strip hangul on cultural concepts (정, 한, p'ansori).</li>
+    <li><b>Voice check.</b> Editorial, atmospheric, sentence-case headlines, mono ALL-CAPS labels (Latin only), no emoji in product UI.</li>
+    <li><b>Verify.</b> Radii are 4 / 8 / 0. One shadow only. Mobile breakpoint at 768px. No tofu boxes for any locale.</li>
+  </ol>
+
+  <h2>What ships in this skill</h2>
+  <div class="files">
+    <div class="file"><span class="name">SKILL.md</span><span class="desc">Frontmatter + agent instructions</span></div>
+    <div class="file"><span class="name">README.html / .md</span><span class="desc">The source of truth</span></div>
+    <div class="file"><span class="name">colors_and_type.css</span><span class="desc">Tokens, vars, @font-face, :lang() stacks</span></div>
+    <div class="file"><span class="name">fonts/</span><span class="desc">Space Grotesk + JetBrains Mono fallbacks</span></div>
+    <div class="file"><span class="name">assets/</span><span class="desc">Logo, 4 hangul marks, cloud illustration</span></div>
+    <div class="file"><span class="name">preview/</span><span class="desc">19 design-system specimens</span></div>
+    <div class="file"><span class="name">ui_kits/marketing/</span><span class="desc">Homepage + responsive showcase</span></div>
+    <div class="file"><span class="name">ui_kits/app/</span><span class="desc">Reader app: discover + reader</span></div>
+    <div class="file"><span class="name">slides/</span><span class="desc">6 deck templates · 1280×720</span></div>
+  </div>
+
+  <h2>Get the skill</h2>
+  <p style="font-size:14.5px;color:var(--muted);max-width:620px">Download the whole project as a zip. Drop the folder into your <code>~/.claude/skills/</code> (or whatever your skills directory is) and the agent will be able to invoke it as <code>kstoryworld-design</code>.</p>
+  <div class="row">
+    <a class="btn" href="SKILL.md" target="_blank">Open SKILL.md →</a>
+    <a class="btn outline" href="README.html" target="_blank">Read the README →</a>
+  </div>
+</main>
+</body>
+</html>

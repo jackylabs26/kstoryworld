@@ -1,0 +1,19 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="../colors_and_type.css">
+<style>body{padding:24px;background:#fff} .row{display:flex;gap:12px;align-items:flex-end}
+.sw{display:flex;flex-direction:column;gap:6px}
+.chip{width:96px;height:84px;border-radius:8px;border:1px solid var(--border-light)}
+.lbl{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:rgba(0,0,0,0.6)}
+.hex{font-family:var(--font-mono);font-size:11px;color:#000}
+h4{margin:0 0 14px 0;font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.55px;font-weight:500}
+</style></head><body>
+<h4>Canvas · Foreground · Border</h4>
+<div class="row">
+  <div class="sw"><div class="chip" style="background:#fff"></div><div class="lbl">canvas-light</div><div class="hex">#FFFFFF</div></div>
+  <div class="sw"><div class="chip" style="background:#010120"></div><div class="lbl">canvas-dark</div><div class="hex">#010120</div></div>
+  <div class="sw"><div class="chip" style="background:#000"></div><div class="lbl">fg-on-light</div><div class="hex">#000000</div></div>
+  <div class="sw"><div class="chip" style="background:rgba(0,0,0,0.6)"></div><div class="lbl">fg-on-light-2</div><div class="hex">000 / 60</div></div>
+  <div class="sw"><div class="chip" style="background:rgba(0,0,0,0.4)"></div><div class="lbl">fg-on-light-3</div><div class="hex">000 / 40</div></div>
+  <div class="sw"><div class="chip" style="background:#fff;border:1px solid rgba(0,0,0,0.08)"></div><div class="lbl">border-light</div><div class="hex">000 / 8</div></div>
+  <div class="sw"><div class="chip" style="background:#010120;border:1px solid rgba(255,255,255,0.12)"></div><div class="lbl">border-dark</div><div class="hex">FFF / 12</div></div>
+</div>
+</body></html>

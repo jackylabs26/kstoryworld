@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>KStoryWorld · Responsive showcase</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="../../colors_and_type.css">
+<style>
+  body { background:#f4f4f7; margin:0; font-family: var(--font-display); }
+  .stage { padding: 32px; }
+  .toolbar { display:flex; gap:8px; align-items:center; padding: 14px 24px; background:#fff; border-bottom:1px solid rgba(0,0,0,0.08); position:sticky; top:0; z-index:20; }
+  .toolbar h1 { margin:0 16px 0 0; font-size:16px; font-weight:500; letter-spacing:-0.16px }
+  .seg { display:flex; border:1px solid rgba(0,0,0,0.08); border-radius:4px; overflow:hidden }
+  .seg button { font-family: var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.55px; padding:8px 14px; border:0; background:#fff; color:#000; cursor:pointer }
+  .seg button.active { background:#010120; color:#fff }
+  .canvas { display:flex; gap:48px; align-items:flex-start; justify-content:center; padding:48px 24px 80px; flex-wrap:wrap }
+  .frame-label { font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.55px; color:rgba(0,0,0,0.6); margin-bottom:12px; text-align:center }
+  /* Desktop browser frame (lightweight) */
+  .browser { width:1240px; max-width:90vw; background:#fff; border-radius:10px; overflow:hidden; box-shadow:0 12px 40px rgba(1,1,32,0.18); border:1px solid rgba(0,0,0,0.08) }
+  .browser .chrome { display:flex; align-items:center; gap:8px; padding:10px 12px; background:#f4f4f7; border-bottom:1px solid rgba(0,0,0,0.08) }
+  .dot { width:11px; height:11px; border-radius:50% }
+  .url { flex:1; margin-left:14px; padding:6px 12px; background:#fff; border:1px solid rgba(0,0,0,0.08); border-radius:4px; font-family:var(--font-mono); font-size:11px; letter-spacing:0.3px; color:rgba(0,0,0,0.65); text-transform:none }
+  .browser iframe { width:100%; height:760px; border:0; display:block; background:#fff }
+  /* Phone frame */
+  .phone { width:390px; height:780px; background:#010120; border-radius:48px; padding:14px; box-shadow:0 18px 50px rgba(1,1,32,0.28) }
+  .phone-screen { width:100%; height:100%; border-radius:36px; overflow:hidden; background:#fff; position:relative }
+  .notch { position:absolute; top:8px; left:50%; transform:translateX(-50%); width:110px; height:30px; background:#010120; border-radius:18px; z-index:5 }
+  .phone iframe { width:100%; height:100%; border:0; display:block; background:#fff }
+  .scale-note { font-family:var(--font-mono); font-size:10px; letter-spacing:0.5px; color:rgba(0,0,0,0.5); text-align:center; margin-top:10px }
+  @media (max-width: 900px) {
+    .canvas { gap:32px; padding:24px 12px }
+    .browser { width:100%; max-width:none }
+    .browser iframe { height:560px }
+  }
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <h1>KStoryWorld · 홈페이지 반응형 미리보기</h1>
+  <div class="seg" id="seg">
+    <button data-v="both" class="active">Both</button>
+    <button data-v="desk">Desktop</button>
+    <button data-v="mob">Mobile</button>
+  </div>
+  <span class="t-mono-sm" style="color:rgba(0,0,0,0.5);margin-left:auto">데스크탑 1280 · 모바일 390</span>
+</div>
+
+<div class="canvas" id="canvas">
+  <div data-pane="desk">
+    <div class="frame-label">DESKTOP · 1280 × 800</div>
+    <div class="browser">
+      <div class="chrome">
+        <div class="dot" style="background:#ff5f57"></div>
+        <div class="dot" style="background:#ffbd2e"></div>
+        <div class="dot" style="background:#28c840"></div>
+        <div class="url">kstoryworld.com</div>
+      </div>
+      <iframe src="../../ui_kits/marketing/index.html" title="Desktop"></iframe>
+    </div>
+  </div>
+
+  <div data-pane="mob">
+    <div class="frame-label">MOBILE · iPhone 14 Pro · 390 × 752</div>
+    <div class="phone">
+      <div class="phone-screen">
+        <div class="notch"></div>
+        <iframe src="../../ui_kits/marketing/index.html" title="Mobile"></iframe>
+      </div>
+    </div>
+    <div class="scale-note">사파리/크롬 모바일 너비로 자동 적응</div>
+  </div>
+</div>
+
+<script>
+  const seg = document.getElementById('seg');
+  const panes = document.querySelectorAll('[data-pane]');
+  seg.addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if (!b) return;
+    seg.querySelectorAll('button').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    const v = b.dataset.v;
+    panes.forEach(p => {
+      if (v === 'both') p.style.display = '';
+      else p.style.display = (p.dataset.pane === v) ? '' : 'none';
+    });
+  });
+</script>
+</body>
+</html>
