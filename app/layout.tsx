@@ -24,6 +24,11 @@ export const metadata: Metadata = {
     '한국 드라마',
     'K-드라마 리뷰',
   ],
+  alternates: {
+    types: {
+      'application/rss+xml': '/feed.xml',
+    },
+  },
   openGraph: {
     title: 'KStoryWorld — K-Drama Reviews & Guides',
     description: 'Your ultimate destination for K-Drama reviews, guides, and recommendations.',
@@ -31,6 +36,11 @@ export const metadata: Metadata = {
     siteName: 'KStoryWorld',
     locale: 'ko_KR',
     type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'KStoryWorld — K-Drama Reviews & Guides',
+    description: 'Your ultimate destination for K-Drama reviews, guides, and recommendations.',
   },
 };
 

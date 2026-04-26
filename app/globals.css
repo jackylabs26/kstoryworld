@@ -195,3 +195,22 @@ body[data-dark="true"] input::placeholder { color: rgba(255,255,255,0.4); }
 /* Fade animation */
 @keyframes ksw-fade-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 .ksw-fade-in { animation: ksw-fade-in 600ms var(--ease-out) both; }
+
+/* ===================== Review article body ===================== */
+.review-body { line-height: 1.70; font-size: 17px; letter-spacing: -0.16px; }
+.review-body h1 { font-family: var(--font-display); font-size: clamp(24px, 3vw, 36px); font-weight: 500; letter-spacing: -0.6px; line-height: 1.15; margin: 48px 0 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border-light); }
+.review-body h2 { font-family: var(--font-display); font-size: clamp(20px, 2.5vw, 28px); font-weight: 500; letter-spacing: -0.4px; line-height: 1.2; margin: 40px 0 14px; color: var(--season-ink); }
+.review-body h3 { font-family: var(--font-display); font-size: 20px; font-weight: 500; letter-spacing: -0.2px; margin: 32px 0 10px; }
+.review-body p { margin: 0 0 18px; }
+.review-body img { max-width: 100%; height: auto; border-radius: var(--radius-card); margin: 28px 0; box-shadow: var(--shadow-1); }
+.review-body ul, .review-body ol { margin: 0 0 18px; padding-left: 24px; }
+.review-body li { margin-bottom: 8px; }
+.review-body blockquote { margin: 28px 0; padding: 18px 24px; border-left: 3px solid var(--season-accent); background: rgba(0,0,0,0.02); border-radius: 0 var(--radius-card) var(--radius-card) 0; font-style: italic; }
+.review-body a { color: var(--season-ink); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color var(--dur) var(--ease-out); }
+.review-body a:hover { border-bottom-color: var(--season-ink); }
+.review-body .meta { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(0,0,0,0.45); margin-bottom: 32px; }
+
+body[data-dark="true"] .review-body h1 { border-bottom-color: var(--border-dark); }
+body[data-dark="true"] .review-body h2 { color: var(--season-accent); }
+body[data-dark="true"] .review-body blockquote { background: rgba(255,255,255,0.03); }
+body[data-dark="true"] .review-body .meta { color: rgba(255,255,255,0.4); }

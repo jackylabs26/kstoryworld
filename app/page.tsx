@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
+import { AdSlot } from '@/components/ksw/ad-slot';
 import { CollectionGrid, type CollectionItem } from '@/components/ksw/collection-grid';
 import { HeroBold } from '@/components/ksw/hero-bold';
+import { HeroSwitch } from '@/components/ksw/hero-switch';
 import { NewsletterCTA } from '@/components/ksw/newsletter';
 import { SeasonCarousel } from '@/components/ksw/season-carousel';
 import { StatsBand } from '@/components/ksw/stats-band';
@@ -17,7 +20,6 @@ export default function HomePage() {
   const dramaCount = uniqueDramaCount();
   const totalPages = totalReviewCount();
 
-  // Build the editorial collection: prefer KO list (richer Korean copy in current corpus)
   const collectionItems: CollectionItem[] = reviews.map((r) => ({
     slug: r.slug,
     title: r.title,
@@ -29,11 +31,19 @@ export default function HomePage() {
 
   return (
     <>
-      <HeroBold />
+      <Suspense fallback={<HeroBold />}>
+        <HeroSwitch fallback="bold" />
+      </Suspense>
       <CollectionGrid items={collectionItems} />
+      <div className="ksw-container" style={{ padding: '40px 32px' }}>
+        <AdSlot variant="banner" />
+      </div>
       <StatsBand dramaCount={dramaCount} totalPages={totalPages} />
       <SeasonCarousel />
       <NewsletterCTA />
+      <div className="ksw-container" style={{ padding: '0 32px 48px' }}>
+        <AdSlot variant="banner" />
+      </div>
     </>
   );
 }
