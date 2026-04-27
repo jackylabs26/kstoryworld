@@ -49,7 +49,7 @@ export default function Navigation() {
       <div
         className="ksw-container"
         style={{
-          height: scrolled ? 56 : 72,
+          height: scrolled ? 52 : 64,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -127,7 +127,11 @@ export default function Navigation() {
               fontSize: 14,
             }}
           >
-            {dark ? '☾' : '☀'}
+            {dark ? (
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M14.3 10.5A6.5 6.5 0 015.5 1.7a7 7 0 108.8 8.8z" fill="currentColor"/></svg>
+            ) : (
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3.5" fill="currentColor"/><path d="M8 0v2m0 12v2m8-8h-2M2 8H0m13.66-5.66L12.24 3.76M3.76 12.24l-1.42 1.42m11.32 0l-1.42-1.42M3.76 3.76L2.34 2.34" stroke="currentColor" strokeWidth="1.2"/></svg>
+            )}
           </button>
           <Link
             href="/reviews"
