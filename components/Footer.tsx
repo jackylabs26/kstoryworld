@@ -11,17 +11,24 @@ export default function Footer() {
   const cols = [
     {
       h: lang === 'ko' ? '카테고리' : 'Categories',
-      l: lang === 'ko'
+      links: (lang === 'ko'
         ? ['K-드라마', 'K-팝', 'K-푸드', 'K-뷰티', 'K-문학']
-        : ['K-Drama', 'K-Pop', 'K-Food', 'K-Beauty', 'K-Literature'],
+        : ['K-Drama', 'K-Pop', 'K-Food', 'K-Beauty', 'K-Literature']
+      ).map((x) => ({ label: x, href: '/reviews/' })),
     },
     {
       h: lang === 'ko' ? '회사' : 'Company',
-      l: lang === 'ko' ? ['소개', '팀', '채용', '보도자료'] : ['About', 'Team', 'Careers', 'Press'],
+      links: [
+        { label: lang === 'ko' ? '소개' : 'About', href: '/about/' },
+        { label: lang === 'ko' ? '문의' : 'Contact', href: 'mailto:hello@kstoryworld.com' },
+      ],
     },
     {
-      h: lang === 'ko' ? '지원' : 'Support',
-      l: lang === 'ko' ? ['문의', '파트너십', '이용약관', '개인정보'] : ['Contact', 'Partners', 'Terms', 'Privacy'],
+      h: lang === 'ko' ? '법적 고지' : 'Legal',
+      links: [
+        { label: lang === 'ko' ? '이용약관' : 'Terms', href: '/terms/' },
+        { label: lang === 'ko' ? '개인정보처리방침' : 'Privacy', href: '/privacy/' },
+      ],
     },
   ];
 
@@ -78,13 +85,13 @@ export default function Footer() {
         {cols.map((c, i) => (
           <div key={i}>
             <div className="t-mono-sm" style={{ color: 'rgba(255,255,255,0.5)', marginBottom: 14 }}>{c.h}</div>
-            {c.l.map((x) => (
-              <div key={x} style={{ marginBottom: 8, fontSize: 14 }}>
+            {c.links.map((item) => (
+              <div key={item.label} style={{ marginBottom: 8, fontSize: 14 }}>
                 <Link
-                  href={i === 0 ? '/reviews' : '#'}
+                  href={item.href}
                   style={{ color: 'rgba(255,255,255,0.85)', textDecoration: 'none', letterSpacing: '-0.14px' }}
                 >
-                  {x}
+                  {item.label}
                 </Link>
               </div>
             ))}
@@ -124,7 +131,11 @@ export default function Footer() {
         }}
       >
         <span>© 2026 KStoryWorld · Powered by JackyLabs</span>
-        <span className="t-mono-xs">EST · 2026 · SEOUL · EDITORIAL · K-DRAMA REVIEWS</span>
+        <span style={{ display: 'flex', gap: 16 }}>
+          <Link href="/privacy/" style={{ color: 'inherit', textDecoration: 'none' }}>Privacy</Link>
+          <Link href="/terms/" style={{ color: 'inherit', textDecoration: 'none' }}>Terms</Link>
+          <Link href="/about/" style={{ color: 'inherit', textDecoration: 'none' }}>About</Link>
+        </span>
       </div>
     </footer>
   );
