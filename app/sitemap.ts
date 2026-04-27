@@ -1,6 +1,8 @@
 import type { MetadataRoute } from 'next';
 import { loadAllReviews } from '@/lib/reviews';
 
+export const dynamic = 'force-static';
+
 const BASE = 'https://kstoryworld.com';
 
 export default function sitemap(): MetadataRoute.Sitemap {

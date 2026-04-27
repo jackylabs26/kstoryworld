@@ -1,5 +1,7 @@
 import { loadAllReviews } from '@/lib/reviews';
 
+export const dynamic = 'force-static';
+
 const BASE = 'https://kstoryworld.com';
 
 export async function GET() {
