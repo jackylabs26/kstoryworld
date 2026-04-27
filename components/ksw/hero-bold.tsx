@@ -102,7 +102,7 @@ export function HeroBold() {
               </h1>
               <p style={{ marginTop: 18, fontSize: 16, color: dark ? 'rgba(255,255,255,0.72)' : 'rgba(0,0,0,0.66)', letterSpacing: '-0.16px', lineHeight: 1.5, maxWidth: 480 }}>
                 {lang === 'ko'
-                  ? 'AI가 정리한 K-드라마 한 편씩 — KStoryWorld는 매주 한국의 컨텐츠를 8개 언어의 에디토리얼로 옮깁니다.'
+                  ? '에디터가 큐레이션한 K-드라마 한 편씩 — KStoryWorld는 매주 한국의 컨텐츠를 8개 언어의 에디토리얼로 옮깁니다.'
                   : 'One K-drama at a time — KStoryWorld delivers Korean stories as editorial in eight world languages.'}
               </p>
               <div style={{ display: 'flex', gap: 10, marginTop: 24, flexWrap: 'wrap' }}>

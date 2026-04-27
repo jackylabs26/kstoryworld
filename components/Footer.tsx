@@ -124,7 +124,7 @@ export default function Footer() {
         }}
       >
         <span>© 2026 KStoryWorld · Powered by JackyLabs</span>
-        <span className="t-mono-xs">EST · 2026 · SEOUL · AI-GENERATED · K-DRAMA REVIEWS</span>
+        <span className="t-mono-xs">EST · 2026 · SEOUL · EDITORIAL · K-DRAMA REVIEWS</span>
       </div>
     </footer>
   );

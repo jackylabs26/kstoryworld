@@ -15,7 +15,7 @@ export function StatsBand({ dramaCount, totalPages }: Props) {
     { n: `${dramaCount}+`, ko: 'K-드라마 리뷰', en: 'K-Drama reviews' },
     { n: '2', ko: '서비스 언어', en: 'Languages live' },
     { n: `${totalPages}`, ko: '에디토리얼 페이지', en: 'Editorial pages' },
-    { n: 'AI', ko: '자동 생성 콘텐츠', en: 'AI-Powered' },
+    { n: '100%', ko: '오리지널 에디토리얼', en: 'Original editorial' },
   ];
 
   return (

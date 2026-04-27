@@ -49,8 +49,8 @@ export function ReviewsBoard({ items }: { items: Item[] }) {
           </h1>
           <p style={{ fontSize: 18, color: dark ? 'rgba(255,255,255,0.66)' : 'rgba(0,0,0,0.66)', maxWidth: 640, lineHeight: 1.5, letterSpacing: '-0.18px' }}>
             {lang === 'ko'
-              ? 'AI 기술로 정리한 고품질 다국어 K-드라마 가이드. 한국어와 영어로 매주 발간.'
-              : 'High-quality, AI-curated K-Drama guides — published weekly in Korean and English.'}
+              ? '에디터가 엄선한 고품질 다국어 K-드라마 가이드'
+              : 'Editor-curated K-Drama guides — high quality, in your language'}
           </p>
           <div style={{ display: 'flex', gap: 8, marginTop: 24, flexWrap: 'wrap' }}>
             {[
