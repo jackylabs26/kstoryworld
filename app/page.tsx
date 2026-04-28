@@ -27,6 +27,7 @@ export default function HomePage() {
     image: r.image,
     season: r.season,
     lang: r.lang,
+    category: r.category,
   }));
 
   return (

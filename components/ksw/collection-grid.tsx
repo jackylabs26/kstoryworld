@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { CategoryTabs } from './category-tabs';
 import { StoryCard } from './story-card';
 import { useKSWTheme, type Season } from './theme-provider';
+import { CATEGORY_LABELS, type ReviewCategory } from '@/lib/categories';
 
 export interface CollectionItem {
   slug: string;
@@ -12,6 +13,7 @@ export interface CollectionItem {
   image?: string;
   season: Season;
   lang: 'ko' | 'en';
+  category: ReviewCategory;
 }
 
 interface Props {
@@ -58,13 +60,13 @@ export function CollectionGrid({ items }: Props) {
             {visible.map((s, i) => (
               <StoryCard
                 key={s.slug + i}
-                href={`/reviews/${s.slug}`}
+                href={`/${s.category}/${s.slug}`}
                 title={s.title}
                 excerpt={s.excerpt}
                 image={s.image}
                 num={String(i + 1).padStart(2, '0')}
                 season={s.season}
-                category="K-Drama"
+                category={CATEGORY_LABELS[s.category].en}
               />
             ))}
           </div>

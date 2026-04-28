@@ -1,6 +1,10 @@
 import fs from 'fs';
 import path from 'path';
 
+export { REVIEW_CATEGORIES, CATEGORY_LABELS, isReviewCategory } from './categories';
+export type { ReviewCategory } from './categories';
+import { REVIEW_CATEGORIES, isReviewCategory, type ReviewCategory } from './categories';
+
 export type Season = 'spring' | 'summer' | 'autumn' | 'winter';
 export type ReviewLang = 'ko' | 'en';
 
@@ -13,6 +17,7 @@ export interface ReviewMeta {
   /** Slug stem without language suffix, e.g. "squid-game" */
   baseSlug: string;
   season: Season;
+  category: ReviewCategory;
 }
 
 const SEASON_CYCLE: Season[] = ['spring', 'summer', 'autumn', 'winter'];
@@ -29,6 +34,22 @@ function seasonForSlug(slug: string): Season {
 
 function reviewsDir() {
   return path.join(process.cwd(), 'content/reviews');
+}
+
+function extractCategory(html: string, slug: string): ReviewCategory {
+  const match = html.match(/<meta\s+name=["']category["']\s+content=["']([^"']+)["']/i);
+  const raw = match ? match[1].trim() : '';
+  if (!raw) {
+    throw new Error(
+      `[reviews] category 메타데이터 누락: ${slug}.html — <meta name="category" content="..."> 를 추가하세요.`
+    );
+  }
+  if (!isReviewCategory(raw)) {
+    throw new Error(
+      `[reviews] category 값이 유효하지 않음: ${slug}.html → "${raw}" (허용: ${REVIEW_CATEGORIES.join(', ')})`
+    );
+  }
+  return raw;
 }
 
 export function loadAllReviews(): ReviewMeta[] {
@@ -53,12 +74,18 @@ export function loadAllReviews(): ReviewMeta[] {
       image: imgMatch ? imgMatch[1] : '',
       lang: isEn ? 'en' : 'ko',
       season: seasonForSlug(baseSlug),
+      category: extractCategory(content, slug),
     };
   });
 }
 
 export function loadReviewsByLang(lang: ReviewLang = 'ko'): ReviewMeta[] {
   return loadAllReviews().filter((r) => r.lang === lang);
+}
+
+export function loadByCategory(category: ReviewCategory, lang?: ReviewLang): ReviewMeta[] {
+  const all = loadAllReviews().filter((r) => r.category === category);
+  return lang ? all.filter((r) => r.lang === lang) : all;
 }
 
 export function totalReviewCount(): number {
@@ -71,4 +98,19 @@ export function uniqueDramaCount(): number {
   const all = loadAllReviews();
   const set = new Set(all.map((r) => r.baseSlug));
   return set.size;
+}
+
+export function uniqueCountByCategory(): Record<ReviewCategory, number> {
+  const counts = REVIEW_CATEGORIES.reduce(
+    (acc, cat) => ({ ...acc, [cat]: 0 }),
+    {} as Record<ReviewCategory, number>
+  );
+  const seen = new Set<string>();
+  for (const r of loadAllReviews()) {
+    const key = `${r.category}::${r.baseSlug}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    counts[r.category] += 1;
+  }
+  return counts;
 }

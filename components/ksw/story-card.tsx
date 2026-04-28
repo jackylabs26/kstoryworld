@@ -91,7 +91,7 @@ export function StoryCard({ href, title, excerpt, image, num, season, category, 
       </div>
       <div style={{ padding: '22px 24px 26px' }}>
         <div className="t-mono-sm" style={{ color: dark ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.55)' }}>
-          {lang === 'ko' ? 'K-드라마' : 'K-DRAMA'} · {s.kor}
+          {category.toUpperCase()} · {s.kor}
         </div>
         <h3
           style={{

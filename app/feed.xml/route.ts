@@ -12,8 +12,8 @@ export async function GET() {
     .map(
       (r) => `    <item>
       <title><![CDATA[${r.title}]]></title>
-      <link>${BASE}/reviews/${r.slug}</link>
-      <guid isPermaLink="true">${BASE}/reviews/${r.slug}</guid>
+      <link>${BASE}/${r.category}/${r.slug}</link>
+      <guid isPermaLink="true">${BASE}/${r.category}/${r.slug}</guid>
       <description><![CDATA[${r.excerpt}]]></description>
       <language>${r.lang === 'ko' ? 'ko' : 'en'}</language>
       <pubDate>${new Date().toUTCString()}</pubDate>

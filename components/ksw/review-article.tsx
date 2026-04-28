@@ -11,9 +11,10 @@ interface ReviewArticleProps {
   title: string;
   lang: 'ko' | 'en';
   siblingSlug?: string;
+  category?: string;
 }
 
-export function ReviewArticle({ bodyHtml, slug, season, title, lang: reviewLang, siblingSlug }: ReviewArticleProps) {
+export function ReviewArticle({ bodyHtml, slug, season, title, lang: reviewLang, siblingSlug, category }: ReviewArticleProps) {
   const { dark, lang } = useKSWTheme();
   const s = SEASONS[season];
 
@@ -56,7 +57,7 @@ export function ReviewArticle({ bodyHtml, slug, season, title, lang: reviewLang,
 
         <div style={{ position: 'relative', maxWidth: 800, margin: '0 auto' }}>
           <Link
-            href="/reviews"
+            href={category ? `/${category}` : '/reviews'}
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -98,7 +99,7 @@ export function ReviewArticle({ bodyHtml, slug, season, title, lang: reviewLang,
 
           {siblingSlug && (
             <Link
-              href={`/reviews/${siblingSlug}`}
+              href={category ? `/${category}/${siblingSlug}` : `/reviews/${siblingSlug}`}
               className="t-mono-sm"
               style={{
                 display: 'inline-block',

@@ -15,6 +15,7 @@ export default function ReviewsPage() {
     image: r.image,
     season: r.season,
     lang: r.lang,
+    category: r.category,
   }));
 
   return <ReviewsBoard items={reviews} />;

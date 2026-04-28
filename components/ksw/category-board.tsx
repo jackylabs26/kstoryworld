@@ -15,9 +15,10 @@ interface Item {
   category: ReviewCategory;
 }
 
-export function ReviewsBoard({ items }: { items: Item[] }) {
+export function CategoryBoard({ items, category }: { items: Item[]; category: ReviewCategory }) {
   const { lang, dark } = useKSWTheme();
   const [filter, setFilter] = useState<'all' | 'ko' | 'en'>('all');
+  const label = CATEGORY_LABELS[category];
 
   const visible = useMemo(() => {
     if (filter === 'all') return items.filter((i) => i.lang === lang);
@@ -26,7 +27,6 @@ export function ReviewsBoard({ items }: { items: Item[] }) {
 
   return (
     <>
-      {/* Header */}
       <section
         style={{
           padding: '64px 32px',
@@ -35,7 +35,7 @@ export function ReviewsBoard({ items }: { items: Item[] }) {
         }}
       >
         <div className="ksw-container">
-          <span className="t-mono-sm" style={{ color: 'var(--season-accent)' }}>KSTORYWORLD · STORIES</span>
+          <span className="t-mono-sm" style={{ color: 'var(--season-accent)' }}>KSTORYWORLD · {label.en.toUpperCase()}</span>
           <h1
             style={{
               margin: '12px 0 12px',
@@ -47,12 +47,12 @@ export function ReviewsBoard({ items }: { items: Item[] }) {
               color: dark ? '#fff' : '#000',
             }}
           >
-            {lang === 'ko' ? 'K-드라마 리뷰' : 'K-Drama reviews'}
+            {lang === 'ko' ? `${label.ko} 리뷰` : `${label.en} Reviews`}
           </h1>
           <p style={{ fontSize: 18, color: dark ? 'rgba(255,255,255,0.66)' : 'rgba(0,0,0,0.66)', maxWidth: 640, lineHeight: 1.5, letterSpacing: '-0.18px' }}>
             {lang === 'ko'
-              ? '에디터가 엄선한 고품질 다국어 K-드라마 가이드'
-              : 'Editor-curated K-Drama guides — high quality, in your language'}
+              ? `에디터가 엄선한 고품질 다국어 ${label.ko} 가이드`
+              : `Editor-curated ${label.en} guides — high quality, in your language`}
           </p>
           <div style={{ display: 'flex', gap: 8, marginTop: 24, flexWrap: 'wrap' }}>
             {[
@@ -86,7 +86,6 @@ export function ReviewsBoard({ items }: { items: Item[] }) {
         </div>
       </section>
 
-      {/* Reviews grid */}
       <section style={{ padding: '64px 32px', background: dark ? '#010120' : '#fff' }}>
         <div className="ksw-container">
           {visible.length === 0 ? (
@@ -104,13 +103,13 @@ export function ReviewsBoard({ items }: { items: Item[] }) {
               {visible.map((s, i) => (
                 <StoryCard
                   key={s.slug}
-                  href={`/${s.category}/${s.slug}`}
+                  href={`/${category}/${s.slug}`}
                   title={s.title}
                   excerpt={s.excerpt}
                   image={s.image}
                   num={String(i + 1).padStart(2, '0')}
                   season={s.season}
-                  category={CATEGORY_LABELS[s.category].en}
+                  category={label.en}
                 />
               ))}
             </div>
