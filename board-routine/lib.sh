@@ -88,7 +88,10 @@ br_pick_kbeauty_keyword() {
 # is the supported path. Files are read once and only when needed.
 br_load_secrets() {
   local f
-  for f in "$HOME/.jackylabs/secrets/n8n.env" "$HOME/.jackylabs/secrets/kstoryworld.env"; do
+  for f in \
+    "$HOME/.jackylabs/secrets/n8n.env" \
+    "$HOME/.jackylabs/secrets/kstoryworld.env" \
+    "$HOME/.jackylabs/secrets/anthropic.env"; do
     [[ -r "$f" ]] || continue
     set -a
     # shellcheck disable=SC1090
@@ -97,13 +100,31 @@ br_load_secrets() {
   done
 }
 
+# Merge anthropic_api_key into the payload JSON so the n8n
+# workflow's HTTP Request node can authenticate to Anthropic.
+# Workflow contract (kpop/kdrama/kfood/kbeauty): expects
+# `body.anthropic_api_key` on the inbound webhook payload.
+br_inject_anthropic_key() {
+  local payload="$1" key="${ANTHROPIC_API_KEY:-}"
+  if [[ -z "$key" ]] || ! command -v python3 >/dev/null 2>&1; then
+    printf '%s' "$payload"
+    return 0
+  fi
+  ANTHROPIC_API_KEY="$key" python3 - "$payload" <<'PY'
+import json, os, sys
+data = json.loads(sys.argv[1])
+data["anthropic_api_key"] = os.environ["ANTHROPIC_API_KEY"]
+json.dump(data, sys.stdout, ensure_ascii=False)
+PY
+}
+
 br_n8n_call() {
   local path="$1" token_var_primary="$2" payload="$3"
   if [[ "${N8N_DRYRUN:-0}" == "1" ]]; then
     printf '{"dryrun":true,"path":"%s","payload":%s}\n' "$path" "$payload"
     return 0
   fi
-  if [[ -z "${N8N_BASE_URL:-}" || -z "${!token_var_primary:-${KPOP_WEBHOOK_TOKEN:-}}" ]]; then
+  if [[ -z "${N8N_BASE_URL:-}" || -z "${!token_var_primary:-${KPOP_WEBHOOK_TOKEN:-}}" || -z "${ANTHROPIC_API_KEY:-}" ]]; then
     br_load_secrets
   fi
   if [[ -z "${N8N_BASE_URL:-}" ]]; then
@@ -115,6 +136,7 @@ br_n8n_call() {
     echo "br_n8n_call: ${token_var_primary} (or KPOP_WEBHOOK_TOKEN fallback) is required" >&2
     return 1
   fi
+  payload="$(br_inject_anthropic_key "$payload")"
   curl -sS -X POST \
     -H "Content-Type: application/json" \
     -H "X-Webhook-Token: $token" \
