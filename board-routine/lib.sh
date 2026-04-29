@@ -82,11 +82,29 @@ br_pick_kbeauty_keyword() {
 # pre-generated dry-run sample. This is what the "12/12 pass" sample log
 # asserts against in CI.
 
+# Autoload local secret files when env vars are absent. The Paperclip
+# codex_local adapter does not currently inject `adapterConfig.env`
+# bindings into the spawned heartbeat process, so per-routine sourcing
+# is the supported path. Files are read once and only when needed.
+br_load_secrets() {
+  local f
+  for f in "$HOME/.jackylabs/secrets/n8n.env" "$HOME/.jackylabs/secrets/kstoryworld.env"; do
+    [[ -r "$f" ]] || continue
+    set -a
+    # shellcheck disable=SC1090
+    source "$f"
+    set +a
+  done
+}
+
 br_n8n_call() {
   local path="$1" token_var_primary="$2" payload="$3"
   if [[ "${N8N_DRYRUN:-0}" == "1" ]]; then
     printf '{"dryrun":true,"path":"%s","payload":%s}\n' "$path" "$payload"
     return 0
+  fi
+  if [[ -z "${N8N_BASE_URL:-}" || -z "${!token_var_primary:-${KPOP_WEBHOOK_TOKEN:-}}" ]]; then
+    br_load_secrets
   fi
   if [[ -z "${N8N_BASE_URL:-}" ]]; then
     echo "br_n8n_call: N8N_BASE_URL is required (e.g. https://n8n.jackyailabs.com)" >&2
@@ -105,15 +123,15 @@ br_n8n_call() {
 }
 
 n8n_call_kpop() {
-  br_n8n_call "kpop-content" "KPOP_WEBHOOK_TOKEN" "$1"
+  br_n8n_call "generate-kpop-content" "KPOP_WEBHOOK_TOKEN" "$1"
 }
 
 n8n_call_kdrama() {
-  br_n8n_call "kdrama-content" "KDRAMA_WEBHOOK_TOKEN" "$1"
+  br_n8n_call "generate-kdrama-content" "KDRAMA_WEBHOOK_TOKEN" "$1"
 }
 
 n8n_call_kfood() {
-  br_n8n_call "kfood-content" "KFOOD_WEBHOOK_TOKEN" "$1"
+  br_n8n_call "generate-kfood-content" "KFOOD_WEBHOOK_TOKEN" "$1"
 }
 
 n8n_call_kbeauty() {
