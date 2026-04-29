@@ -20,6 +20,17 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Content Pipeline
+
+KStoryWorld의 일일 콘텐츠는 카테고리별 n8n 워크플로가 생성하고, Paperclip routine이 매일 04:00 KST에 kickoff합니다.
+
+| 디렉터리 | 설명 |
+|----------|------|
+| [`n8n-workflows/`](./n8n-workflows) | 카테고리별 n8n 워크플로 JSON + dry-run 샘플. 현재 K-Beauty 1종 commit. |
+| [`board-routine/`](./board-routine) | Paperclip routine이 호출하는 `*-kickoff.sh` + 공용 `lib.sh` (키워드 풀, n8n webhook 호출). |
+
+발행 게이트는 [`npm run check:no-ai-copy`](./package.json) + 워크플로 내부 12-check + 의료·효능 단정 가드를 모두 통과해야 합니다.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

@@ -1,0 +1,118 @@
+{
+  "name": "K-Beauty Content Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "kbeauty-content",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "1c2bdb01-9c0a-4f2b-9e30-7c0f1f8a0a01",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 320],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "kbeauty-webhook-header-auth",
+          "name": "K-Beauty Webhook Header Auth"
+        }
+      },
+      "webhookId": "kbeauty-content-generator"
+    },
+    {
+      "parameters": {
+        "url": "https://openapi.naver.com/v1/search/blog.json",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "naverOpenApi",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            { "name": "query", "value": "={{ $json.keyword }} K-뷰티" },
+            { "name": "display", "value": "20" },
+            { "name": "sort", "value": "date" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1c2bdb01-9c0a-4f2b-9e30-7c0f1f8a0a02",
+      "name": "Naver Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [460, 320]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filter out unsafe topics and select 1 candidate.\n// Medical assertion guard: block 발암/의료사고/효능 단정.\nconst BLOCKED = [\n  '발암', '의료사고', '병원성', '식약처 회수', '리콜',\n  'cancer', 'medical accident', 'side effect death'\n];\nconst keyword = $('Webhook').first().json.keyword || '';\nfor (const w of BLOCKED) {\n  if (keyword.includes(w)) {\n    throw new Error(`Blocked keyword detected: ${w}`);\n  }\n}\nconst items = ($json.items || []).filter((it) => {\n  const blob = `${it.title || ''} ${it.description || ''}`;\n  return !BLOCKED.some((w) => blob.includes(w));\n});\nif (items.length === 0) {\n  return [{ json: { keyword, topic: keyword, source: null, fallback: true } }];\n}\nconst pick = items[0];\nreturn [{\n  json: {\n    keyword,\n    topic: keyword,\n    source: { title: pick.title, link: pick.link, description: pick.description },\n    fallback: false\n  }\n}];"
+      },
+      "id": "1c2bdb01-9c0a-4f2b-9e30-7c0f1f8a0a03",
+      "name": "Filter & Select Topic",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 320]
+    },
+    {
+      "parameters": {
+        "url": "https://api.anthropic.com/v1/messages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "anthropicApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "anthropic-version", "value": "2023-06-01" },
+            { "name": "content-type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"claude-sonnet-4-6\",\n  \"max_tokens\": 4096,\n  \"system\": \"당신은 한국 뷰티 전문 에디터입니다. '에디터 큐레이션' 톤으로 ko/en 이중언어 K-뷰티 가이드를 작성합니다. 절대 금지: AI/자동생성 표현, 의료·효능 단정 표현(발암/의료사고/치료 등), '~에 좋다/낫는다/없애준다' 같은 효능 단정. 항상 '~에 도움이 될 수 있다', '~로 알려져 있습니다' 등 완곡 표현을 사용하세요.\",\n  \"messages\": [{\n    \"role\": \"user\",\n    \"content\": \"키워드: {{ $json.keyword }}\\n원천 자료: {{ JSON.stringify($json.source) }}\\n\\n다음 7개 섹션으로 ko/en 두 버전 작성:\\n1) intro — 후킹 1문단\\n2) trend_snapshot — 글로벌·국내 트렌드 1~2문단\\n3) how_to_use — 단계별 루틴/사용법(번호 매기기)\\n4) cultural_context — 한국 뷰티 문화 맥락 1문단\\n5) editor_picks — 에디터 추천 대상 1문단\\n6) closing — 짧은 마무리\\n7) source — 원천 링크 1줄\\n\\nJSON으로만 응답:\\n{\\\"ko\\\":{\\\"title\\\":\\\"\\\",\\\"slug\\\":\\\"\\\",\\\"sections\\\":{...}},\\\"en\\\":{\\\"title\\\":\\\"\\\",\\\"slug\\\":\\\"\\\",\\\"sections\\\":{...}}}\"\n  }]\n}",
+        "options": {}
+      },
+      "id": "1c2bdb01-9c0a-4f2b-9e30-7c0f1f8a0a04",
+      "name": "Claude Draft K-Beauty Post",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [900, 320]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format response into ko/en HTML and run 12-check + no-ai-copy gates.\nconst draft = JSON.parse($json.content?.[0]?.text || '{}');\nconst ko = draft.ko || {};\nconst en = draft.en || {};\nconst SECTIONS = ['intro','trend_snapshot','how_to_use','cultural_context','editor_picks','closing','source'];\n\nconst AI_COPY = /AI(-| )(generated|curated|powered)|AI가 정리|자동 생성 콘텐츠|Generated:/i;\nconst MEDICAL_GUARD = /(발암|의료사고|치료해\\s*드립니다|완치|부작용\\s*없음)/;\nconst EFFICACY_ASSERT = /(에\\s*좋다|를\\s*낫게\\s*해|을\\s*없애준다)/;\n\nfunction renderHtml(side, lang) {\n  const t = side.title || '';\n  const sx = side.sections || {};\n  const items = (sx.how_to_use || '').split(/\\n+/).filter(Boolean);\n  const list = items.map((l) => `        <li>${l.replace(/^\\d+[\\).\\s-]*/,'')}</li>`).join('\\n');\n  return [\n    `<!DOCTYPE html>`,\n    `<html lang=\"${lang}\">`,\n    `<head>`,\n    `<meta charset=\"UTF-8\">`,\n    `<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">`,\n    `<meta name=\"description\" content=\"${(sx.intro || '').replace(/\"/g,'&quot;').slice(0,200)}\">`,\n    `<meta name=\"category\" content=\"k-beauty\">`,\n    `<title>${t}</title>`,\n    `</head>`,\n    `<body>`,\n    `<h1>${t}</h1>`,\n    `<div class=\"meta\">Language: ${lang === 'ko' ? '한국어' : 'English'} · Editor's Curation · K-Beauty</div>`,\n    `<h3>${lang === 'ko' ? '들어가며' : 'Intro'}</h3><p>${sx.intro || ''}</p>`,\n    `<h3>${lang === 'ko' ? '트렌드 스냅샷' : 'Trend Snapshot'}</h3><p>${sx.trend_snapshot || ''}</p>`,\n    `<h3>${lang === 'ko' ? '에디터 추천 루틴' : 'How To Use'}</h3>`,\n    `<ul>\\n${list}\\n</ul>`,\n    `<h3>${lang === 'ko' ? '한국 뷰티 문화의 맥락' : 'Cultural Context'}</h3><p>${sx.cultural_context || ''}</p>`,\n    `<h3>${lang === 'ko' ? '에디터 픽' : 'Editor Picks'}</h3><p>${sx.editor_picks || ''}</p>`,\n    `<h3>${lang === 'ko' ? '마무리' : 'Closing'}</h3><p>${sx.closing || ''}</p>`,\n    `<h3>${lang === 'ko' ? '출처' : 'Source'}</h3><p>${sx.source || ''}</p>`,\n    `</body>`,\n    `</html>`\n  ].join('\\n');\n}\n\nconst koHtml = renderHtml(ko, 'ko');\nconst enHtml = renderHtml(en, 'en');\nconst koTextOnly = koHtml.replace(/<[^>]+>/g,' ');\nconst enTextOnly = enHtml.replace(/<[^>]+>/g,' ');\n\nconst checks = {\n  '01_ko_title_present': !!ko.title,\n  '02_en_title_present': !!en.title,\n  '03_ko_slug_kebab': /^[a-z0-9-]+$/.test(ko.slug || ''),\n  '04_en_slug_kebab': /^[a-z0-9-]+$/.test(en.slug || ''),\n  '05_all_sections_ko': SECTIONS.every((s) => (ko.sections || {})[s]),\n  '06_all_sections_en': SECTIONS.every((s) => (en.sections || {})[s]),\n  '07_ko_min_length_600': koTextOnly.replace(/\\s+/g,'').length >= 600,\n  '08_en_min_words_200': enTextOnly.split(/\\s+/).filter(Boolean).length >= 200,\n  '09_no_ai_copy': !AI_COPY.test(koTextOnly) && !AI_COPY.test(enTextOnly),\n  '10_medical_guard': !MEDICAL_GUARD.test(koTextOnly) && !MEDICAL_GUARD.test(enTextOnly),\n  '11_no_efficacy_assert': !EFFICACY_ASSERT.test(koTextOnly),\n  '12_category_meta': /name=\\\"category\\\"\\s+content=\\\"k-beauty\\\"/.test(koHtml) && /name=\\\"category\\\"\\s+content=\\\"k-beauty\\\"/.test(enHtml)\n};\n\nconst passed = Object.values(checks).filter(Boolean).length;\nconst total = Object.keys(checks).length;\nconst pass = passed === total;\n\nreturn [{ json: {\n  category: 'k-beauty',\n  ko: { title: ko.title, slug: ko.slug, html: koHtml, korean_chars: koTextOnly.replace(/\\s+/g,'').length },\n  en: { title: en.title, slug: en.slug, html: enHtml, en_word_count: enTextOnly.split(/\\s+/).filter(Boolean).length },\n  checks, passed, total, pass,\n  ai_copy_hit: AI_COPY.test(koTextOnly + enTextOnly) ? AI_COPY.exec(koTextOnly + enTextOnly)[0] : null,\n  blocked_keyword_hit: MEDICAL_GUARD.test(koTextOnly + enTextOnly) ? MEDICAL_GUARD.exec(koTextOnly + enTextOnly)[0] : null\n}}];"
+      },
+      "id": "1c2bdb01-9c0a-4f2b-9e30-7c0f1f8a0a05",
+      "name": "Format & Self-Check",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1120, 320]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "1c2bdb01-9c0a-4f2b-9e30-7c0f1f8a0a06",
+      "name": "Return",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1340, 320]
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{ "node": "Naver Search", "type": "main", "index": 0 }]] },
+    "Naver Search": { "main": [[{ "node": "Filter & Select Topic", "type": "main", "index": 0 }]] },
+    "Filter & Select Topic": { "main": [[{ "node": "Claude Draft K-Beauty Post", "type": "main", "index": 0 }]] },
+    "Claude Draft K-Beauty Post": { "main": [[{ "node": "Format & Self-Check", "type": "main", "index": 0 }]] },
+    "Format & Self-Check": { "main": [[{ "node": "Return", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" },
+  "meta": {
+    "category": "k-beauty",
+    "tone": "에디터 큐레이션",
+    "language_pair": ["ko", "en"],
+    "sections": ["intro","trend_snapshot","how_to_use","cultural_context","editor_picks","closing","source"],
+    "guards": ["12-check", "no-ai-copy", "medical-assertion", "efficacy-assertion"]
+  },
+  "tags": [{ "name": "kstoryworld" }, { "name": "k-beauty" }, { "name": "phase-b" }]
+}
