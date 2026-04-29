@@ -1,0 +1,198 @@
+{
+  "name": "K-Drama Content Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "generate-kdrama-content",
+        "responseMode": "responseNode",
+        "authentication": "headerAuth",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -800,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "dp70W0DKNXVtAely",
+          "name": "K-Drama Webhook Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://openapi.naver.com/v1/search/news.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{ $json.body.keyword }} 드라마"
+            },
+            {
+              "name": "display",
+              "value": "10"
+            },
+            {
+              "name": "sort",
+              "value": "date"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "id": "naver-search",
+      "name": "Naver Search News",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -540,
+        300
+      ],
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "Or1dBWYQ8nK7ly1s",
+          "name": "Naver Open API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filter & Select Topic — JAC-1787 B안: 후보 배열 반환 (최대 5)\n// 입력: items[0].json.items (네이버 뉴스 응답)\n// 출력: filtered[] (최대 5건). selected는 filtered[0]로 호환 유지.\n\nconst BLACKLIST_DOMAINS = [\n  'news.naver.com/sports',\n  'dcinside.com',\n  'theqoo.net',\n  'pann.nate.com',\n  'instiz.net',\n];\nconst BLACKLIST_KEYWORDS = [\n  '음주운전', '마약', '폭행', '사망', '장례',\n  '19금', '노출', '이재명', '윤석열', '한동훈', '조국',\n  '사기', '제도', '삼인', '성적', '선정적', '음란',\n  '스포', '스포일러', '결말유출',\n];\n\nfunction stripHtml(s) {\n  return (s || '').replace(/<[^>]+>/g, '').replace(/&[^;]+;/g, ' ').trim();\n}\n\nfunction isBlocked(item) {\n  const title = stripHtml(item.title);\n  const desc = stripHtml(item.description);\n  const url = item.originallink || item.link || '';\n  const text = (title + ' ' + desc).toLowerCase();\n  if (BLACKLIST_KEYWORDS.some(k => text.includes(k))) return true;\n  if (BLACKLIST_DOMAINS.some(d => url.includes(d))) return true;\n  return false;\n}\n\nconst input = $input.first().json;\nconst items = input.items || [];\nconst body = $('Webhook Trigger').first().json.body || {};\nconst keyword = body.keyword || '';\n\nconst filteredRaw = items.filter(i => !isBlocked(i));\nif (filteredRaw.length === 0) {\n  return [{ json: {\n    error: 'no_candidates',\n    reason: '네이버 검색 결과가 모두 필터링됨',\n    keyword,\n    total_received: items.length,\n  } }];\n}\n\n// 상위 5개까지만 후보로 보관 (재시도 최대 3회 + 여유분)\nconst filtered = filteredRaw.slice(0, 5).map(it => ({\n  title: stripHtml(it.title),\n  description: stripHtml(it.description),\n  source_url: it.originallink || it.link,\n  pub_date: it.pubDate,\n}));\n\nconst drama_guess = keyword.split(' ')[0] || '';\n\nreturn [{\n  json: {\n    keyword,\n    filtered,\n    // selected: 기본 후보(filtered[0]) — 호환성 유지\n    selected: { ...filtered[0], drama_guess },\n    total_received: items.length,\n    candidates_after_filter: filteredRaw.length,\n  },\n}];\n"
+      },
+      "id": "filter-select",
+      "name": "Filter & Select Topic",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -280,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Fetch Source + Claude Draft — JAC-1787 B안\n// 후보 배열을 순회하며: 출처 본문 fetch → Claude 호출 → source_irrelevant 시 다음 후보 재시도 (최대 3회)\n// 출력: { ok, content, source_body_text, selected, attempt_index, attempts_log }\n\nconst MAX_ATTEMPTS = 3;\nconst SOURCE_BODY_MAX = 5000;\nconst FETCH_TIMEOUT_MS = 12000;\nconst CLAUDE_TIMEOUT_MS = 90000;\n\nfunction stripHtmlPage(html) {\n  if (!html) return '';\n  // <script>, <style> 블록 제거\n  let s = html.replace(/<script[\\s\\S]*?<\\/script>/gi, ' ');\n  s = s.replace(/<style[\\s\\S]*?<\\/style>/gi, ' ');\n  // <noscript>, <iframe> 등 잡음\n  s = s.replace(/<noscript[\\s\\S]*?<\\/noscript>/gi, ' ');\n  // 태그 제거\n  s = s.replace(/<[^>]+>/g, ' ');\n  // entity 정리\n  s = s.replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '\"').replace(/&#39;/g, \"'\");\n  s = s.replace(/&[a-z#0-9]+;/gi, ' ');\n  // 공백 압축\n  s = s.replace(/\\s+/g, ' ').trim();\n  return s;\n}\n\nconst upstream = $input.first().json;\nconst filtered = upstream.filtered || [];\nconst keyword = upstream.keyword || '';\nconst webhookBody = $('Webhook Trigger').first().json.body || {};\nconst apiKey = webhookBody.anthropic_api_key;\nconst model = webhookBody.model || 'claude-sonnet-4-6';\n\nif (!Array.isArray(filtered) || filtered.length === 0) {\n  return [{ json: { ok: false, reason: 'no_candidates_input', upstream } }];\n}\nif (!apiKey) {\n  return [{ json: { ok: false, reason: 'missing_anthropic_api_key' } }];\n}\n\nconst attempts_log = [];\nconst candidates = filtered.slice(0, MAX_ATTEMPTS);\n\nfor (let i = 0; i < candidates.length; i++) {\n  const cand = candidates[i];\n  const attempt = { index: i, source_url: cand.source_url };\n\n  // ---- 1. 출처 페이지 fetch ----\n  let pageHtml = '';\n  let fetchOk = false;\n  try {\n    const resp = await this.helpers.httpRequest({\n      method: 'GET',\n      url: cand.source_url,\n      headers: {\n        'user-agent': 'Mozilla/5.0 (compatible; KStoryWorldBot/1.0; +https://kstoryworld.com)',\n        'accept': 'text/html,application/xhtml+xml',\n      },\n      timeout: FETCH_TIMEOUT_MS,\n      returnFullResponse: false,\n      json: false,\n    });\n    pageHtml = typeof resp === 'string' ? resp : (resp?.body || JSON.stringify(resp));\n    fetchOk = !!pageHtml && pageHtml.length > 0;\n  } catch (e) {\n    attempt.fetch_error = (e && e.message) || String(e);\n  }\n\n  if (!fetchOk) {\n    attempt.outcome = 'fetch_failed';\n    attempts_log.push(attempt);\n    continue;\n  }\n\n  const sourceBodyText = stripHtmlPage(pageHtml).substring(0, SOURCE_BODY_MAX);\n  attempt.source_body_chars = sourceBodyText.length;\n\n  if (sourceBodyText.length < 200) {\n    attempt.outcome = 'source_body_too_short';\n    attempts_log.push(attempt);\n    continue;\n  }\n\n  // ---- 2. Claude 호출 ----\n  const drama_guess = keyword.split(' ')[0] || '';\n  const userPrompt = `당신은 KStoryWorld 블로그의 K-드라마 에디터입니다. '에디터 큐레이션 톤' 스타일로 한국어와 영어 이중 언어 가이드 초안을 작성합니다. 글로벌 독자(영어권)도 한국 드라마의 매력을 이해할 수 있게 친근하고 통찰력 있는 해설을 제공합니다.\n\n# 입력\n- 검색 키워드(드라마 제목 후보): ${keyword}\n- 뉴스 제목: ${cand.title}\n- 뉴스 요약: ${cand.description}\n- 추정 드라마: ${drama_guess}\n- 출처 URL: ${cand.source_url}\n- 출처 페이지 본문(원문, 일부): ${sourceBodyText}\n\n# 작성 규칙 — 매우 중요\n1. **에디터 큐레이션 톤** — 사람 에디터가 직접 큐레이션·해설한 결과처럼 작성. 정중하지만 친근한 어조.\n2. **AI/자동생성 표현 절대 금지** — 다음 표현·뉘앙스를 본문/제목/슬러그/메타에 절대 포함하지 말 것:\n   - 'AI', 'AI가', 'AI-generated', 'AI-curated', 'AI-powered', '자동 생성', '자동생성', '에이전트', 'GPT', 'Claude', 'LLM', '챗봇', '인공지능', 'auto-generated', 'machine-generated'\n   - 'Generated:' 같은 자동 생성 메타라인 표기\n   - AI disclosure 섹션도 작성하지 말 것 — 본 워크플로는 에디터 큐레이션으로 포지셔닝\n3. **본인 해설/큐레이션이 80% 이상** — 뉴스 요약을 그대로 옮겨 적지 말 것. 드라마 자체에 대한 인사이트·문화적 맥락·추천 이유가 본문 핵심.\n4. **스포일러 금지** — 줄거리는 1~2화 시작점까지만, 결말·반전 노출 금지.\n5. 정치인 실명·범죄 단정·성인 표현·사망 관련 표현 금지.\n6. 출처 표기는 글 마지막에 1회만.\n7. 한국어 본문 600자 이상, 영어 본문 200단어 이상.\n8. **출처 본문에 명시된 사실만 사용** — 인물명·배우명·작품명·날짜·플랫폼 정보는 반드시 출처 본문(위 'source_body_text')에 등장한 것만 인용. 출처에 없는 사실은 추측·작성 금지.\n9. **출처 본문이 드라마와 무관할 경우** — 즉, 출처가 추정 드라마(${drama_guess}) 또는 검색 키워드(${keyword})와 사실적 연관이 없다고 판단되면, 본문을 작성하지 말고 다음 JSON만 반환:\n   { \"error\": \"source_irrelevant\", \"reason\": \"<짧은 이유>\" }\n\n# 출력 형식 (오직 JSON만, 마크다운 코드블록·설명 텍스트 금지)\n{\n  \"category\": \"k-drama\",\n  \"ko\": {\n    \"title\": \"SEO 친화적 한국어 제목 (60자 이내, 'AI'·'자동 생성' 단어 금지)\",\n    \"slug\": \"english-slug-with-hyphens\",\n    \"meta_description\": \"검색결과 발췌용 한국어 요약 (160자 이내)\",\n    \"sections\": {\n      \"intro\": \"도입 단락 (드라마·플랫폼·방영 맥락, 100~150자)\",\n      \"plot_teaser\": \"줄거리 티저 — 스포일러 없이 1~2화까지의 설정·갈등 (200~300자)\",\n      \"cultural_context\": \"한국 문화·사회·언어적 배경 해설 (200~300자)\",\n      \"why_watch\": \"이 작품을 추천하는 이유 — 연출·연기·OST·세계관 중 2~3가지 (150~250자)\",\n      \"closing\": \"마무리 (50~100자)\",\n      \"source\": \"출처: ${cand.source_url}\"\n    }\n  },\n  \"en\": {\n    \"title\": \"SEO friendly English title (under 70 chars, no 'AI' or 'auto-generated' words)\",\n    \"slug\": \"english-slug-with-hyphens\",\n    \"meta_description\": \"English meta for search snippets (under 160 chars)\",\n    \"sections\": {\n      \"intro\": \"Lead paragraph (drama, platform, release context — 70~120 words)\",\n      \"plot_teaser\": \"Spoiler-free teaser through episodes 1~2 setup (120~180 words)\",\n      \"cultural_context\": \"Korean cultural / social / linguistic context (120~180 words)\",\n      \"why_watch\": \"Why we recommend this — directing, acting, OST, worldbuilding etc (90~150 words)\",\n      \"closing\": \"Closing thought (40~70 words)\",\n      \"source\": \"Source: ${cand.source_url}\"\n    }\n  },\n  \"tags\": [\"k-drama\", \"한국드라마\", \"editor-curated\"]\n}`;\n\n  let claudeJson = null;\n  let claudeRaw = null;\n  let claudeError = null;\n  try {\n    const resp = await this.helpers.httpRequest({\n      method: 'POST',\n      url: 'https://api.anthropic.com/v1/messages',\n      headers: {\n        'x-api-key': apiKey,\n        'anthropic-version': '2023-06-01',\n        'content-type': 'application/json',\n      },\n      body: {\n        model,\n        max_tokens: 6000,\n        messages: [{ role: 'user', content: userPrompt }],\n      },\n      json: true,\n      timeout: CLAUDE_TIMEOUT_MS,\n    });\n    claudeJson = resp;\n    claudeRaw = resp?.content?.[0]?.text || '';\n  } catch (e) {\n    claudeError = (e && e.message) || String(e);\n  }\n\n  if (claudeError || !claudeRaw) {\n    attempt.outcome = 'claude_call_failed';\n    attempt.claude_error = claudeError;\n    attempts_log.push(attempt);\n    continue;\n  }\n\n  // ---- 3. Claude 응답에서 source_irrelevant 판별 ----\n  let parsedDraft = null;\n  let parseError = null;\n  try {\n    parsedDraft = JSON.parse(claudeRaw);\n  } catch (e) {\n    const m = claudeRaw.match(/\\{[\\s\\S]*\\}/);\n    if (m) {\n      try { parsedDraft = JSON.parse(m[0]); } catch (e2) { parseError = e2.message; }\n    } else {\n      parseError = e.message;\n    }\n  }\n\n  if (parsedDraft && parsedDraft.error === 'source_irrelevant') {\n    attempt.outcome = 'source_irrelevant';\n    attempt.reason = parsedDraft.reason || null;\n    attempts_log.push(attempt);\n    continue;\n  }\n\n  // 성공 — Format & Self-Check로 전달\n  attempt.outcome = parsedDraft ? 'success' : 'claude_response_parse_failed';\n  attempts_log.push(attempt);\n\n  return [{\n    json: {\n      ok: true,\n      // 기존 'Claude Draft' 노드와 호환: content/usage 등 그대로 전달\n      content: claudeJson?.content || [{ type: 'text', text: claudeRaw }],\n      usage: claudeJson?.usage,\n      stop_reason: claudeJson?.stop_reason,\n      model: claudeJson?.model,\n      // B안 신규 필드\n      source_body_text: sourceBodyText,\n      selected: { ...cand, drama_guess },\n      attempt_index: i,\n      attempts_log,\n      keyword,\n      claude_parse_error: parseError,\n    },\n  }];\n}\n\n// 모든 후보 실패\nreturn [{\n  json: {\n    ok: false,\n    reason: 'all_candidates_failed',\n    detail: '3개 후보 모두 fetch 실패 또는 source_irrelevant',\n    attempts_log,\n    keyword,\n  },\n}];\n"
+      },
+      "id": "fetch-claude",
+      "name": "Fetch Source + Claude Draft",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -20,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format & Self-Check — 13항목 (JAC-1787 B안: 출처 본문 ⊆ 본문 13번째 추가)\n// 입력: 'Fetch Source + Claude Draft' 노드 출력 (ok=true 또는 false)\n// 출력: 검증 결과 + 정제된 컨텐츠 (category=k-drama, ko/en 이중 언어)\n\nconst BLOCKED_KEYWORDS = ['음주운전','마약','폭행','사망','장례','19금','노출','이재명','윤석열','한동훈','조국','사기','제도','삼인','성적','선정적','음란'];\nconst NO_AI_COPY_PATTERN = /(AI[- ](generated|curated|powered)|AI가\\s?정리|자동\\s?생성\\s?콘텐츠|Generated:)/i;\n\nconst raw = $input.first().json;\n\n// 업스트림에서 ok:false (모든 후보 실패) — 그대로 패스스루\nif (raw && raw.ok === false) {\n  return [{ json: {\n    ok: false,\n    reason: raw.reason || 'upstream_failed',\n    detail: raw.detail,\n    attempts_log: raw.attempts_log,\n    keyword: raw.keyword,\n  } }];\n}\n\nconst contentText = raw?.content?.[0]?.text || '';\nconst sourceBodyText = raw?.source_body_text || '';\n\nlet parsed = null;\nlet parseError = null;\ntry {\n  parsed = JSON.parse(contentText);\n} catch (e) {\n  const m = contentText.match(/\\{[\\s\\S]*\\}/);\n  if (m) {\n    try { parsed = JSON.parse(m[0]); } catch (e2) { parseError = e2.message; }\n  } else {\n    parseError = e.message;\n  }\n}\n\nif (!parsed) {\n  return [{ json: {\n    ok: false,\n    reason: 'claude_response_parse_failed',\n    parseError,\n    raw_excerpt: contentText.substring(0, 500),\n  } }];\n}\n\nconst ko = parsed.ko || {};\nconst en = parsed.en || {};\nconst koSec = ko.sections || {};\nconst enSec = en.sections || {};\n\nconst koBodyText = [koSec.intro, koSec.plot_teaser, koSec.cultural_context, koSec.why_watch, koSec.closing].filter(Boolean).join(' ');\nconst enBodyText = [enSec.intro, enSec.plot_teaser, enSec.cultural_context, enSec.why_watch, enSec.closing].filter(Boolean).join(' ');\n\nconst allText = [\n  ko.title, ko.slug, ko.meta_description, koBodyText,\n  en.title, en.slug, en.meta_description, enBodyText,\n  (parsed.tags || []).join(' '),\n].filter(Boolean).join(' ');\n\nconst korean_chars = (koBodyText.match(/[\\uAC00-\\uD7AF]/g) || []).length;\nconst en_word_count = enBodyText.trim() ? enBodyText.trim().split(/\\s+/).length : 0;\nconst blocked_kw = BLOCKED_KEYWORDS.find(k => allText.includes(k));\nconst ai_copy_match = allText.match(NO_AI_COPY_PATTERN);\n\n// ---- 13. 출처 본문 토큰 ⊆ 본문 토큰 (간이 fact-anchor 검증) ----\nfunction extractTokens(text) {\n  return Array.from(new Set(\n    (text || '')\n      .replace(/[^\\uAC00-\\uD7AFa-zA-Z0-9 ]/g, ' ')\n      .split(/\\s+/)\n      .filter(t => t.length >= 2)\n  ));\n}\nconst sourceTokens = extractTokens(sourceBodyText);\nconst bodyTokens = new Set(extractTokens(koBodyText + ' ' + enBodyText));\nconst overlapTokens = sourceTokens.filter(t => bodyTokens.has(t));\nconst overlap_ratio = sourceTokens.length ? overlapTokens.length / sourceTokens.length : 0;\n\nconst checks = {\n  '01_category_is_k_drama': parsed.category === 'k-drama',\n  '02_ko_korean_chars_min_600': korean_chars >= 600,\n  '03_en_word_count_min_200': en_word_count >= 200,\n  '04_ko_title_exists_under_60': !!(ko.title && ko.title.length > 0 && ko.title.length <= 60),\n  '05_en_title_exists_under_70': !!(en.title && en.title.length > 0 && en.title.length <= 70),\n  '06_ko_slug_exists': !!(ko.slug && ko.slug.length > 0),\n  '07_en_slug_exists': !!(en.slug && en.slug.length > 0),\n  '08_ko_meta_description_under_160': !!(ko.meta_description && ko.meta_description.length > 0 && ko.meta_description.length <= 160),\n  '09_en_meta_description_under_160': !!(en.meta_description && en.meta_description.length > 0 && en.meta_description.length <= 160),\n  '10_tags_exist_and_are_array': !!(parsed.tags && Array.isArray(parsed.tags) && parsed.tags.length > 0),\n  '11_no_blocked_keywords': !blocked_kw,\n  '12_no_ai_copy_pattern': !ai_copy_match,\n  '13_source_body_overlap_min_15pct': overlap_ratio >= 0.15,\n};\nconst pass = Object.values(checks).every(Boolean);\nconst failures = Object.entries(checks).filter(([k,v])=>!v).map(([k])=>k);\n\nreturn [{\n  json: {\n    ok: pass,\n    self_check: checks,\n    self_check_failures: failures,\n    self_check_summary: pass ? '13/13 통과' : `${Object.values(checks).filter(Boolean).length}/13 통과 — 미통과: ${failures.join(', ')}`,\n    blocked_keyword_hit: blocked_kw || null,\n    ai_copy_hit: ai_copy_match ? ai_copy_match[0] : null,\n    korean_chars,\n    en_word_count,\n    source_body_overlap: {\n      ratio: overlap_ratio,\n      threshold: 0.15,\n      source_token_count: sourceTokens.length,\n      overlap_token_count: overlapTokens.length,\n      sample_overlap_tokens: overlapTokens.slice(0, 20),\n    },\n    draft: parsed,\n    metadata: {\n      keyword: raw.keyword,\n      source: raw.selected,\n      attempt_index: raw.attempt_index,\n      attempts_log: raw.attempts_log,\n      generated_at: new Date().toISOString(),\n      model: raw.model || ($('Webhook Trigger').first().json.body.model || 'claude-sonnet-4-6'),\n    },\n  },\n}];\n"
+      },
+      "id": "format-selfcheck",
+      "name": "Format & Self-Check",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "respond",
+      "name": "Return Generated Content",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        500,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Naver Search News",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Naver Search News": {
+      "main": [
+        [
+          {
+            "node": "Filter & Select Topic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter & Select Topic": {
+      "main": [
+        [
+          {
+            "node": "Fetch Source + Claude Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Source + Claude Draft": {
+      "main": [
+        [
+          {
+            "node": "Format & Self-Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format & Self-Check": {
+      "main": [
+        [
+          {
+            "node": "Return Generated Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}
