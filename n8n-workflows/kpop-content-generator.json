@@ -1,0 +1,228 @@
+{
+  "name": "K-Pop Content Generator",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "generate-kpop-content",
+        "responseMode": "responseNode",
+        "authentication": "headerAuth",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -800,
+        300
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "u5L3xh1NjVpyBm8C",
+          "name": "K-Pop Webhook Header Auth"
+        }
+      },
+      "webhookId": "5a103b78-16c1-40e8-a770-b681b510aca6"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://openapi.naver.com/v1/search/news.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpCustomAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{ $json.body.keyword }}"
+            },
+            {
+              "name": "display",
+              "value": "10"
+            },
+            {
+              "name": "sort",
+              "value": "date"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 15000
+        }
+      },
+      "id": "naver-search",
+      "name": "Naver Search News",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -540,
+        300
+      ],
+      "credentials": {
+        "httpCustomAuth": {
+          "id": "Or1dBWYQ8nK7ly1s",
+          "name": "Naver Open API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filter & Select Topic — JAC-1707 workflow-design §3-4\n// 입력: items[0].json.items (네이버 뉴스 응답)\n// 출력: 선정된 1건 + 메타데이터\n\nconst BLACKLIST_DOMAINS = [\n  'tistory.com',\n  'news.naver.com/sports',\n  'dcinside.com',\n  'theqoo.net',\n  'pann.nate.com',\n];\nconst BLACKLIST_KEYWORDS = [\n  '음주운전', '마약', '폭행', '사망', '장례',\n  '19금', '노출', '이재명', '윤석열', '한동훈', '조국',\n];\n\nfunction stripHtml(s) {\n  return (s || '').replace(/<[^>]+>/g, '').replace(/&[^;]+;/g, ' ').trim();\n}\n\nfunction isBlocked(item) {\n  const title = stripHtml(item.title);\n  const desc = stripHtml(item.description);\n  const url = item.originallink || item.link || '';\n  const text = (title + ' ' + desc).toLowerCase();\n  if (BLACKLIST_KEYWORDS.some(k => text.includes(k))) return true;\n  if (BLACKLIST_DOMAINS.some(d => url.includes(d))) return true;\n  return false;\n}\n\nconst input = $input.first().json;\nconst items = input.items || [];\nconst body = $('Webhook Trigger').first().json.body || {};\nconst keyword = body.keyword || '';\n\nconst filtered = items.filter(i => !isBlocked(i));\nif (filtered.length === 0) {\n  return [{ json: {\n    error: 'no_candidates',\n    reason: '네이버 검색 결과가 모두 필터링됨',\n    keyword,\n    total_received: items.length,\n  } }];\n}\n\n// 정렬: 차트인 키워드(아티스트명) 일치 + 발행일\nconst topItem = filtered[0];\nconst title = stripHtml(topItem.title);\nconst description = stripHtml(topItem.description);\n\n// 아티스트·곡명 추출 (간이 패턴 — 더 정교한 NER은 LLM 단계에서 보강)\nlet artist_guess = '';\nlet song_guess = '';\nconst quoted = title.match(/[\\'\\\"]([^\\'\\\"]+)[\\'\\\"]/) || description.match(/[\\'\\\"]([^\\'\\\"]+)[\\'\\\"]/);\nif (quoted) song_guess = quoted[1];\n// 키워드의 첫 단어를 아티스트 후보로\nartist_guess = keyword.split(' ')[0] || '';\n\nreturn [{\n  json: {\n    keyword,\n    selected: {\n      title,\n      description,\n      source_url: topItem.originallink || topItem.link,\n      pub_date: topItem.pubDate,\n      artist_guess,\n      song_guess,\n    },\n    total_received: items.length,\n    candidates_after_filter: filtered.length,\n  },\n}];"
+      },
+      "id": "filter-select",
+      "name": "Filter & Select Topic",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -280,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.anthropic.com/v1/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key",
+              "value": "={{ $('Webhook Trigger').first().json.body.anthropic_api_key }}"
+            },
+            {
+              "name": "anthropic-version",
+              "value": "2023-06-01"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: $('Webhook Trigger').first().json.body.model || 'claude-sonnet-4-6', max_tokens: 4000, messages: [{ role: 'user', content: `당신은 KStoryWorld 블로그의 K-팝 컨텐츠 작성자입니다. 한국어 학습자(영어권 독자)를 대상으로 K-팝 곡에 대한 친근하고 통찰력 있는 한국어 블로그 글 초안을 작성합니다.\\n\\n# 입력\\n- 검색 키워드: ${$json.keyword}\\n- 뉴스 제목: ${$json.selected.title}\\n- 뉴스 요약: ${$json.selected.description}\\n- 추정 아티스트: ${$json.selected.artist_guess}\\n- 추정 곡명: ${$json.selected.song_guess}\\n- 출처 URL: ${$json.selected.source_url}\\n\\n# 작성 규칙 (JAC-1696 법적 SOP 준수)\\n1. 본문은 한국어, 600자 이상\\n2. 본인 해설/분석이 80% 이상 — 뉴스 요약을 그대로 옮겨 적지 말 것\\n3. 가사 인용은 본 초안에 포함하지 말 것 → \\\"[LYRICS_PLACEHOLDER]\\\" 마커만 남겨두면 Story가 검수 단계에서 1-2줄 추가\\n4. 문장 끝마다 출처를 표기하지 말고 글 마지막에만 1회 표기\\n5. 정치인 실명·범죄 단정·성인 표현·사망 관련 표현 금지\\n6. AI 사용 disclosure 문구 마지막에 포함\\n\\n# 출력 형식 (오직 JSON만, 마크다운 코드블록 금지)\\n{\\n  \\\"title\\\": \\\"SEO 친화적 한국어 제목 (60자 이내)\\\",\\n  \\\"slug\\\": \\\"english-slug-with-hyphens\\\",\\n  \\\"meta_description\\\": \\\"검색결과 발췌용 한국어 요약 (160자 이내)\\\",\\n  \\\"sections\\\": {\\n    \\\"intro\\\": \\\"도입 단락 (아티스트·곡 발매 맥락, 100~150자)\\\",\\n    \\\"lyrics_quote\\\": \\\"[LYRICS_PLACEHOLDER] — Story가 1-2줄 가사 인용 + 한국어 직역 + 영문 의역 추가\\\",\\n    \\\"cultural_context\\\": \\\"한국 문화·세대·언어적 배경 해설 (200~300자)\\\",\\n    \\\"learning_points\\\": [\\n      { \\\"phrase\\\": \\\"한국어 표현 1\\\", \\\"english\\\": \\\"English equivalent\\\", \\\"explanation\\\": \\\"학습자용 해설 1-2문장\\\" },\\n      { \\\"phrase\\\": \\\"한국어 표현 2\\\", \\\"english\\\": \\\"English equivalent\\\", \\\"explanation\\\": \\\"학습자용 해설 1-2문장\\\" },\\n      { \\\"phrase\\\": \\\"한국어 표현 3\\\", \\\"english\\\": \\\"English equivalent\\\", \\\"explanation\\\": \\\"학습자용 해설 1-2문장\\\" }\\n    ],\\n    \\\"closing\\\": \\\"마무리 단락 (50~100자)\\\",\\n    \\\"source\\\": \\\"출처: ${$json.selected.source_url}\\\",\\n    \\\"ai_disclosure\\\": \\\"본 글은 AI 분석 보조로 작성된 초안을 인간 편집자가 검수·보완한 결과입니다.\\\"\\n  },\\n  \\\"tags\\\": [\\\"k-pop\\\", \\\"한국어학습\\\", \\\"문화해설\\\"],\\n  \\\"self_check\\\": {\\n    \\\"korean_char_count_estimate\\\": 0,\\n    \\\"contains_lyrics_quote\\\": false,\\n    \\\"contains_disclosure\\\": true,\\n    \\\"contains_source\\\": true,\\n    \\\"contains_blocked_keywords\\\": false\\n  }\\n}` }] }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 60000
+        }
+      },
+      "id": "claude-draft",
+      "name": "Claude Draft K-Pop Post",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -20,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format Output + Self-Check 8항목 자동 검증\n// 입력: Claude 응답\n// 출력: 검증 결과 + 정제된 컨텐츠\n\nconst BLOCKED_KEYWORDS = ['음주운전','마약','폭행','사망','장례','19금','노출','이재명','윤석열','한동훈','조국','사기','절도','살인','성적','선정적','음란'];\n\nconst raw = $input.first().json;\nconst contentText = raw?.content?.[0]?.text || '';\n\nlet parsed = null;\nlet parseError = null;\ntry {\n  parsed = JSON.parse(contentText);\n} catch (e) {\n  // JSON 추출 시도\n  const m = contentText.match(/\\{[\\s\\S]*\\}/);\n  if (m) {\n    try { parsed = JSON.parse(m[0]); } catch (e2) { parseError = e2.message; }\n  } else {\n    parseError = e.message;\n  }\n}\n\nif (!parsed) {\n  return [{ json: {\n    ok: false,\n    reason: 'claude_response_parse_failed',\n    parseError,\n    raw_excerpt: contentText.substring(0, 500),\n  } }];\n}\n\n// 셀프체크 — JAC-1696 §6 자동 항목\nconst sec = parsed.sections || {};\nconst body_text = [\n  sec.intro,\n  sec.cultural_context,\n  sec.closing,\n  ...(sec.learning_points || []).map(lp => `${lp.phrase} ${lp.explanation}`),\n].filter(Boolean).join(' ');\n\nconst korean_chars = (body_text.match(/[\\uAC00-\\uD7AF]/g) || []).length;\nconst lyrics_placeholder_present = (sec.lyrics_quote || '').includes('[LYRICS_PLACEHOLDER]');\nconst disclosure_present = !!(sec.ai_disclosure && sec.ai_disclosure.includes('AI'));\nconst source_present = !!(sec.source && sec.source.startsWith('출처'));\nconst blocked_kw = BLOCKED_KEYWORDS.find(k => (body_text + ' ' + (parsed.title||'')).includes(k));\nconst learning_points_count = (sec.learning_points || []).length;\n\nconst checks = {\n  '1_korean_chars_min_600': korean_chars >= 600,\n  '2_lyrics_placeholder_present': lyrics_placeholder_present,\n  '3_ai_disclosure_present': disclosure_present,\n  '4_source_url_present': source_present,\n  '5_no_blocked_keywords': !blocked_kw,\n  '6_learning_points_3': learning_points_count === 3,\n  '7_title_exists': !!(parsed.title && parsed.title.length > 0),\n  '8_title_length_under_60': (parsed.title || '').length <= 60,\n  '9_slug_exists': !!(parsed.slug && parsed.slug.length > 0),\n  '10_meta_description_exists': !!(parsed.meta_description && parsed.meta_description.length > 0),\n  '11_meta_description_under_160': (parsed.meta_description || '').length <= 160,\n  '12_tags_exist_and_are_array': !!(parsed.tags && Array.isArray(parsed.tags) && parsed.tags.length > 0),\n};\nconst pass = Object.values(checks).every(Boolean);\n\nreturn [{\n  json: {\n    ok: pass,\n    self_check: checks,\n    self_check_summary: pass ? '12/12 통과' : `${Object.values(checks).filter(Boolean).length}/12 통과 — 미통과: ${Object.entries(checks).filter(([k,v])=>!v).map(([k])=>k).join(', ')}`,\n    blocked_keyword_hit: blocked_kw || null,\n    korean_chars,\n    draft: parsed,\n    metadata: {\n      keyword: $('Filter & Select Topic').first().json.keyword,\n      source: $('Filter & Select Topic').first().json.selected,\n      generated_at: new Date().toISOString(),\n      model: $('Webhook Trigger').first().json.body.model || 'claude-sonnet-4-6',\n    },\n  },\n}];"
+      },
+      "id": "format-selfcheck",
+      "name": "Format & Self-Check",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "respond",
+      "name": "Return Generated Content",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        500,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Naver Search News",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Naver Search News": {
+      "main": [
+        [
+          {
+            "node": "Filter & Select Topic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter & Select Topic": {
+      "main": [
+        [
+          {
+            "node": "Claude Draft K-Pop Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Claude Draft K-Pop Post": {
+      "main": [
+        [
+          {
+            "node": "Format & Self-Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format & Self-Check": {
+      "main": [
+        [
+          {
+            "node": "Return Generated Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

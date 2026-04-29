@@ -8,8 +8,10 @@ KStoryWorld의 카테고리별 콘텐츠 생성 워크플로 모음입니다. �
 |----------|------|--------------|------|
 | K-Beauty | [`kbeauty-content-generator.json`](./kbeauty-content-generator.json) | `/webhook/kbeauty-content` | `K-Beauty Webhook Header Auth` (`KBEAUTY_WEBHOOK_TOKEN`, 부재 시 `KPOP_WEBHOOK_TOKEN` 폴백) |
 | K-Drama  | [`kdrama-content-generator.json`](./kdrama-content-generator.json)   | `/webhook/generate-kdrama-content` | `K-Drama Webhook Header Auth` |
+| K-Pop    | [`kpop-content-generator.json`](./kpop-content-generator.json)       | `/webhook/generate-kpop-content`   | `K-Pop Webhook Header Auth` (headerAuth, `KPOP_WEBHOOK_TOKEN`) |
+| K-Food   | [`kfood-content-generator.json`](./kfood-content-generator.json)     | `/webhook/generate-kfood-content`  | `K-Food Webhook Header Auth` (headerAuth, `KFOOD_WEBHOOK_TOKEN`) |
 
-> Drive의 JSON이 n8n 인스턴스 적용용 소스 트루스입니다. 본 디렉터리는 git-tracked 사본 + dry-run 산출물 보관용. K-Pop/K-Food 워크플로 JSON은 추후 추가됩니다 ([JAC-1764](https://paperclip.ing/JAC/issues/JAC-1764) 코멘트 참조).
+> 본 디렉터리는 라이브 n8n 인스턴스 active version의 git-tracked SOT 사본입니다. JSON은 `connections` / `name` / `nodes` / `settings` (+ optional `meta`, `tags`)만 보존하는 정규화 형식으로, n8n API export 결과에 동일 정규화를 적용하면 byte-level identical 재현됩니다. K-Pop/K-Food JSON은 [JAC-1811](https://paperclip.ing/JAC/issues/JAC-1811) audit 시 라이브에서 추출하여 추가했습니다.
 
 ## K-Beauty 워크플로 노드 구성 (6 nodes)
 
@@ -35,6 +37,8 @@ KStoryWorld의 카테고리별 콘텐츠 생성 워크플로 모음입니다. �
 | 파일 | 결과 |
 |------|------|
 | [`kbeauty-2026-04-28-glass-skin-routine.json`](./_dryrun-samples/kbeauty-2026-04-28-glass-skin-routine.json) | 12/12 pass · ko 812자 · en 433단어 · ai_copy_hit=null · blocked_keyword_hit=null |
+| [`kpop-2026-04-27-execution-17.json`](./_dryrun-samples/kpop-2026-04-27-execution-17.json) | n8n execution #17 (`6PGMEqWum8phoThz`) 캡처. self_check 통과, ai_copy_hit=null, blocked_keyword_hit=null. |
+| [`kfood-2026-04-28-execution-33.json`](./_dryrun-samples/kfood-2026-04-28-execution-33.json) | n8n execution #33 (`yyggyltfQaKh6kHc`) 캡처. ko/en 이중 언어 self_check 통과. |
 | [`JAC-1787-calibration.json`](./_dryrun-samples/JAC-1787-calibration.json) | K-Drama 13번째 self-check (출처 본문 ⊆ 본문) 임계치 0.15 캘리브레이션. 무관 출처(Esquire 패션) 0.061 / 관련 출처(Tudum·squidgame·glory) 0.350~0.550 — 0.15가 명확히 분리. |
 
 ## K-Drama 워크플로 — 출처 검증 강화 (B안, JAC-1787)
