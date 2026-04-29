@@ -65,14 +65,18 @@ check_review_urls() {
   local total="${#urls[@]}"
   local ko=0
   local en=0
+  local kpop=0
+  local kdrama=0
   local u code
   for u in "${urls[@]}"; do
     [[ "$u" =~ -ko$ ]] && ko=$((ko+1))
     [[ "$u" =~ -en$ ]] && en=$((en+1))
+    [[ "$u" == *"/k-pop/"* ]] && kpop=$((kpop+1))
+    [[ "$u" == *"/k-drama/"* ]] && kdrama=$((kdrama+1))
   done
 
-  if [[ "$total" -ne 24 || "$ko" -ne 12 || "$en" -ne 12 ]]; then
-    ng "URL file needs 24 URLs (ko=12,en=12); got total=${total},ko=${ko},en=${en}"
+  if [[ "$total" -lt 24 || "$ko" -ne "$en" || "$kpop" -lt 2 || "$kdrama" -lt 2 ]]; then
+    ng "URL file needs >=24 URLs, balanced ko/en, and k-pop + k-drama samples; got total=${total},ko=${ko},en=${en},kpop=${kpop},kdrama=${kdrama}"
     return
   fi
 
