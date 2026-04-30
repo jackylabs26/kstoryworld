@@ -1,0 +1,99 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://kstoryworld.com/schemas/hexagon.json",
+  "title": "Hexagon Manifest",
+  "description": "Schema for a hexagon content cluster (1 k-drama anchor + 5 sister-domain articles). Source: JAC-1836 plan rev2.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["hexagon_id", "season_window", "anchor", "sisters", "review", "publish"],
+  "properties": {
+    "hexagon_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "description": "Stable kebab-case identifier. Must match the filename stem."
+    },
+    "season_window": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-(spring|summer|fall|winter)$",
+      "description": "Default seasonal tone window for the cluster."
+    },
+    "anchor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["domain", "title_ko", "title_en", "year", "network", "hero_image"],
+      "properties": {
+        "domain": { "const": "k-drama" },
+        "title_ko": { "type": "string", "minLength": 1 },
+        "title_en": { "type": "string", "minLength": 1 },
+        "year": { "type": "integer", "minimum": 1900, "maximum": 2100 },
+        "network": { "type": "string", "minLength": 1 },
+        "hero_image": { "$ref": "#/definitions/hero_image" }
+      }
+    },
+    "sisters": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["domain", "seed", "cross_links", "hero_image"],
+        "properties": {
+          "domain": {
+            "enum": ["k-food", "k-pop", "k-beauty", "k-travel", "k-literature"]
+          },
+          "seed": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+          },
+          "cross_links": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "pattern": "^[a-z-]+/[a-z0-9-]+$" }
+          },
+          "hero_image": { "$ref": "#/definitions/hero_image" }
+        }
+      },
+      "description": "Exactly 5 entries; each domain (k-food, k-pop, k-beauty, k-travel, k-literature) must appear exactly once. Cross-domain uniqueness is enforced by the validator, not the schema."
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": {
+          "enum": ["draft", "seeds_approved", "ready_for_board", "approved", "rejected"]
+        },
+        "board_approval_issue": {
+          "type": ["string", "null"]
+        }
+      }
+    },
+    "publish": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy"],
+      "properties": {
+        "policy": { "const": "bundle-only" }
+      }
+    }
+  },
+  "definitions": {
+    "hero_image": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "license", "seasonal_tone"],
+      "properties": {
+        "source": {
+          "enum": ["unsplash", "pexels", "pixabay", "wikimedia", "cc0", "cc-by"]
+        },
+        "asset_id": { "type": "string" },
+        "license": { "type": "string", "minLength": 1 },
+        "credit": { "type": "string" },
+        "seasonal_tone": {
+          "enum": ["spring", "summer", "fall", "winter"]
+        }
+      }
+    }
+  }
+}

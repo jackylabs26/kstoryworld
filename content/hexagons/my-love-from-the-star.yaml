@@ -1,0 +1,83 @@
+# 별에서 온 그대 hexagon — first instance (JAC-1836 시범안).
+# Schema: content/hexagons/SCHEMA.md
+# Gate 1 (seeds + headlines + image direction): accepted 2026-04-30 03:40:42 UTC (approval 2bfb733b).
+
+hexagon_id: my-love-from-the-star
+season_window: 2026-spring
+
+anchor:
+  domain: k-drama
+  title_ko: 별에서 온 그대
+  title_en: My Love from the Star
+  year: 2013
+  network: SBS
+  hero_image:
+    source: unsplash
+    asset_id: TBD
+    license: unsplash-license
+    credit: TBD
+    # 첫눈+한강 야경 무드 — 사실 충실도 예외(겨울 톤). inline 1장은 spring 의무.
+    seasonal_tone: winter
+
+sisters:
+  - domain: k-food
+    seed: chimaek-fried-chicken-beer
+    cross_links:
+      - k-travel/han-river-night
+    hero_image:
+      source: pexels
+      asset_id: TBD
+      license: pexels-license
+      credit: TBD
+      seasonal_tone: spring
+
+  - domain: k-pop
+    seed: my-destiny-lyn-ost
+    cross_links:
+      - k-drama/anchor
+    hero_image:
+      source: pexels
+      asset_id: TBD
+      license: pexels-license
+      credit: TBD
+      seasonal_tone: spring
+
+  - domain: k-beauty
+    seed: cheon-song-yi-lip-trend
+    cross_links:
+      - k-pop/my-destiny-lyn-ost
+    hero_image:
+      source: unsplash
+      asset_id: TBD
+      license: unsplash-license
+      credit: TBD
+      seasonal_tone: spring
+
+  - domain: k-travel
+    seed: petite-france-namsan-tower
+    cross_links:
+      - k-food/chimaek-fried-chicken-beer
+    hero_image:
+      source: unsplash
+      asset_id: TBD
+      license: unsplash-license
+      credit: TBD
+      seasonal_tone: spring
+
+  - domain: k-literature
+    seed: do-min-joon-bookshelf-classics
+    cross_links:
+      - k-drama/anchor
+    hero_image:
+      source: pexels
+      asset_id: TBD
+      license: pexels-license
+      credit: TBD
+      seasonal_tone: spring
+
+review:
+  status: seeds_approved
+  board_approval_issue: 2bfb733b
+
+publish:
+  policy: bundle-only
