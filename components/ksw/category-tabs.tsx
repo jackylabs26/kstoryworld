@@ -1,19 +1,18 @@
 'use client';
 
 import { useKSWTheme } from './theme-provider';
+import { CATEGORY_LABELS, REVIEW_CATEGORIES, type ReviewCategory } from '@/lib/categories';
 
-const CATEGORIES = [
+export type CategoryTabId = 'all' | ReviewCategory;
+
+const CATEGORIES: { id: CategoryTabId; kor: string; en: string }[] = [
   { id: 'all', kor: '전체', en: 'All' },
-  { id: 'drama', kor: 'K-드라마', en: 'K-Drama' },
-  { id: 'pop', kor: 'K-팝', en: 'K-Pop' },
-  { id: 'food', kor: 'K-푸드', en: 'K-Food' },
-  { id: 'beauty', kor: 'K-뷰티', en: 'K-Beauty' },
-  { id: 'lit', kor: 'K-문학', en: 'K-Literature' },
+  ...REVIEW_CATEGORIES.map((c) => ({ id: c, kor: CATEGORY_LABELS[c].ko, en: CATEGORY_LABELS[c].en })),
 ];
 
 interface Props {
-  active: string;
-  onChange: (id: string) => void;
+  active: CategoryTabId;
+  onChange: (id: CategoryTabId) => void;
 }
 
 export function CategoryTabs({ active, onChange }: Props) {
@@ -54,7 +53,7 @@ export function CategoryTabs({ active, onChange }: Props) {
           className="t-mono-sm hidden md:flex"
           style={{ alignItems: 'center', color: dark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.45)', whiteSpace: 'nowrap' }}
         >
-          {lang === 'ko' ? '카테고리 · 6' : 'CATEGORIES · 6'}
+          {lang === 'ko' ? `카테고리 · ${REVIEW_CATEGORIES.length}` : `CATEGORIES · ${REVIEW_CATEGORIES.length}`}
         </span>
       </div>
     </div>

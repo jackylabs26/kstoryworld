@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { CategoryTabs } from './category-tabs';
+import { CategoryTabs, type CategoryTabId } from './category-tabs';
 import { StoryCard } from './story-card';
 import { useKSWTheme, type Season } from './theme-provider';
 import { CATEGORY_LABELS, type ReviewCategory } from '@/lib/categories';
@@ -22,11 +22,12 @@ interface Props {
 
 export function CollectionGrid({ items }: Props) {
   const { lang, dark } = useKSWTheme();
-  const [activeCat, setActiveCat] = useState('all');
+  const [activeCat, setActiveCat] = useState<CategoryTabId>('all');
 
-  // language filter — show items matching the current UI lang first, fall back to other lang
-  const sameLang = items.filter((i) => i.lang === lang);
-  const visible = (sameLang.length ? sameLang : items).slice(0, 6);
+  const inCategory = activeCat === 'all' ? items : items.filter((i) => i.category === activeCat);
+  const sameLang = inCategory.filter((i) => i.lang === lang);
+  const visible = (sameLang.length ? sameLang : inCategory).slice(0, 6);
+  const emptyCategory = activeCat !== 'all' && inCategory.length === 0;
 
   return (
     <>
@@ -43,7 +44,7 @@ export function CollectionGrid({ items }: Props) {
               </h2>
             </div>
             <a
-              href="/reviews"
+              href={activeCat === 'all' ? '/reviews' : `/${activeCat}`}
               className="t-mono-sm"
               style={{
                 color: dark ? '#fff' : '#000',
@@ -56,20 +57,34 @@ export function CollectionGrid({ items }: Props) {
               {lang === 'ko' ? '전체 보기 →' : 'View all →'}
             </a>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {visible.map((s, i) => (
-              <StoryCard
-                key={s.slug + i}
-                href={`/${s.category}/${s.slug}`}
-                title={s.title}
-                excerpt={s.excerpt}
-                image={s.image}
-                num={String(i + 1).padStart(2, '0')}
-                season={s.season}
-                category={CATEGORY_LABELS[s.category].en}
-              />
-            ))}
-          </div>
+          {emptyCategory ? (
+            <div
+              style={{
+                textAlign: 'center',
+                padding: '64px 0',
+                color: dark ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.55)',
+              }}
+            >
+              {lang === 'ko'
+                ? `${CATEGORY_LABELS[activeCat].ko} 콘텐츠는 곧 공개됩니다.`
+                : `${CATEGORY_LABELS[activeCat].en} stories are coming soon.`}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {visible.map((s, i) => (
+                <StoryCard
+                  key={s.slug + i}
+                  href={`/${s.category}/${s.slug}`}
+                  title={s.title}
+                  excerpt={s.excerpt}
+                  image={s.image}
+                  num={String(i + 1).padStart(2, '0')}
+                  season={s.season}
+                  category={CATEGORY_LABELS[s.category].en}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </>
