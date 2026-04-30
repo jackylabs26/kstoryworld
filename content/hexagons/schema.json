@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://kstoryworld.com/schemas/hexagon.json",
   "title": "Hexagon Manifest",
-  "description": "Schema for a hexagon content cluster (1 k-drama anchor + 5 sister-domain articles). Source: JAC-1836 plan rev2.",
+  "description": "Schema for a hexagon content cluster (1 k-drama anchor + 5 sister-domain articles). Source: JAC-1836 plan rev3.",
   "type": "object",
   "additionalProperties": false,
   "required": ["hexagon_id", "season_window", "anchor", "sisters", "review", "publish"],
@@ -59,10 +59,14 @@
     "review": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["status"],
+      "required": ["status", "policy"],
       "properties": {
         "status": {
           "enum": ["draft", "seeds_approved", "ready_for_board", "approved", "rejected"]
+        },
+        "policy": {
+          "enum": ["bundle"],
+          "description": "Gate-2 review policy. v1 only supports bundle (6편 묶음 검토)."
         },
         "board_approval_issue": {
           "type": ["string", "null"]
@@ -74,8 +78,37 @@
       "additionalProperties": false,
       "required": ["policy"],
       "properties": {
-        "policy": { "const": "bundle-only" }
-      }
+        "policy": {
+          "enum": ["drip", "bundle-only"],
+          "description": "Post-approval publish cadence. drip = 1~2 articles/day from queue (rev3 default, AdSense-safe). bundle-only = legacy rev2 behavior (all 6 publish together)."
+        },
+        "daily_cap": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2,
+          "description": "Hard cap on daily publish count. Required when policy=drip; ignored when bundle-only."
+        },
+        "schedule_kind": {
+          "enum": ["queue"],
+          "description": "Queue scheduling discipline. v1 only supports FIFO-with-priority queue."
+        },
+        "recommended_order": {
+          "type": "array",
+          "minItems": 6,
+          "maxItems": 6,
+          "uniqueItems": true,
+          "items": {
+            "enum": ["k-drama", "k-food", "k-pop", "k-beauty", "k-travel", "k-literature"]
+          },
+          "description": "Publish order priority within the hexagon. Anchor (k-drama) typically first."
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "policy": { "const": "drip" } } },
+          "then": { "required": ["policy", "daily_cap", "schedule_kind", "recommended_order"] }
+        }
+      ]
     }
   },
   "definitions": {

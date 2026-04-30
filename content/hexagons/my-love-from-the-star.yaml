@@ -77,7 +77,17 @@ sisters:
 
 review:
   status: seeds_approved
+  policy: bundle              # gate-2 = 6편 묶음 검토
   board_approval_issue: 2bfb733b
 
 publish:
-  policy: bundle-only
+  policy: drip                # rev3 default — gate-2 통과 후 1일 1~2건 분할 publish (AdSense 대응)
+  daily_cap: 2
+  schedule_kind: queue
+  recommended_order:
+    - k-drama                 # 앵커 우선
+    - k-food
+    - k-travel
+    - k-pop
+    - k-beauty
+    - k-literature

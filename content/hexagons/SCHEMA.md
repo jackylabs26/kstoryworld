@@ -4,7 +4,7 @@ Each hexagon is a 6-article cluster centered on one anchor drama (k-drama) plus 
 
 A hexagon is described by a single YAML file at `content/hexagons/<hexagon_id>.yaml`. The manifest is the source of truth for the cluster's anchor seed, sister seeds, hero image direction, board review state, and publish policy.
 
-Source plan: [JAC-1836 plan rev2](/JAC/issues/JAC-1836#document-plan) §2, §7, §8.
+Source plan: [JAC-1836 plan rev3](/JAC/issues/JAC-1836#document-plan) §2, §7, §8, §10.
 
 ## File location
 
@@ -63,7 +63,8 @@ The hero image direction stored in the manifest is the **curation seed**, not th
 
 | Field | Required | Type | Notes |
 |-------|----------|------|-------|
-| `status` | yes | enum `draft` \| `seeds_approved` \| `ready_for_board` \| `approved` \| `rejected` | Bundle review lifecycle. |
+| `status` | yes | enum `draft` \| `seeds_approved` \| `ready_for_board` \| `approved` \| `rejected` | Review lifecycle. |
+| `policy` | yes | const `bundle` | Gate-2 review policy. v1 only supports bundle (6편 묶음 검토). |
 | `board_approval_issue` | no | string \| null | Paperclip issue id of the bundle approval ticket once raised. `null` until raised. |
 
 Lifecycle:
@@ -76,11 +77,18 @@ draft
   → rejected         (gate 2 reject; specific sister(s) re-drafted)
 ```
 
+`review.policy = bundle` and `publish.policy` are orthogonal: review is always done as a 6-article bundle (gate 2), but post-approval publish cadence is governed by `publish.policy` separately (see below).
+
 ## Publish
 
 | Field | Required | Type | Notes |
 |-------|----------|------|-------|
-| `policy` | yes | const `bundle-only` | All 6 articles MUST publish together. v1 model has no other policies. |
+| `policy` | yes | enum `drip` \| `bundle-only` | Post-approval publish cadence. `drip` = 1–2 articles/day drained from a queue (rev3 default, AdSense-safe). `bundle-only` = legacy rev2 (all 6 publish together). |
+| `daily_cap` | conditional | integer 1..2 | Hard cap on daily publish count. **Required when `policy=drip`**, ignored when `bundle-only`. Per plan §10.1. |
+| `schedule_kind` | conditional | const `queue` | Queue scheduling discipline. **Required when `policy=drip`**. v1 only supports FIFO-with-priority. |
+| `recommended_order` | conditional | array (length = 6, unique) of domain enum | Publish-order priority within the hexagon. **Required when `policy=drip`**. Anchor (`k-drama`) typically first. |
+
+`drip` cadence rationale (plan §10): KStoryWorld is 1-person-operated and AdSense review treats simultaneous large-batch uploads as content-farm signal. Spreading bundle approval over 1–2 articles/day with a daily cap of 2 keeps a steady cadence trail without flagging the site.
 
 ## Schema file
 
