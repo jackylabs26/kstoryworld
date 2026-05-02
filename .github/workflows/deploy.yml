@@ -27,6 +27,8 @@ jobs:
         run: npm ci
 
       - name: Build static export
+        env:
+          NEXT_PUBLIC_NAVER_SITE_VERIFICATION: 98fbc877e00c1f552ebb530b2a1ac902d27a7cc7
         run: npm run build
 
       - name: Deploy to Cloudflare Pages
