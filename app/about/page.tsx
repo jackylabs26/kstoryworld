@@ -4,6 +4,7 @@ export const metadata: Metadata = {
   title: 'About KStoryWorld',
   description:
     'About KStoryWorld — an editorial platform curating K-Drama, K-Pop, and Korean culture stories in Korean and English.',
+  alternates: { canonical: '/about' },
 };
 
 export default function AboutPage() {

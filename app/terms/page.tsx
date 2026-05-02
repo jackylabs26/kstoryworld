@@ -4,6 +4,7 @@ export const metadata: Metadata = {
   title: 'Terms of Service',
   description:
     'KStoryWorld terms of service — usage rules, content licensing, and liability limitations.',
+  alternates: { canonical: '/terms' },
 };
 
 export default function TermsPage() {
