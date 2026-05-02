@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import './globals.css';
 import Footer from '@/components/Footer';
 import Navigation from '@/components/Navigation';
@@ -44,10 +45,21 @@ export const metadata: Metadata = {
   },
 };
 
+const ADSENSE_PUB_ID = process.env.NEXT_PUBLIC_ADSENSE_PUB_ID ?? 'pub-7668661264696899';
+const ADSENSE_CLIENT = ADSENSE_PUB_ID.startsWith('pub-') ? `ca-${ADSENSE_PUB_ID}` : null;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko" data-season="winter" className="h-full antialiased">
       <body className="min-h-full flex flex-col" data-dark="false">
+        {ADSENSE_CLIENT ? (
+          <Script
+            id="adsense-auto-ads"
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
+            strategy="beforeInteractive"
+            crossOrigin="anonymous"
+          />
+        ) : null}
         <KSWThemeProvider>
           <Navigation />
           <main className="flex-1">{children}</main>
