@@ -1,7 +1,7 @@
 slug: yuna
 display_name_ko: 유나
 display_name_en: Yuna
-status: draft
+status: confirmed
 age: 23
 gender: female
 nationality: korean
@@ -50,4 +50,4 @@ avatar_image:
   credit: ""
 created_at: 2026-05-02
 notes: |
-  CEO 제안 후보 #7 (draft). JAC-1952 게이트 1 보드 검토 대상.
+  CEO 제안 후보 → 보드 confirmed 2026-05-02 (JAC-1952 코멘트 2fc823c8: "5명 다 confirmed").

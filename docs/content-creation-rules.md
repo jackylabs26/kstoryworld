@@ -63,7 +63,7 @@ KStoryWorld는 7명의 화자 페르소나가 콘텐츠를 큐레이션하는 �
 - 필수 필드: `slug`, `display_name_{ko,en}`, `status`, `age`, `gender`, `nationality`, `home_base`, `profession_{ko,en}`, `years_experience`, `identity_keywords`, `voice_tone.{ko,en}`, `category_fit.{6개 카테고리}`, `signature_phrases_{ko,en}`, `created_at`.
 - `status` 값: `confirmed` (워크플로 회전 풀 포함) / `draft` (보드 검토 대기, opt-in) / `retired` (사용 중단).
 - 회전 정책: workflow는 `status === "confirmed"` + `category_fit[<category>] >= 1` 페르소나만 풀에 포함하고 `date +%j % 풀크기`로 결정성 회전. `webhook body.narrator_persona_slug`가 있으면 강제 사용.
-- 보드 시드 페르소나: `sabina` (40대 여성, 외항사 23년 승무원), `jacky` (50대 남성, 제주, 호텔/카지노 IT 25년). CEO 제안 5명(`minji`/`hiroshi`/`alejandra`/`cheolsu`/`yuna`)은 `status: draft`로 등록되어 있어 보드 confirm 후 회전 풀 합류.
+- 보드 confirmed 7인 (2026-05-02 컨펌): `sabina` (40대 여성, 외항사 23년 승무원, 한국 리터니), `jacky` (50대 남성, 제주, 호텔/카지노 IT 25년), `minji` (27세 부산, K-Beauty MUA), `hiroshi` (33세 일본인, J-K 번역가), `alejandra` (29세 멕시코, K-Pop PhD), `cheolsu` (52세 광주, 한식 셰프 미슐랭 1성), `yuna` (23세 제주, K-Travel + 지속가능성). 7명 전원 회전 풀 포함.
 - 본문 푸터에 1줄 byline 자동 삽입(예: "by 사비나 (Seoul + Hong Kong, ex-cabin crew)").
 
 ---

@@ -1,7 +1,7 @@
 slug: hiroshi
 display_name_ko: 히로시
 display_name_en: Hiroshi
-status: draft
+status: confirmed
 age: 33
 gender: male
 nationality: japanese
@@ -51,4 +51,4 @@ avatar_image:
   credit: ""
 created_at: 2026-05-02
 notes: |
-  CEO 제안 후보 #4 (draft). JAC-1952 게이트 1 보드 검토 대상.
+  CEO 제안 후보 → 보드 confirmed 2026-05-02 (JAC-1952 코멘트 2fc823c8: "5명 다 confirmed").
