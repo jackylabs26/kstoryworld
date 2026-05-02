@@ -13,6 +13,7 @@ export const metadata: Metadata = {
   title: 'KStoryWorld — K-Drama Reviews & Guides | K-드라마 리뷰',
   description:
     'KStoryWorld는 한국의 K-드라마, K-팝, K-푸드, K-뷰티, K-문학 등 K-콘텐츠를 한국어와 영어 에디토리얼로 옮기는 글로벌 매체입니다.',
+  alternates: { canonical: '/' },
 };
 
 export default function HomePage() {

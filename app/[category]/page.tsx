@@ -21,9 +21,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { category } = await params;
   if (!isReviewCategory(category)) return { title: 'Not Found' };
   const label = CATEGORY_LABELS[category];
+  const title = `${label.ko} 리뷰 & 가이드 | KStoryWorld`;
+  const description = `${label.ko} 콘텐츠의 모든 것. 심층 리뷰, 분석, 그리고 숨겨진 명작 추천까지.`;
+  const url = `https://kstoryworld.com/${category}`;
   return {
-    title: `${label.ko} 리뷰 & 가이드 | KStoryWorld`,
-    description: `${label.ko} 콘텐츠의 모든 것. 심층 리뷰, 분석, 그리고 숨겨진 명작 추천까지.`,
+    title,
+    description,
+    alternates: { canonical: `/${category}` },
+    openGraph: { title, description, url, type: 'website', siteName: 'KStoryWorld' },
+    twitter: { card: 'summary_large_image', title, description },
   };
 }
 
