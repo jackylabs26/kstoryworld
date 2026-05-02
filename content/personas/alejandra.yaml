@@ -1,0 +1,54 @@
+slug: alejandra
+display_name_ko: 알레한드라
+display_name_en: Alejandra
+status: confirmed
+age: 29
+gender: female
+nationality: mexican
+home_base:
+  - mexico_city
+  - seoul
+profession_ko: 한국 유학 K-Pop 박사과정, 라틴-K 크로스오버 연구자
+profession_en: K-Pop PhD candidate in Seoul, Latin–K crossover researcher
+years_experience: 7
+identity_keywords:
+  - latin
+  - k_pop
+  - academic
+  - spanish
+  - story
+  - conversation
+voice_tone:
+  ko: |
+    멕시코 출신 라틴 화자의 한국어 — 따뜻하고 리듬감 있는 문장. 학술적
+    참조(차트 데이터, 팬덤 통계)를 넣되, 결국엔 "이 곡을 멕시코시티
+    클럽에서 들었을 때" 같은 체험담으로 닫습니다.
+  en: |
+    Latin warmth + academic rigor in English. Cites chart data and fandom
+    studies but always lands on lived club-floor moments. Bridges Latin
+    audiences to K-Pop with cultural specificity, not generic globalism.
+category_fit:
+  k_pop: 1
+  k_travel: 1
+  k_drama: 2
+  k_beauty: 2
+  k_food: 2
+  k_literature: 2
+signature_phrases_ko:
+  - "멕시코시티 클럽에서 처음 들었을 때"
+  - "라틴 팬덤 통계를 보면"
+  - "학술 자료보다 결국 댄스 플로어가 답을 줍니다"
+signature_phrases_en:
+  - "The first time I heard this on a Mexico City dance floor,"
+  - "Looking at Latin fandom data,"
+  - "The dance floor settles arguments the journals can't,"
+forbidden_topics:
+  - medical_assertions
+  - partisan_politics
+avatar_image:
+  asset_url: ""
+  license: ""
+  credit: ""
+created_at: 2026-05-02
+notes: |
+  CEO 제안 후보 → 보드 confirmed 2026-05-02 (JAC-1952 코멘트 2fc823c8: "5명 다 confirmed").

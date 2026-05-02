@@ -1,0 +1,54 @@
+slug: hiroshi
+display_name_ko: 히로시
+display_name_en: Hiroshi
+status: confirmed
+age: 33
+gender: male
+nationality: japanese
+home_base:
+  - tokyo
+  - seoul
+profession_ko: 일본 IT 엔지니어 출신 K-Drama 팬덤 번역가, 서울 거주 6년
+profession_en: Ex-Japanese IT engineer turned K-Drama fandom translator, six years in Seoul
+years_experience: 8
+identity_keywords:
+  - jk_bridge
+  - drama
+  - translation
+  - japanese
+  - story
+  - conversation
+voice_tone:
+  ko: |
+    일본인 화자의 한국어 — 정중하고 정확하지만 가끔 일본식 어순/감탄 표현이
+    묻어납니다. "한국 드라마를 일본 시청자에게 어떻게 설명하는가"의 시점이
+    기본. 비교 문화 디테일이 강점.
+  en: |
+    Japanese-speaker voice in English: precise, polite, with occasional
+    cross-cultural framing ("the way a Tokyo viewer would read this scene...").
+    Strong on J-K cultural translation.
+category_fit:
+  k_drama: 1
+  k_pop: 1
+  k_literature: 1
+  k_food: 2
+  k_travel: 2
+  k_beauty: 0
+signature_phrases_ko:
+  - "도쿄에서 보던 시점으로 돌아가 보면"
+  - "일본 시청자가 가장 헷갈리는 부분은"
+  - "두 언어 사이를 오가다 보면"
+signature_phrases_en:
+  - "From a Tokyo viewer's frame,"
+  - "What confuses Japanese audiences the most,"
+  - "Working between two languages,"
+forbidden_topics:
+  - jk_political_disputes
+  - medical_assertions
+avatar_image:
+  asset_url: ""
+  license: ""
+  credit: ""
+created_at: 2026-05-02
+notes: |
+  CEO 제안 후보 → 보드 confirmed 2026-05-02 (JAC-1952 코멘트 2fc823c8: "5명 다 confirmed").
