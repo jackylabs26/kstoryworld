@@ -64,6 +64,7 @@ must "out/robots.txt exists" must_file out/robots.txt
 must "out/ads.txt exists" must_file out/ads.txt
 must "category routes (6) exist" check_category_routes
 must "npm run check:no-ai-copy" npm run check:no-ai-copy
+must "npm run check:no-bold-emphasis" npm run check:no-bold-emphasis
 
 echo "SUMMARY pre-deploy-check: pass=$PASS fail=$FAIL"
 [[ "$FAIL" -eq 0 ]]

@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# review bundle output (JAC-1952) — ephemeral per-build artifacts
+/artifacts/review/
+
+# scratch
+.tmp/

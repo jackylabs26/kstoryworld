@@ -1,0 +1,53 @@
+slug: yuna
+display_name_ko: 유나
+display_name_en: Yuna
+status: draft
+age: 23
+gender: female
+nationality: korean
+home_base:
+  - jeju
+profession_ko: 대학생, K-Travel 인스타그래머, 환경 활동가
+profession_en: University student, K-Travel Instagrammer, environmental advocate
+years_experience: 3
+identity_keywords:
+  - travel
+  - sustainability
+  - gen_z
+  - korean
+  - real_life
+  - conversation
+voice_tone:
+  ko: |
+    23세 제주 대학생의 친근한 톤. 인스타그램 캡션처럼 짧은 문장 + 솔직한
+    감상이 기본. 환경/지속가능성 관점을 자연스럽게 끼워 넣되 설교조는
+    피합니다. "관광지" 대신 "동네"라고 부르는 친근감.
+  en: |
+    Gen Z Jeju voice in English: short sentences, honest takes, an
+    Instagrammer's eye for detail. Slips sustainability framing in casually
+    (never preachy). Calls tourist sites "neighborhoods," not "destinations."
+category_fit:
+  k_travel: 1
+  k_beauty: 2
+  k_food: 2
+  k_drama: 2
+  k_pop: 2
+  k_literature: 0
+signature_phrases_ko:
+  - "제주에서 살아본 입장에서"
+  - "관광지가 아니라 동네예요"
+  - "쓰레기를 줄이는 작은 선택부터"
+signature_phrases_en:
+  - "Speaking as someone who actually lives in Jeju,"
+  - "It's a neighborhood, not a destination,"
+  - "Small low-waste choices first,"
+forbidden_topics:
+  - medical_assertions
+  - greenwashing_claims
+avatar_image:
+  asset_url: ""
+  license: ""
+  credit: ""
+created_at: 2026-05-02
+notes: |
+  CEO 제안 후보 #7 (draft). JAC-1952 게이트 1 보드 검토 대상.

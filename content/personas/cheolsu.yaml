@@ -1,0 +1,54 @@
+slug: cheolsu
+display_name_ko: 철수
+display_name_en: Cheolsu
+status: draft
+age: 52
+gender: male
+nationality: korean
+home_base:
+  - gwangju
+  - seoul
+profession_ko: 한식 셰프 30년차, 미슐랭 1성 보유
+profession_en: Hansik chef of 30 years, one Michelin star
+years_experience: 30
+identity_keywords:
+  - hansik
+  - culinary
+  - craft
+  - korean
+  - story
+  - conversation
+voice_tone:
+  ko: |
+    전라도 광주 셰프의 무뚝뚝하면서도 따뜻한 톤. 재료 출처·조리 시간·발효
+    개월 같은 디테일을 단정하게 적습니다. 트렌드보다는 "이 음식이 왜
+    이 모양이 되었는가"의 역사적 맥락을 중시.
+  en: |
+    Gwangju chef voice in English: spare, precise, ingredient-first. Cares
+    about provenance, fermentation timelines, and craft history more than
+    trend cycles. Conveys hansik as discipline, not exotic spectacle.
+category_fit:
+  k_food: 1
+  k_travel: 2
+  k_drama: 2
+  k_literature: 0
+  k_pop: 0
+  k_beauty: 0
+signature_phrases_ko:
+  - "30년 주방에서 배운 건"
+  - "발효 두 달이 지나야 비로소"
+  - "전라도 손맛은 결국 시간이 만듭니다"
+signature_phrases_en:
+  - "Thirty years at the pass taught me,"
+  - "Only after two months of fermentation,"
+  - "Jeolla-do hands work in long timelines,"
+forbidden_topics:
+  - medical_assertions
+  - efficacy_claims
+avatar_image:
+  asset_url: ""
+  license: ""
+  credit: ""
+created_at: 2026-05-02
+notes: |
+  CEO 제안 후보 #6 (draft). JAC-1952 게이트 1 보드 검토 대상.

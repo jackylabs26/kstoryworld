@@ -1,0 +1,44 @@
+# KStoryWorld 화자 페르소나 스키마 (JAC-1952)
+#
+# 콘텐츠 워크플로(n8n)는 본 디렉터리의 <slug>.yaml 페르소나를 결정성 회전으로
+# 선택해 system prompt에 voice_tone / signature_phrases / identity_keywords를
+# 주입하고, 산출 메타에 narrator_persona_slug를 기록합니다.
+#
+# 필드 정의:
+#
+# slug                 (string, required) 영문 소문자 + 하이픈. 워크플로 ID와 일치.
+# display_name_ko      (string, required) 한국어 표시 이름.
+# display_name_en      (string, required) 영문 표시 이름.
+# status               (enum, required) confirmed | draft | retired
+#                      - confirmed: 보드 승인 완료. 워크플로 회전 풀에 포함.
+#                      - draft    : CEO 제안, 보드 검토 대기. 회전 풀에서 제외(opt-in).
+#                      - retired  : 더 이상 신규 콘텐츠에 사용하지 않음.
+# age                  (integer, required) 20–59 범위.
+# gender               (enum, required) female | male | nonbinary
+# nationality          (string, required) 자유 슬러그 (예: korean, korean_returnee, japanese, mexican)
+# home_base            (array<string>, required) 도시 슬러그 1~3개.
+# profession_ko        (string, required)
+# profession_en        (string, required)
+# years_experience     (integer, required)
+# identity_keywords    (array<string>, required) 정체성 키워드 3~7개.
+# voice_tone           (object, required)
+#   ko                 (string, required) 한국어 본문 작성 톤 가이드.
+#   en                 (string, required) English voice tone guide.
+# category_fit         (object, required) 카테고리별 적합도. 1=주력 / 2=보조 / 0=금지.
+#   k_drama, k_pop, k_food, k_beauty, k_travel, k_literature  (integer 0|1|2, required)
+# signature_phrases_ko (array<string>, required) 페르소나 어휘 시그니처 ≥ 3.
+# signature_phrases_en (array<string>, required) Same in English ≥ 3.
+# forbidden_topics     (array<string>, optional) 페르소나가 다루지 않는 주제(예: 의료/정치).
+# avatar_image         (object, optional) 향후 reader-app 표시용
+#   asset_url, license, credit
+# created_at           (string, required) YYYY-MM-DD
+# notes                (string, optional) 개정 이력.
+#
+# 회전 정책:
+# - 모든 카테고리 워크플로는 status === "confirmed" + category_fit[<category>] >= 1 인
+#   페르소나만 풀에 포함.
+# - 회전 인덱스: date +%j (연중 일수) % 풀 크기 (결정성, 키워드 회전과 동일 패턴).
+# - webhook body에 narrator_persona_slug가 명시되면 회전 무시하고 강제 사용.
+#
+# 자기 점검 #18 (narrator_persona_resolved):
+# 워크플로 산출 메타에 narrator_persona_slug 필드가 비어 있지 않아야 통과.
