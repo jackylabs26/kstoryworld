@@ -10,6 +10,7 @@ Paperclip "Daily Content" 루틴이 호출하는 카테고리별 kickoff 스크�
 | [`kbeauty-kickoff.sh`](./kbeauty-kickoff.sh) | K-Beauty 일일 kickoff. K-Drama/K-Pop kickoff와 동형 (Story 자식 + 발행 게이트 자식 패턴). |
 | [`kpop-publish.sh`](./kpop-publish.sh) | Paperclip `draft-content` 문서를 `content/reviews/*.html`로 렌더링하는 repo-side K-Pop publish adapter. 성공 시 대상 prod URL을 publish issue 코멘트에 남깁니다. |
 | [`kfood-kickoff.sh`](./kfood-kickoff.sh) | K-Food 일일 kickoff. 에디터 큐레이션 + 12-check/no-ai-copy 가드가 걸린 dry-run 검증 진입점. |
+| [`daily-aggregate.sh`](./daily-aggregate.sh) | Paperclip `Daily Publish Aggregate` routine 진입점. 어제(KST) `_dryrun-samples/{category}-YYYY-MM-DD-*.json` 4개 카테고리(kpop/kdrama/kfood/kbeauty) 카운트 → 0편이면 `ALERT_ISSUE_ID`(기본 JAC-1737) priority=critical + 알림 코멘트, 1편 이상이면 routine 이슈에 카운트 요약. 종료 시 본 이슈 status=done. |
 
 ## K-Beauty 키워드 풀 (10)
 
@@ -38,6 +39,12 @@ bash board-routine/kfood-kickoff.sh "$PAPERCLIP_TASK_ID"
 # 로컬 dry-run (네트워크 X, 스텁 응답을 dry-run 샘플로 저장):
 N8N_DRYRUN=1 bash board-routine/kbeauty-kickoff.sh manual-test
 N8N_DRYRUN=1 bash board-routine/kfood-kickoff.sh manual-test
+
+# Daily Publish Aggregate (cron 0 9 * * * KST, JAC-1966 routine):
+bash board-routine/daily-aggregate.sh "$PAPERCLIP_TASK_ID"
+DAILY_AGGREGATE_DRYRUN=1 bash board-routine/daily-aggregate.sh JAC-1966           # API 호출 없이 의도 출력
+DAILY_AGGREGATE_DRYRUN=1 DAILY_AGGREGATE_DATE=2026-04-29 \
+  bash board-routine/daily-aggregate.sh JAC-1966                                  # 임의 날짜로 검증
 ```
 
 성공 시 `n8n-workflows/_dryrun-samples/{category}-YYYY-MM-DD-{slug}.json`에 응답이 persist되며, 12/12 self-check pass 여부가 stdout으로 노출됩니다.
@@ -51,4 +58,8 @@ N8N_DRYRUN=1 bash board-routine/kfood-kickoff.sh manual-test
 | `KFOOD_WEBHOOK_TOKEN` | 선택 | K-Food 전용 webhook header auth 토큰. |
 | `KBEAUTY_WEBHOOK_TOKEN` | 선택 | K-Beauty 전용 webhook header auth 토큰. |
 | `N8N_DRYRUN` | 선택 | `1`이면 webhook 호출을 건너뛰고 스텁 응답을 echo. |
+| `ALERT_ISSUE_ID` | 선택 | `daily-aggregate.sh` 0편 알림 대상. 기본 `JAC-1737`. |
+| `DAILY_AGGREGATE_DRYRUN` | 선택 | `1`이면 Paperclip API 호출 없이 의도된 POST/PATCH payload만 출력. |
+| `DAILY_AGGREGATE_DATE` | 선택 | `daily-aggregate.sh` 카운트 기준일 override (YYYY-MM-DD). 기본은 KST 기준 어제. |
+| `PAPERCLIP_API_URL` / `PAPERCLIP_API_KEY` / `PAPERCLIP_RUN_ID` | 자동 | Paperclip 실행 시 주입. `daily-aggregate.sh` 본 호출용. |
 | `PAPERCLIP_TASK_ID` | 자동 | Paperclip routine이 주입. 첫 인자로도 전달 가능. |
