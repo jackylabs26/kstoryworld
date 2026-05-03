@@ -2,7 +2,7 @@
 
 > 대상 독자: 콘텐츠 에디터, n8n 워크플로 운영자, QC 감사자, 보드(Paperclip) 사용자.
 > 본 문서는 코드·워크플로·게이트에 흩어져 있는 콘텐츠 생산 규칙을 한 곳으로 모은 다운로드용 SOP입니다.
-> 마지막 갱신: 2026-05-02 (JAC-1952 — 페르소나 7명·`** **` ban·이미지 ≥1·유튜브 URL ≥1·검토 번들).
+> 마지막 갱신: 2026-05-04 (JAC-1952 — 페르소나 8인·`** **` ban·이미지 ≥1·유튜브 URL ≥1·검토 번들).
 > 변경 시 반드시 본 문서와 원본 SoT를 함께 갱신하세요.
 
 ---
@@ -57,13 +57,13 @@
 
 ### 1.4 화자 페르소나 (JAC-1952)
 
-KStoryWorld는 7명의 화자 페르소나가 콘텐츠를 큐레이션하는 컨셉입니다. 모든 콘텐츠 산출물은 메타에 `narrator_persona_slug`를 포함해야 합니다 (self-check #18).
+KStoryWorld는 8인의 화자 페르소나가 콘텐츠를 큐레이션하는 컨셉입니다. 모든 콘텐츠 산출물은 메타에 `narrator_persona_slug`를 포함해야 합니다 (self-check #18).
 
 - 레지스트리 위치: `content/personas/<slug>.yaml` (스키마는 `content/personas/_schema.yaml`).
 - 필수 필드: `slug`, `display_name_{ko,en}`, `status`, `age`, `gender`, `nationality`, `home_base`, `profession_{ko,en}`, `years_experience`, `identity_keywords`, `voice_tone.{ko,en}`, `category_fit.{6개 카테고리}`, `signature_phrases_{ko,en}`, `created_at`.
 - `status` 값: `confirmed` (워크플로 회전 풀 포함) / `draft` (보드 검토 대기, opt-in) / `retired` (사용 중단).
 - 회전 정책: workflow는 `status === "confirmed"` + `category_fit[<category>] >= 1` 페르소나만 풀에 포함하고 `date +%j % 풀크기`로 결정성 회전. `webhook body.narrator_persona_slug`가 있으면 강제 사용.
-- 보드 confirmed 7인 (2026-05-02 컨펌): `sabina` (40대 여성, 외항사 23년 승무원, 한국 리터니), `jacky` (50대 남성, 제주, 호텔/카지노 IT 25년), `minji` (27세 부산, K-Beauty MUA), `hiroshi` (33세 일본인, J-K 번역가), `alejandra` (29세 멕시코, K-Pop PhD), `cheolsu` (52세 광주, 한식 셰프 미슐랭 1성), `yuna` (23세 제주, K-Travel + 지속가능성). 7명 전원 회전 풀 포함.
+- 보드 confirmed 8인: `sabina` (40대 여성, 외항사 23년 승무원, 한국 리터니), `jacky` (50대 남성, 제주, 호텔/카지노 IT 25년), `minji` (27세 부산, K-Beauty MUA), `hiroshi` (33세 일본인, J-K 번역가), `alejandra` (29세 멕시코, K-Pop PhD), `cheolsu` (52세 광주, 한식 셰프 미슐랭 1성), `yuna` (23세 제주, K-Travel + 지속가능성), `echo` (38세 서울, KStoryWorld 에디터스 데스크 책임자, 12년차 콘텐츠 에디터 — JAC-1952 2026-05-04 추가). 8인 전원 회전 풀 포함.
 - 본문 푸터에 1줄 byline 자동 삽입(예: "by 사비나 (Seoul + Hong Kong, ex-cabin crew)").
 
 ---
