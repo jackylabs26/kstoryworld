@@ -118,9 +118,42 @@ json.dump(data, sys.stdout, ensure_ascii=False)
 PY
 }
 
+# JAC-1895: when HEXAGON_ID (and optionally ANCHOR_DRAMA_JSON) are exported in
+# the environment, merge `hexagon_id` and `anchor_drama` into the webhook
+# payload so the sister-workflow self-check #14 (anchor_backlink_present) and
+# the hexagon prompt block fire. When HEXAGON_ID is absent the payload is
+# returned unchanged, preserving the legacy daily 04–06 KST single-category
+# routine. ANCHOR_DRAMA_JSON, if set, must be a JSON object with at minimum
+# `title_ko`, `title_en`, `year`, `network`; optional `key_motifs` (string[]).
+br_inject_hexagon_extras() {
+  local payload="$1"
+  if [[ -z "${HEXAGON_ID:-}" ]] || ! command -v python3 >/dev/null 2>&1; then
+    printf '%s' "$payload"
+    return 0
+  fi
+  HEXAGON_ID="$HEXAGON_ID" ANCHOR_DRAMA_JSON="${ANCHOR_DRAMA_JSON:-}" python3 - "$payload" <<'PY'
+import json, os, sys
+data = json.loads(sys.argv[1])
+data["hexagon_id"] = os.environ["HEXAGON_ID"]
+ad_raw = os.environ.get("ANCHOR_DRAMA_JSON", "").strip()
+if ad_raw:
+    try:
+        ad = json.loads(ad_raw)
+    except json.JSONDecodeError as e:
+        print(f"br_inject_hexagon_extras: ANCHOR_DRAMA_JSON parse error: {e}", file=sys.stderr)
+        sys.exit(1)
+    if not isinstance(ad, dict):
+        print("br_inject_hexagon_extras: ANCHOR_DRAMA_JSON must be a JSON object", file=sys.stderr)
+        sys.exit(1)
+    data["anchor_drama"] = ad
+json.dump(data, sys.stdout, ensure_ascii=False)
+PY
+}
+
 br_n8n_call() {
   local path="$1" token_var_primary="$2" payload="$3"
   if [[ "${N8N_DRYRUN:-0}" == "1" ]]; then
+    payload="$(br_inject_hexagon_extras "$payload")"
     printf '{"dryrun":true,"path":"%s","payload":%s}\n' "$path" "$payload"
     return 0
   fi
@@ -136,6 +169,7 @@ br_n8n_call() {
     echo "br_n8n_call: ${token_var_primary} (or KPOP_WEBHOOK_TOKEN fallback) is required" >&2
     return 1
   fi
+  payload="$(br_inject_hexagon_extras "$payload")"
   payload="$(br_inject_anthropic_key "$payload")"
   curl -sS -X POST \
     -H "Content-Type: application/json" \

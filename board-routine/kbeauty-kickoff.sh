@@ -42,6 +42,9 @@ JSON
 )
 
 echo "[kbeauty-kickoff] task=$TASK_ID date=$DATE keyword=$KEYWORD"
+if [[ -n "${HEXAGON_ID:-}" ]]; then
+  echo "[kbeauty-kickoff] hexagon mode: hexagon_id=$HEXAGON_ID anchor_drama=${ANCHOR_DRAMA_JSON:+set}"
+fi
 
 RESPONSE_FILE="$(br_dryrun_path "kbeauty" "$DATE" "$SLUG")"
 mkdir -p "$(dirname "$RESPONSE_FILE")"
