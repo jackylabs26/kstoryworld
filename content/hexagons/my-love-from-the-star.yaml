@@ -1,0 +1,220 @@
+hexagon_id: my-love-from-the-star
+season_window: 2026-spring
+anchor:
+  domain: k-drama
+  title_ko: "2013년의 별이 다시 뜨는 이유 — 별에서 온 그대 다시 보기 가이드"
+  title_en: "Why a 2013 SBS Drama Still Rules: A Curator's Guide to My Love from the Star"
+  year: 2013
+  network: SBS
+  slug: my-love-from-the-star-curator-guide
+  articles:
+    ko: content/dramas/my-love-from-the-star-ko.html
+    en: content/dramas/my-love-from-the-star-en.html
+  sources:
+    - "SBS 공식 (sbs.co.kr)"
+    - "Netflix Tudum (tudum.com)"
+    - "Wikipedia — My Love from the Star"
+  hero_image:
+    source: pexels
+    asset_id: "2246803"
+    asset_url: "https://www.pexels.com/photo/concrete-bridge-photography-2246803/"
+    license: pexels-license
+    credit: "Photo by Ethan Brooke on Pexels"
+    seasonal_tone: winter
+    alt_text:
+      ko: "서울 한강 야경과 다리 위로 비치는 도시의 불빛 — 별에서 온 그대의 겨울 감성을 떠올리게 하는 풍경"
+      en: "Seoul's Han River at night with city lights reflecting off the bridge — evoking the winter atmosphere of My Love from the Star"
+  inline_images:
+    - source: pexels
+      asset_id: "32164870"
+      asset_url: "https://www.pexels.com/photo/cherry-blossoms-framing-iconic-seoul-tower-32164870/"
+      license: pexels-license
+      credit: "Photo by Theodore Nguyen on Pexels"
+      seasonal_tone: spring
+      alt_text:
+        ko: "봄밤 벚꽃 사이로 보이는 서울 남산타워 야경"
+        en: "Seoul's Namsan Tower framed by cherry blossoms on a spring night"
+    - source: pexels
+      asset_id: "21011587"
+      asset_url: "https://www.pexels.com/photo/street-in-seoul-in-south-korea-in-spring-21011587/"
+      license: pexels-license
+      credit: "Photo by Honggrider Rock on Pexels"
+      seasonal_tone: spring
+      alt_text:
+        ko: "서울 봄 거리에 만개한 벚꽃나무 아래 산책로"
+        en: "Cherry blossom trees lining a peaceful Seoul street in spring"
+  backlinks:
+    - domain: k-food
+      slug: chimek-korean-fried-chicken-beer-culture
+    - domain: k-pop
+      slug: my-love-from-the-star-ost-kpop-crossover
+    - domain: k-beauty
+      slug: cheon-songyi-makeup-glass-skin
+    - domain: k-travel
+      slug: seoul-drama-filming-locations-avenueel
+    - domain: k-literature
+      slug: edward-said-joseon-alien-gaze
+sisters:
+  - domain: k-food
+    seed: chimaek-fried-chicken-beer
+    cross_links: [k-travel/han-river-night]
+    hero_image:
+      source: pexels
+      asset_id: "32196425"
+      asset_url: "https://www.pexels.com/photo/vibrant-spring-day-overlooking-seoul-skyline-from-hangang-park-32196425/"
+      license: pexels-license
+      credit: "Photo by Theodore Nguyen on Pexels"
+      seasonal_tone: spring
+    inline_images:
+      - source: pexels
+        asset_id: "5773996"
+        asset_url: "https://www.pexels.com/photo/close-up-of-a-korean-fried-chicken-platter-5773996/"
+        license: pexels-license
+        credit: "Photo by Luis Becerra Fotógrafo on Pexels"
+        seasonal_tone: spring
+      - source: pexels
+        asset_id: "30769066"
+        asset_url: "https://www.pexels.com/photo/relaxing-picnic-by-the-han-river-in-seoul-30769066/"
+        license: pexels-license
+        credit: "Photo by Sangmin Jeong on Pexels"
+        seasonal_tone: spring
+    articles:
+      ko: content/foods/chimaek-fried-chicken-beer-ko.html
+      en: content/foods/chimaek-fried-chicken-beer-en.html
+  - domain: k-pop
+    seed: my-destiny-lyn-ost
+    cross_links: [k-drama/anchor]
+    hero_image:
+      source: pexels
+      asset_id: "3944104"
+      asset_url: "https://www.pexels.com/photo/black-vinyl-record-on-white-table-3944104/"
+      license: pexels-license
+      credit: "Photo by cottonbro studio on Pexels"
+      seasonal_tone: spring
+    inline_images:
+      - source: pexels
+        asset_id: "6625690"
+        asset_url: "https://www.pexels.com/photo/pink-and-red-tulip-flowers-beside-a-clear-glass-mug-with-liquid-6625690/"
+        license: pexels-license
+        credit: "Photo by Pink Press on Pexels"
+        seasonal_tone: spring
+      - source: pexels
+        asset_id: "2099737"
+        asset_url: "https://www.pexels.com/photo/cherry-blossom-tree-2099737/"
+        license: pexels-license
+        credit: "Photo by Susanne Jutzeler, suju-foto on Pexels"
+        seasonal_tone: spring
+    articles:
+      ko: content/songs/my-destiny-lyn-ost-ko.md
+      en: content/songs/my-destiny-lyn-ost-en.md
+  - domain: k-beauty
+    seed: cheon-song-yi-lip-trend
+    cross_links: [k-pop/my-destiny-lyn-ost]
+    hero_image:
+      source: pexels
+      asset_id: "7256147"
+      asset_url: "https://www.pexels.com/photo/lipstick-against-a-pink-background-7256147/"
+      license: pexels-license
+      credit: "Photo by DS stories on Pexels"
+      seasonal_tone: spring
+      alt_text:
+        ko: "파스텔 핑크 배경 위에 기하학적으로 배열된 봄 톤 립스틱 플랫레이"
+        en: "Flat lay of spring-toned lipsticks arranged in a geometric pattern on pastel pink background"
+    inline_images:
+      - source: pexels
+        asset_id: "4008597"
+        asset_url: "https://www.pexels.com/photo/charming-young-ethnic-woman-with-hairdo-in-garden-4008597/"
+        license: pexels-license
+        credit: "Photo by Thiều Hoàng Phước on Pexels"
+        seasonal_tone: spring
+        alt_text:
+          ko: "봄 꽃나무 아래 내추럴 메이크업의 여성 — 부드러운 코랄 립 무드"
+          en: "Woman with natural makeup under blooming spring tree — soft coral lip mood"
+      - source: pexels
+        asset_id: "1213558"
+        asset_url: "https://www.pexels.com/photo/pink-lipstick-1213558/"
+        license: pexels-license
+        credit: "Photo by Suzy Hazelwood on Pexels"
+        seasonal_tone: spring
+        alt_text:
+          ko: "화장대 위 핑크 립스틱 클로즈업 — 거울에 비친 봄 색감"
+          en: "Close-up of pink lipstick on vanity — spring tones reflected in mirror"
+    articles:
+      ko: content/beauties/cheon-song-yi-lip-trend-ko.md
+      en: content/beauties/cheon-song-yi-lip-trend-en.md
+  - domain: k-travel
+    seed: petite-france-namsan-tower
+    cross_links: [k-food/chimaek-fried-chicken-beer]
+    hero_image:
+      source: pexels
+      asset_id: "4198567"
+      asset_url: "https://www.pexels.com/photo/pink-cherry-blossom-tree-near-city-buildings-4198567/"
+      license: pexels-license
+      credit: "Photo by Taryn Elliott on Pexels"
+      seasonal_tone: spring
+    inline_images:
+      - source: pexels
+        asset_id: "32133726"
+        asset_url: "https://www.pexels.com/photo/namsan-seoul-tower-among-cherry-blossoms-in-spring-32133726/"
+        license: pexels-license
+        credit: "Photo by Theodore Nguyen on Pexels"
+        seasonal_tone: spring
+      - source: pexels
+        asset_id: "30769066"
+        asset_url: "https://www.pexels.com/photo/relaxing-picnic-by-the-han-river-in-seoul-30769066/"
+        license: pexels-license
+        credit: "Photo by Sangmin Jeong on Pexels"
+        seasonal_tone: spring
+    articles:
+      ko: content/travels/petite-france-namsan-tower-ko.html
+      en: content/travels/petite-france-namsan-tower-en.html
+    locations:
+      - name_ko: 가평 쁘띠프랑스
+        name_en: Petite France, Gapyeong
+        scene: Do Min-joon rooftop
+      - name_ko: 남산 N서울타워
+        name_en: N Seoul Tower, Namsan
+        scene: romance night view
+      - name_ko: 한강공원
+        name_en: Han River Park
+        scene: chimaek first-snow scene
+  - domain: k-literature
+    seed: do-min-joon-bookshelf-classics
+    cross_links: [k-drama/anchor]
+    hero_image:
+      source: pexels
+      asset_id: "16063643"
+      asset_url: "https://www.pexels.com/photo/clsoe-up-of-a-book-and-a-cup-of-tea-on-a-windowsill-16063643/"
+      license: pexels-license
+      credit: "Photo by Arsonela K on Pexels"
+      seasonal_tone: spring
+      alt_text:
+        ko: "창가에 놓인 펼쳐진 책과 찻잔 — 봄 자연광이 비치는 독서 무드"
+        en: "Open book and tea cup on a windowsill bathed in spring natural light"
+    inline_images:
+      - source: pexels
+        asset_id: "1290828"
+        asset_url: "https://www.pexels.com/photo/four-pile-of-books-on-top-of-brown-wooden-surface-1290828/"
+        license: pexels-license
+        credit: "Photo by Suzy Hazelwood on Pexels"
+        seasonal_tone: spring
+        alt_text:
+          ko: "나무 테이블 위에 쌓인 빈티지 양장본 — 고전 문학 컬렉션 무드"
+          en: "Stacked vintage hardcover books on a wooden table — classic literature collection mood"
+      - source: pexels
+        asset_id: "19577909"
+        asset_url: "https://www.pexels.com/photo/dried-leaf-on-a-korean-book-19577909/"
+        license: pexels-license
+        credit: "Photo by Photo Diary on Pexels"
+        seasonal_tone: spring
+        alt_text:
+          ko: "한글이 인쇄된 책 페이지 위에 놓인 마른 은행잎"
+          en: "Dried ginkgo leaf resting on a book page printed with Korean hangul text"
+    articles:
+      ko: content/literatures/do-min-joon-bookshelf-classics-ko.md
+      en: content/literatures/do-min-joon-bookshelf-classics-en.md
+review:
+  status: draft
+  board_approval_issue: null
+publish:
+  policy: bundle-only
