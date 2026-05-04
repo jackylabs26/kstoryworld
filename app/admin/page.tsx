@@ -4,61 +4,41 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   useSyncExternalStore,
   type ReactNode,
 } from 'react';
 import { parseFrontmatter, renderMarkdownBody, type Frontmatter } from './_lib/markdown';
+import {
+  closePullRequest,
+  fetchPullRequestFiles,
+  fetchPullRequests,
+  fetchRawText,
+  getFileSha,
+  mergePullRequest,
+  saveFileContent,
+  verifyToken,
+  type GitHubFile,
+  type PullRequest,
+} from './_lib/github';
 
-const REPO = 'jackylabs26/kstoryworld';
 const SESSION_KEY = 'ksw-admin-auth-2026-05';
+const PAT_KEY = 'ksw-admin-gh-pat-2026-05';
+const PAT_LOGIN_KEY = 'ksw-admin-gh-login-2026-05';
 const DEFAULT_PASS_HASH = '72d8494c5c7f65b6ac516ee99049fd5aa5b3e17c569ed4606e152d52522ae012';
 const PASS_HASH = process.env.NEXT_PUBLIC_ADMIN_PASS_HASH || DEFAULT_PASS_HASH;
 const RECENT_PUBLISHED_DAYS = 7;
-
-type Label = { name: string; color: string; description: string | null };
-type GitHubUser = { login: string; avatar_url: string };
-type PullRequest = {
-  number: number;
-  title: string;
-  body: string | null;
-  state: string;
-  draft: boolean;
-  user: GitHubUser;
-  labels: Label[];
-  created_at: string;
-  updated_at: string;
-  merged_at: string | null;
-  html_url: string;
-  head: { ref: string };
-  changed_files?: number;
-  additions?: number;
-  deletions?: number;
-};
-
-type GitHubFile = {
-  filename: string;
-  status: string;
-  additions: number;
-  deletions: number;
-  raw_url: string;
-  blob_url: string;
-};
 
 type ContentFile = {
   file: GitHubFile;
   fm: Frontmatter;
   body: string;
+  rawSha?: string;
 };
 
 type ArticleStatus = 'draft' | 'published';
-
-type Article = {
-  pr: PullRequest;
-  status: ArticleStatus;
-  date: string;
-};
-
+type Article = { pr: PullRequest; status: ArticleStatus; date: string };
 type FilterMode = 'all' | 'draft' | 'published';
 
 async function sha256Hex(input: string): Promise<string> {
@@ -129,6 +109,151 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
   );
 }
 
+function readPat(): { token: string | null; login: string | null } {
+  if (typeof window === 'undefined') return { token: null, login: null };
+  return {
+    token: sessionStorage.getItem(PAT_KEY),
+    login: sessionStorage.getItem(PAT_LOGIN_KEY),
+  };
+}
+
+function useGitHubToken() {
+  const [state, setState] = useState<{ token: string | null; login: string | null }>(() =>
+    typeof window === 'undefined' ? { token: null, login: null } : readPat()
+  );
+  useEffect(() => {
+    setState(readPat());
+    const onChange = () => setState(readPat());
+    window.addEventListener('storage', onChange);
+    window.addEventListener('ksw-admin-pat', onChange);
+    return () => {
+      window.removeEventListener('storage', onChange);
+      window.removeEventListener('ksw-admin-pat', onChange);
+    };
+  }, []);
+
+  const setToken = useCallback(async (raw: string) => {
+    const trimmed = raw.trim();
+    if (!trimmed) return { ok: false, message: '토큰이 비어 있습니다.' };
+    try {
+      const user = await verifyToken(trimmed);
+      sessionStorage.setItem(PAT_KEY, trimmed);
+      sessionStorage.setItem(PAT_LOGIN_KEY, user.login);
+      window.dispatchEvent(new Event('ksw-admin-pat'));
+      return { ok: true as const, login: user.login };
+    } catch (e) {
+      return {
+        ok: false as const,
+        message: e instanceof Error ? e.message : '검증 실패',
+      };
+    }
+  }, []);
+
+  const clearToken = useCallback(() => {
+    sessionStorage.removeItem(PAT_KEY);
+    sessionStorage.removeItem(PAT_LOGIN_KEY);
+    window.dispatchEvent(new Event('ksw-admin-pat'));
+  }, []);
+
+  return { ...state, setToken, clearToken };
+}
+
+function TokenBar({
+  token,
+  login,
+  setToken,
+  clearToken,
+}: {
+  token: string | null;
+  login: string | null;
+  setToken: (raw: string) => Promise<{ ok: boolean; login?: string; message?: string }>;
+  clearToken: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+
+  const submit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      setBusy(true);
+      setMsg(null);
+      const r = await setToken(value);
+      setBusy(false);
+      if (r.ok) {
+        setMsg(null);
+        setValue('');
+        setOpen(false);
+      } else {
+        setMsg(r.message ?? '실패');
+      }
+    },
+    [value, setToken]
+  );
+
+  if (token && login && !open) {
+    return (
+      <div className="mb-4 flex items-center justify-between rounded border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-900">
+        <span>
+          GitHub PAT 활성: <strong>{login}</strong> — 게재 / 반려 / 편집 1-click 가능.
+        </span>
+        <button
+          type="button"
+          onClick={clearToken}
+          className="text-xs text-emerald-800 hover:underline"
+        >
+          PAT 제거
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mb-4 rounded border border-amber-200 bg-amber-50 px-3 py-2.5 text-sm text-amber-900">
+      <div className="flex items-center justify-between">
+        <span>
+          GitHub PAT 미설정 — 게재 / 반려 / 편집 1-click 을 쓰려면 PAT 입력하세요. (없어도 GitHub
+          새 탭으로 동작)
+        </span>
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          className="rounded border border-amber-300 bg-white px-2 py-1 text-xs hover:bg-amber-100"
+        >
+          {open ? '닫기' : 'PAT 입력'}
+        </button>
+      </div>
+      {open ? (
+        <form onSubmit={submit} className="mt-3 space-y-2">
+          <input
+            type="password"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            placeholder="ghp_… (fine-grained PAT, repo: jackylabs26/kstoryworld, Pull requests R/W + Contents R/W)"
+            className="w-full rounded border border-amber-300 bg-white px-2 py-1.5 text-xs text-stone-800"
+            autoComplete="off"
+          />
+          <div className="flex items-center gap-2">
+            <button
+              type="submit"
+              disabled={busy || !value}
+              className="rounded bg-amber-700 px-3 py-1 text-xs text-white disabled:opacity-50"
+            >
+              {busy ? '검증 중…' : '저장 (sessionStorage)'}
+            </button>
+            {msg ? <span className="text-xs text-red-700">{msg}</span> : null}
+          </div>
+          <p className="text-xs text-amber-800">
+            토큰은 브라우저 sessionStorage 에만 저장됩니다 (탭 닫으면 사라짐). v0 임시 방편 —
+            v1.0 Phase 3 에서 OAuth 로 대체.
+          </p>
+        </form>
+      ) : null}
+    </div>
+  );
+}
+
 function isContentMarkdown(filename: string): boolean {
   if (!filename.startsWith('content/')) return false;
   return filename.endsWith('.md') || filename.endsWith('.mdx');
@@ -153,17 +278,15 @@ function previewUrlFromBranch(branch: string): string {
   return `https://kstoryworld-git-${slug}-jackylabs26.vercel.app`;
 }
 
-function liveUrlForArticle(): string {
-  return 'https://kstoryworld.com/';
-}
-
 function formatDateKo(iso: string): string {
   const d = new Date(iso);
   return `${d.getMonth() + 1}월 ${d.getDate()}일`;
 }
 
 function cleanTitle(prTitle: string): string {
-  return prTitle.replace(/^JAC-\d+\s*[:·]?\s*/i, '').replace(/^content[:(]\s*[^)]*\)\s*/i, '');
+  return prTitle
+    .replace(/^JAC-\d+\s*[:·]?\s*/i, '')
+    .replace(/^content[:(]\s*[^)]*\)\s*/i, '');
 }
 
 function thumbnailChar(title: string): string {
@@ -179,9 +302,7 @@ function thumbnailHue(title: string): number {
 }
 
 function StatusPill({ status }: { status: ArticleStatus }) {
-  if (status === 'draft') {
-    return <span className="font-medium text-amber-700">임시보관</span>;
-  }
+  if (status === 'draft') return <span className="font-medium text-amber-700">임시보관</span>;
   return <span className="font-medium text-emerald-700">게시됨</span>;
 }
 
@@ -190,40 +311,50 @@ function CategoryChip({ name, hex }: { name: string; hex?: string }) {
     ? { backgroundColor: `#${hex}1f`, borderColor: `#${hex}66`, color: `#${hex}` }
     : undefined;
   return (
-    <span className="rounded-full border border-stone-300 px-2 py-0.5 text-xs text-stone-700" style={style}>
+    <span
+      className="rounded-full border border-stone-300 px-2 py-0.5 text-xs text-stone-700"
+      style={style}
+    >
       {name}
     </span>
   );
 }
 
-function IconButton({
+function IconBtn({
+  onClick,
   href,
   title,
   children,
   intent = 'neutral',
+  disabled,
 }: {
-  href: string;
+  onClick?: () => void;
+  href?: string;
   title: string;
   children: ReactNode;
-  intent?: 'neutral' | 'publish' | 'reject';
+  intent?: 'neutral' | 'publish' | 'reject' | 'edit';
+  disabled?: boolean;
 }) {
-  const cls =
+  const intentCls =
     intent === 'publish'
       ? 'text-stone-500 hover:text-emerald-700'
       : intent === 'reject'
       ? 'text-stone-500 hover:text-red-700'
+      : intent === 'edit'
+      ? 'text-stone-500 hover:text-blue-700'
       : 'text-stone-500 hover:text-stone-900';
+  const cls = `inline-flex h-8 w-8 items-center justify-center rounded transition disabled:opacity-30 disabled:hover:text-stone-500 ${intentCls}`;
+  if (href) {
+    return (
+      <a href={href} target="_blank" rel="noreferrer" title={title} aria-label={title} className={cls}>
+        {children}
+      </a>
+    );
+  }
   return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noreferrer"
-      title={title}
-      aria-label={title}
-      className={`inline-flex h-8 w-8 items-center justify-center rounded transition ${cls}`}
-    >
+    <button type="button" onClick={onClick} title={title} aria-label={title} className={cls} disabled={disabled}>
       {children}
-    </a>
+    </button>
   );
 }
 
@@ -235,11 +366,11 @@ function SendIcon() {
     </svg>
   );
 }
-function TagIcon() {
+function EditIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
-      <line x1="7" y1="7" x2="7.01" y2="7" />
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
     </svg>
   );
 }
@@ -258,22 +389,6 @@ function EyeIcon() {
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
       <circle cx="12" cy="12" r="3" />
-    </svg>
-  );
-}
-function CommentIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-    </svg>
-  );
-}
-function ChartIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="6" y1="20" x2="6" y2="10" />
-      <line x1="12" y1="20" x2="12" y2="4" />
-      <line x1="18" y1="20" x2="18" y2="14" />
     </svg>
   );
 }
@@ -331,18 +446,176 @@ function FrontmatterCard({ fm, filename }: { fm: Frontmatter; filename: string }
   );
 }
 
-function ArticleBody({ entry }: { entry: ContentFile }) {
+function ContentEditor({
+  entry,
+  branch,
+  token,
+  onSaved,
+  onCancel,
+}: {
+  entry: ContentFile;
+  branch: string;
+  token: string;
+  onSaved: () => void;
+  onCancel: () => void;
+}) {
+  const initial = useMemo(() => stitchFile(entry), [entry]);
+  const [text, setText] = useState(initial);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState(`JAC-1991 admin 편집: ${entry.file.filename}`);
+
+  const save = useCallback(async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      const sha = await getFileSha(token, branch, entry.file.filename);
+      await saveFileContent({
+        token,
+        branch,
+        path: entry.file.filename,
+        content: text,
+        sha,
+        message,
+      });
+      onSaved();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '저장 실패');
+    } finally {
+      setBusy(false);
+    }
+  }, [token, branch, entry.file.filename, text, message, onSaved]);
+
   return (
-    <div className="space-y-3">
-      <FrontmatterCard fm={entry.fm} filename={entry.file.filename} />
-      <article className="max-w-none text-stone-800">
-        {renderMarkdownBody(entry.body, `pr-${entry.file.filename}`)}
-      </article>
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-stone-500">
+          편집 모드 — 전체 파일 내용 (frontmatter 포함). 저장 시 PR 브랜치{' '}
+          <code className="rounded bg-stone-100 px-1 text-stone-700">{branch}</code> 에 새 커밋이
+          만들어집니다.
+        </p>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={busy}
+            className="rounded border border-stone-300 bg-white px-3 py-1 text-xs text-stone-700 hover:bg-stone-50 disabled:opacity-50"
+          >
+            취소
+          </button>
+          <button
+            type="button"
+            onClick={save}
+            disabled={busy || text === initial}
+            className="rounded bg-blue-700 px-3 py-1 text-xs text-white hover:bg-blue-800 disabled:opacity-50"
+          >
+            {busy ? '저장 중…' : '저장 (커밋)'}
+          </button>
+        </div>
+      </div>
+      <input
+        type="text"
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        className="w-full rounded border border-stone-300 bg-white px-2 py-1 text-xs text-stone-800"
+        placeholder="커밋 메시지"
+      />
+      <textarea
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        rows={24}
+        spellCheck={false}
+        className="block w-full rounded border border-stone-300 bg-white p-3 font-mono text-xs leading-relaxed text-stone-800"
+      />
+      {error ? <p className="text-xs text-red-700">{error}</p> : null}
     </div>
   );
 }
 
-function ExpandedDetail({ pr }: { pr: PullRequest }) {
+function stitchFile(entry: ContentFile): string {
+  const fmEntries = Object.entries(entry.fm);
+  if (fmEntries.length === 0) return entry.body;
+  const lines: string[] = ['---'];
+  for (const [k, v] of fmEntries) {
+    if (Array.isArray(v)) {
+      lines.push(`${k}:`);
+      for (const item of v) lines.push(`  - ${item}`);
+    } else {
+      lines.push(`${k}: ${needsQuote(v) ? JSON.stringify(v) : v}`);
+    }
+  }
+  lines.push('---');
+  return `${lines.join('\n')}\n${entry.body}`;
+}
+
+function needsQuote(s: string): boolean {
+  return /[:#&*!|>%@]/.test(s) || /^\s|\s$/.test(s);
+}
+
+function ArticleBody({
+  entry,
+  branch,
+  token,
+  onSaved,
+}: {
+  entry: ContentFile;
+  branch: string;
+  token: string | null;
+  onSaved: () => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <FrontmatterTitle filename={entry.file.filename} />
+        {token ? (
+          editing ? null : (
+            <button
+              type="button"
+              onClick={() => setEditing(true)}
+              className="inline-flex items-center gap-1 rounded border border-stone-300 bg-white px-2.5 py-1 text-xs text-stone-700 hover:bg-stone-50"
+            >
+              <EditIcon /> 편집
+            </button>
+          )
+        ) : null}
+      </div>
+      <FrontmatterCard fm={entry.fm} filename={entry.file.filename} />
+      {editing ? (
+        <ContentEditor
+          entry={entry}
+          branch={branch}
+          token={token!}
+          onSaved={() => {
+            setEditing(false);
+            onSaved();
+          }}
+          onCancel={() => setEditing(false)}
+        />
+      ) : (
+        <article className="max-w-none text-stone-800">
+          {renderMarkdownBody(entry.body, `pr-${entry.file.filename}`)}
+        </article>
+      )}
+    </div>
+  );
+}
+
+function FrontmatterTitle({ filename }: { filename: string }) {
+  return <span className="text-xs text-stone-500">{filename}</span>;
+}
+
+function ExpandedDetail({
+  pr,
+  token,
+  reloadKey,
+  onReload,
+}: {
+  pr: PullRequest;
+  token: string | null;
+  reloadKey: number;
+  onReload: () => void;
+}) {
   const [contents, setContents] = useState<ContentFile[] | null>(null);
   const [otherCount, setOtherCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -351,22 +624,17 @@ function ExpandedDetail({ pr }: { pr: PullRequest }) {
 
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
+    setError(null);
     const run = async () => {
       try {
-        const res = await fetch(
-          `https://api.github.com/repos/${REPO}/pulls/${pr.number}/files?per_page=100`,
-          { headers: { Accept: 'application/vnd.github+json' } }
-        );
-        if (!res.ok) throw new Error(`files API ${res.status}`);
-        const list: GitHubFile[] = await res.json();
+        const list = await fetchPullRequestFiles(token, pr.number);
         if (cancelled) return;
         const contentFiles = list.filter((f) => isContentMarkdown(f.filename));
         const loaded: ContentFile[] = await Promise.all(
           contentFiles.map(async (f) => {
             try {
-              const raw = await fetch(f.raw_url);
-              if (!raw.ok) return { file: f, fm: {}, body: `(raw fetch failed: ${raw.status})` };
-              const text = await raw.text();
+              const text = await fetchRawText(f.raw_url, token);
               const parsed = parseFrontmatter(text);
               return { file: f, fm: parsed.fm, body: parsed.body };
             } catch (e) {
@@ -391,7 +659,7 @@ function ExpandedDetail({ pr }: { pr: PullRequest }) {
     return () => {
       cancelled = true;
     };
-  }, [pr.number]);
+  }, [pr.number, token, reloadKey]);
 
   if (loading) return <p className="px-4 py-3 text-sm text-stone-500">콘텐츠 불러오는 중...</p>;
   if (error)
@@ -434,7 +702,7 @@ function ExpandedDetail({ pr }: { pr: PullRequest }) {
           })}
         </div>
       ) : null}
-      <ArticleBody entry={activeEntry} />
+      <ArticleBody entry={activeEntry} branch={pr.head.ref} token={token} onSaved={onReload} />
       {otherCount > 0 ? (
         <p className="text-xs text-stone-500">
           기타 {otherCount}개 파일 (코드/설정 등) 은 GitHub diff 에서 확인하세요.
@@ -444,14 +712,20 @@ function ExpandedDetail({ pr }: { pr: PullRequest }) {
   );
 }
 
+type RowAction = 'idle' | 'merging' | 'closing';
+
 function ArticleRow({
   article,
   expanded,
   onToggle,
+  token,
+  onMutated,
 }: {
   article: Article;
   expanded: boolean;
   onToggle: () => void;
+  token: string | null;
+  onMutated: () => void;
 }) {
   const { pr, status, date } = article;
   const visibleLabels = pr.labels.filter(
@@ -460,8 +734,39 @@ function ArticleRow({
   const initial = thumbnailChar(pr.title);
   const hue = thumbnailHue(pr.title);
   const previewUrl = previewUrlFromBranch(pr.head.ref);
-  const liveUrl = liveUrlForArticle();
-  const closeUrl = `${pr.html_url}#event-close`;
+  const [action, setAction] = useState<RowAction>('idle');
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
+
+  const onPublish = useCallback(async () => {
+    if (!token) return;
+    if (!window.confirm(`#${pr.number} ${cleanTitle(pr.title)} — 게재(squash merge) 진행?`)) return;
+    setAction('merging');
+    setActionError(null);
+    try {
+      await mergePullRequest(token, pr.number);
+      onMutated();
+    } catch (e) {
+      setActionError(e instanceof Error ? e.message : 'merge 실패');
+    } finally {
+      setAction('idle');
+    }
+  }, [token, pr.number, pr.title, onMutated]);
+
+  const onReject = useCallback(async () => {
+    if (!token) return;
+    if (!window.confirm(`#${pr.number} ${cleanTitle(pr.title)} — 반려(PR close) 진행?`)) return;
+    setAction('closing');
+    setActionError(null);
+    try {
+      await closePullRequest(token, pr.number);
+      onMutated();
+    } catch (e) {
+      setActionError(e instanceof Error ? e.message : 'close 실패');
+    } finally {
+      setAction('idle');
+    }
+  }, [token, pr.number, pr.title, onMutated]);
 
   return (
     <div
@@ -472,10 +777,7 @@ function ArticleRow({
       <div className="flex items-start gap-4 px-4 py-3">
         <div
           className="flex h-14 w-14 shrink-0 items-center justify-center rounded text-2xl font-bold"
-          style={{
-            background: `hsl(${hue} 70% 95%)`,
-            color: `hsl(${hue} 60% 35%)`,
-          }}
+          style={{ background: `hsl(${hue} 70% 95%)`, color: `hsl(${hue} 60% 35%)` }}
           aria-hidden="true"
         >
           {initial}
@@ -498,84 +800,113 @@ function ArticleRow({
             <CategoryChip name={`#${pr.number}`} />
             <span className="ml-1 text-stone-400">by {pr.user.login}</span>
           </div>
+          {actionError ? (
+            <p className="mt-1 text-xs text-red-700">{actionError}</p>
+          ) : null}
         </div>
-        <div className="hidden items-center gap-1 text-stone-400 md:flex">
+        <div className="hidden items-center gap-1 md:flex">
           {status === 'draft' ? (
             <>
-              <IconButton href={pr.html_url} title="게재 (GitHub 머지)" intent="publish">
-                <SendIcon />
-              </IconButton>
-              <IconButton href={`${pr.html_url}/labels`} title="라벨">
-                <TagIcon />
-              </IconButton>
-              <IconButton href={closeUrl} title="반려 (GitHub 닫기)" intent="reject">
-                <TrashIcon />
-              </IconButton>
-              <IconButton href={previewUrl} title="Vercel 프리뷰">
+              {token ? (
+                <IconBtn
+                  onClick={onPublish}
+                  title={action === 'merging' ? '머지 중…' : '게재 (1-click squash merge)'}
+                  intent="publish"
+                  disabled={action !== 'idle'}
+                >
+                  <SendIcon />
+                </IconBtn>
+              ) : (
+                <IconBtn href={pr.html_url} title="게재 (GitHub 머지)" intent="publish">
+                  <SendIcon />
+                </IconBtn>
+              )}
+              <IconBtn
+                onClick={onToggle}
+                title="편집 (펼쳐서 본문 편집)"
+                intent="edit"
+              >
+                <EditIcon />
+              </IconBtn>
+              {token ? (
+                <IconBtn
+                  onClick={onReject}
+                  title={action === 'closing' ? 'close 중…' : '반려 (1-click close)'}
+                  intent="reject"
+                  disabled={action !== 'idle'}
+                >
+                  <TrashIcon />
+                </IconBtn>
+              ) : (
+                <IconBtn href={pr.html_url} title="반려 (GitHub 닫기)" intent="reject">
+                  <TrashIcon />
+                </IconBtn>
+              )}
+              <IconBtn href={previewUrl} title="Vercel 프리뷰">
                 <EyeIcon />
-              </IconButton>
+              </IconBtn>
             </>
           ) : (
-            <IconButton href={liveUrl} title="게시된 페이지">
+            <IconBtn href={pr.html_url} title="GitHub PR">
               <EyeIcon />
-            </IconButton>
+            </IconBtn>
           )}
-          <span className="ml-2 inline-flex items-center gap-1 text-stone-400">
-            <CommentIcon />
-            <span className="text-xs">0</span>
-          </span>
-          <span className="ml-1 inline-flex items-center gap-1 text-stone-400">
-            <ChartIcon />
-            <span className="text-xs">—</span>
-          </span>
         </div>
       </div>
-      {expanded ? <div className="border-t border-stone-100">{<ExpandedDetail pr={pr} />}</div> : null}
+      {expanded ? (
+        <div className="border-t border-stone-100">
+          <ExpandedDetail
+            pr={pr}
+            token={token}
+            reloadKey={reloadKey}
+            onReload={() => setReloadKey((k) => k + 1)}
+          />
+        </div>
+      ) : null}
     </div>
   );
 }
 
 function looksLikeContentPR(pr: PullRequest): boolean {
   if (pr.labels.some((l) => l.name === 'content-review')) return true;
-  return /^content[:/]/i.test(pr.title) || /\bcontent\b/i.test(pr.title) && /^(feat|content)/i.test(pr.title);
+  return /^content[:/]/i.test(pr.title) || (/\bcontent\b/i.test(pr.title) && /^(feat|content)/i.test(pr.title));
 }
 
 function AdminDashboard() {
+  const { token, login, setToken, clearToken } = useGitHubToken();
   const [openPRs, setOpenPRs] = useState<PullRequest[] | null>(null);
   const [closedPRs, setClosedPRs] = useState<PullRequest[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [refreshAt, setRefreshAt] = useState<number>(Date.now());
   const [filter, setFilter] = useState<FilterMode>('all');
   const [expanded, setExpanded] = useState<number | null>(null);
+  const fetchSeq = useRef(0);
 
   const fetchPRs = useCallback(async () => {
+    const seq = ++fetchSeq.current;
     setError(null);
     try {
-      const [openRes, closedRes] = await Promise.all([
-        fetch(
-          `https://api.github.com/repos/${REPO}/pulls?state=open&per_page=50&sort=updated&direction=desc`,
-          { headers: { Accept: 'application/vnd.github+json' } }
-        ),
-        fetch(
-          `https://api.github.com/repos/${REPO}/pulls?state=closed&per_page=30&sort=updated&direction=desc`,
-          { headers: { Accept: 'application/vnd.github+json' } }
-        ),
+      const [open, closed] = await Promise.all([
+        fetchPullRequests(token, 'open', 50),
+        fetchPullRequests(token, 'closed', 30),
       ]);
-      if (!openRes.ok || !closedRes.ok) {
-        throw new Error(`GitHub API ${openRes.status}/${closedRes.status}`);
-      }
-      const open: PullRequest[] = await openRes.json();
-      const closed: PullRequest[] = await closedRes.json();
+      if (seq !== fetchSeq.current) return;
       setOpenPRs(open);
       setClosedPRs(closed);
     } catch (e) {
+      if (seq !== fetchSeq.current) return;
       setError(e instanceof Error ? e.message : '불러오기 실패');
     }
-  }, []);
+  }, [token]);
 
   useEffect(() => {
     void fetchPRs();
   }, [fetchPRs, refreshAt]);
+
+  const onMutated = useCallback(() => {
+    setRefreshAt(Date.now());
+    setExpanded(null);
+  }, []);
 
   const articles = useMemo<Article[]>(() => {
     const drafts: Article[] = (openPRs ?? [])
@@ -597,17 +928,18 @@ function AdminDashboard() {
   );
   const draftCount = articles.filter((a) => a.status === 'draft').length;
   const publishedCount = articles.filter((a) => a.status === 'published').length;
-
-  const onToggleExpand = (n: number) => setExpanded((cur) => (cur === n ? null : n));
-
   const filterLabel: Record<FilterMode, string> = {
     all: `전체 (${articles.length})`,
     draft: `임시보관 (${draftCount})`,
     published: `게시됨 (${publishedCount})`,
   };
 
+  const onToggleExpand = (n: number) => setExpanded((cur) => (cur === n ? null : n));
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-6">
+      <TokenBar token={token} login={login} setToken={setToken} clearToken={clearToken} />
+
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <select
@@ -629,16 +961,15 @@ function AdminDashboard() {
         </div>
         <div className="flex items-center gap-3 text-sm">
           <a
-            href={`https://github.com/${REPO}/labels`}
+            href="https://github.com/jackylabs26/kstoryworld/labels"
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-1 text-stone-500 hover:text-stone-900"
+            className="text-stone-500 hover:text-stone-900"
           >
-            <TagIcon />
-            <span className="hidden sm:inline">라벨</span>
+            라벨
           </a>
           <a
-            href={`https://github.com/${REPO}/pulls`}
+            href="https://github.com/jackylabs26/kstoryworld/pulls"
             target="_blank"
             rel="noreferrer"
             className="text-blue-700 hover:underline"
@@ -650,7 +981,8 @@ function AdminDashboard() {
 
       {error ? (
         <div className="mb-4 rounded border border-red-300 bg-red-50 p-3 text-sm text-red-800">
-          {error} (GitHub 미인증 호출은 IP 당 시간 60건 제한 — 잠시 후 재시도)
+          {error}{' '}
+          {token ? null : '(미인증 호출 IP 당 시간 60건 제한 — PAT 입력 시 5000건/h)'}
         </div>
       ) : null}
 
@@ -674,15 +1006,17 @@ function AdminDashboard() {
               article={a}
               expanded={expanded === a.pr.number}
               onToggle={() => onToggleExpand(a.pr.number)}
+              token={token}
+              onMutated={onMutated}
             />
           ))}
         </div>
       )}
 
       <footer className="mt-12 border-t border-stone-200 pt-4 text-xs text-stone-500">
-        v0.2 — 정적 export 호환 client-side 페이지. 콘텐츠 본문은 GitHub raw 에서 client-fetch
-        합니다. 게재/반려는 GitHub PR 에서 머지/닫기로 수행하세요. 진짜 인증·1-click 게재는
-        Phase 3 (Supabase) 에서 도입.
+        v0.3 — 정적 export 호환 client-side 페이지. PAT 입력 시 1-click 게재(squash merge) /
+        반려(close) / 인라인 편집 (Contents API). PAT 없으면 GitHub 새 탭으로 동작. 진짜
+        OAuth 인증은 Phase 3 (Supabase + 별도 Vercel) 에서 도입.
       </footer>
     </div>
   );
