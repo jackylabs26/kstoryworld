@@ -65,8 +65,25 @@ export async function fetchPullRequestFiles(
   return res.json();
 }
 
+function toCorsRawUrl(rawUrl: string): string {
+  const m = /^https:\/\/github\.com\/([^/]+)\/([^/]+)\/raw\/([^/]+)\/(.+)$/.exec(rawUrl);
+  if (!m) return rawUrl;
+  const [, owner, repo, sha, encodedPath] = m;
+  let path: string;
+  try {
+    path = decodeURIComponent(encodedPath);
+  } catch {
+    path = encodedPath;
+  }
+  return `https://raw.githubusercontent.com/${owner}/${repo}/${sha}/${path
+    .split('/')
+    .map(encodeURIComponent)
+    .join('/')}`;
+}
+
 export async function fetchRawText(rawUrl: string, token: string | null): Promise<string> {
-  const res = await fetch(rawUrl, {
+  const url = toCorsRawUrl(rawUrl);
+  const res = await fetch(url, {
     headers: token ? { Authorization: `Bearer ${token}` } : undefined,
   });
   if (!res.ok) throw new Error(`raw ${res.status}`);

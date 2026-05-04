@@ -254,9 +254,35 @@ function TokenBar({
   );
 }
 
-function isContentMarkdown(filename: string): boolean {
+function isContentFile(filename: string): boolean {
   if (!filename.startsWith('content/')) return false;
-  return filename.endsWith('.md') || filename.endsWith('.mdx');
+  return (
+    filename.endsWith('.md') ||
+    filename.endsWith('.mdx') ||
+    filename.endsWith('.html')
+  );
+}
+
+function fileKind(filename: string): 'markdown' | 'html' {
+  return filename.endsWith('.html') ? 'html' : 'markdown';
+}
+
+function parseHtmlMeta(html: string): Frontmatter {
+  const fm: Frontmatter = {};
+  const titleMatch = /<title[^>]*>([^<]*)<\/title>/i.exec(html);
+  if (titleMatch) fm.title = titleMatch[1].trim();
+  const langMatch = /<html[^>]*\blang=["']([^"']+)["']/i.exec(html);
+  if (langMatch) fm.language = langMatch[1].trim();
+  const metaRe = /<meta\s+name=["']([^"']+)["']\s+content=["']([^"']*)["'][^>]*\/?>/gi;
+  let m: RegExpExecArray | null;
+  while ((m = metaRe.exec(html))) {
+    const name = m[1].toLowerCase();
+    const content = m[2];
+    if (name === 'description') fm.description = content;
+    else if (name === 'category') fm.category = content;
+    else if (name === 'tags') fm.tags = content;
+  }
+  return fm;
 }
 
 function fmString(fm: Frontmatter, key: string): string | undefined {
@@ -285,8 +311,9 @@ function formatDateKo(iso: string): string {
 
 function cleanTitle(prTitle: string): string {
   return prTitle
-    .replace(/^JAC-\d+\s*[:·]?\s*/i, '')
-    .replace(/^content[:(]\s*[^)]*\)\s*/i, '');
+    .replace(/^feat\([^)]+\):\s*/i, '')
+    .replace(/^JAC-\d+\s*:?\s*(content:\s*)?/i, '')
+    .trim();
 }
 
 function thumbnailChar(title: string): string {
@@ -592,11 +619,30 @@ function ArticleBody({
           }}
           onCancel={() => setEditing(false)}
         />
+      ) : fileKind(entry.file.filename) === 'html' ? (
+        <HtmlPreview entry={entry} />
       ) : (
         <article className="max-w-none text-stone-800">
           {renderMarkdownBody(entry.body, `pr-${entry.file.filename}`)}
         </article>
       )}
+    </div>
+  );
+}
+
+function HtmlPreview({ entry }: { entry: ContentFile }) {
+  const fullHtml = useMemo(() => stitchFile(entry), [entry]);
+  return (
+    <div className="space-y-2">
+      <p className="text-xs text-stone-500">
+        HTML 콘텐츠 — sandboxed iframe 으로 미리보기. 실제 사이트 렌더는 Vercel 프리뷰 버튼.
+      </p>
+      <iframe
+        title={`preview-${entry.file.filename}`}
+        srcDoc={fullHtml}
+        sandbox=""
+        className="h-[28rem] w-full rounded border border-stone-200 bg-white"
+      />
     </div>
   );
 }
@@ -630,11 +676,14 @@ function ExpandedDetail({
       try {
         const list = await fetchPullRequestFiles(token, pr.number);
         if (cancelled) return;
-        const contentFiles = list.filter((f) => isContentMarkdown(f.filename));
+        const contentFiles = list.filter((f) => isContentFile(f.filename));
         const loaded: ContentFile[] = await Promise.all(
           contentFiles.map(async (f) => {
             try {
               const text = await fetchRawText(f.raw_url, token);
+              if (fileKind(f.filename) === 'html') {
+                return { file: f, fm: parseHtmlMeta(text), body: text };
+              }
               const parsed = parseFrontmatter(text);
               return { file: f, fm: parsed.fm, body: parsed.body };
             } catch (e) {
