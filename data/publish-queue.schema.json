@@ -1,0 +1,81 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://kstoryworld/schemas/publish-queue.schema.json",
+  "title": "Drip Publish Queue (JAC-1899)",
+  "description": "FIFO-with-priority queue of publish units consumed by scripts/publish-queue/dispatch.mjs at daily 09:00 KST cron. Each entry is one publish unit (1 article × all on-disk locales). One approved hexagon expands into 6 entries (anchor + 5 sisters) ordered by hexagon manifest publish.recommended_order.",
+  "definitions": {
+    "queue": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/publishUnit" }
+    },
+    "publishUnit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "unit_id",
+        "hexagon_id",
+        "domain",
+        "slug",
+        "enqueued_at",
+        "state",
+        "attempts"
+      ],
+      "properties": {
+        "unit_id": {
+          "type": "string",
+          "description": "Stable unique id: <hexagon_id>:<domain>"
+        },
+        "hexagon_id": {
+          "type": "string",
+          "description": "Hexagon manifest slug (matches content/hexagons/<id>.yaml)"
+        },
+        "domain": {
+          "enum": ["k-drama", "k-food", "k-pop", "k-beauty", "k-travel", "k-literature"]
+        },
+        "slug": {
+          "type": "string",
+          "description": "Article slug used in content/<domain-folder>/<slug>-<locale>.<ext>"
+        },
+        "priority": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Lower = earlier. Derived from manifest recommended_order index."
+        },
+        "enqueued_at": { "type": "string", "format": "date-time" },
+        "state": {
+          "enum": ["pending", "publishing", "published", "failed", "paused"]
+        },
+        "attempts": { "type": "integer", "minimum": 0, "maximum": 3 },
+        "last_attempt_at": { "type": ["string", "null"], "format": "date-time" },
+        "last_error": { "type": ["string", "null"] },
+        "published_at": { "type": ["string", "null"], "format": "date-time" }
+      }
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "paused",
+        "consecutive_dry_outs"
+      ],
+      "properties": {
+        "paused": {
+          "type": "boolean",
+          "description": "Board hold flag. When true, dispatch skips the queue with a Story alert."
+        },
+        "paused_reason": { "type": ["string", "null"] },
+        "last_run": { "type": ["string", "null"], "format": "date-time" },
+        "last_run_outcome": {
+          "enum": [null, "published", "dry_out", "paused", "failed"]
+        },
+        "consecutive_dry_outs": { "type": "integer", "minimum": 0 },
+        "weekly_publish_count": { "type": "integer", "minimum": 0 },
+        "weekly_window_start": { "type": ["string", "null"], "format": "date" }
+      }
+    }
+  },
+  "oneOf": [
+    { "$ref": "#/definitions/queue" },
+    { "$ref": "#/definitions/state" }
+  ]
+}
