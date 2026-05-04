@@ -1,0 +1,95 @@
+# 헥사곤 매니페스트 스키마 (JAC-1893 / parent JAC-1836 plan rev2 §2)
+#
+# 1 헥사곤 = 앵커 드라마 1편 + 자매 도메인 5편 (k-food, k-pop, k-beauty, k-travel, k-literature) = 6 article cluster.
+# 자매 콘텐츠는 모두 앵커 드라마 페이지로 back-link 한다 (self-check #14).
+# 6편이 한 단위로 함께 publish 된다 (publish.policy = bundle-only).
+#
+# 실 인스턴스 파일은 `content/hexagons/<slug>.yaml` 로 저장한다.
+# 예: content/hexagons/my-love-from-the-star.yaml
+#
+# 이 파일(_schema.yaml)은 YAML 그 자체로 valid 한 "기준 인스턴스" 이며, 주석에 필드별 제약을 적었다.
+# CI 또는 publish-time validator 가 이 스키마를 기준으로 인스턴스를 검증한다.
+
+hexagon_id: my-love-from-the-star            # 슬러그. 영문 소문자 + 하이픈. 자매 article 도 동일 값을 메타에 보유.
+season_window: 2026-spring                   # publish 분기. self-check #15 default tone 결정에 사용.
+                                             # 허용값: 2026-spring | 2026-summer | 2026-fall | 2027-winter | ...
+
+anchor:                                      # K-Drama 앵커 (필수, exactly 1)
+  domain: k-drama                            # 고정값. 헥사곤은 항상 K-Drama 가 앵커.
+  title_ko: 별에서 온 그대                   # 한국어 정식 명칭
+  title_en: My Love from the Star            # 영어 정식 명칭
+  year: 2013                                 # 정수. 방영/발매 연도.
+  network: SBS                               # 채널·플랫폼. 자매 워크플로 입력 시드로도 전달.
+  url:                                       # 앵커 article 최종 URL (publish 후 확정).
+    ko: /content/dramas/my-love-from-the-star-ko.html
+    en: /content/dramas/my-love-from-the-star-en.html
+  hero_image:
+    source: unsplash                         # 화이트리스트: unsplash | pexels | pixabay | wikimedia | cc0 | cc-by
+    asset_id: TBD                            # 소스 플랫폼의 asset id (필수)
+    license: unsplash-license                # 라이선스 식별자 (소스에 매칭)
+    credit: "Photo by [Name] on Unsplash"    # 표기 문자열 (필수, 빈 문자열 금지)
+    seasonal_tone: winter                    # 사실 충실도 예외(첫눈 치맥). #15 의 분기 default 와 다를 수 있음.
+
+sisters:                                     # 자매 5편. 정확히 5개 (k-food, k-pop, k-beauty, k-travel, k-literature).
+  - domain: k-food
+    seed: chimaek-fried-chicken-beer         # 자매 워크플로에 전달되는 시드 슬러그 (인물·연도·플랫폼·키 모티프 hint).
+    anchor_seed:                             # 앵커가 자매에 전달하는 사실 시드 (k-drama 워크플로가 추출).
+      person: 천송이
+      year: 2013
+      platform: SBS
+      key_motif: 첫눈 치맥
+    cross_links:                             # 다른 자매 1~2개를 가리키는 cross-link (publish 직전 확정).
+      - k-travel/petite-france-namsan-tower
+    url:
+      ko: /content/foods/chimaek-fried-chicken-beer-ko.html
+      en: /content/foods/chimaek-fried-chicken-beer-en.html
+    hero_image:
+      source: pexels
+      license: pexels-license
+      seasonal_tone: spring                  # 분기 default 봄.
+
+  - domain: k-pop
+    seed: my-destiny-lyn-ost
+    anchor_seed: { person: Lyn, year: 2014, platform: 가온차트, key_motif: My Destiny }
+    cross_links: [k-beauty/cheon-song-yi-lip-trend]
+    url:
+      ko: /content/songs/my-destiny-lyn-ost-ko.md
+      en: /content/songs/my-destiny-lyn-ost-en.md
+    hero_image: { source: pexels, license: pexels-license, seasonal_tone: spring }
+
+  - domain: k-beauty
+    seed: cheon-song-yi-lip-trend
+    anchor_seed: { person: 천송이, year: 2014, platform: 중국매장, key_motif: 립 컬러 }
+    cross_links: [k-pop/my-destiny-lyn-ost]
+    url:
+      ko: /content/beauties/cheon-song-yi-lip-trend-ko.md
+      en: /content/beauties/cheon-song-yi-lip-trend-en.md
+    hero_image: { source: unsplash, license: unsplash-license, seasonal_tone: spring }
+
+  - domain: k-travel
+    seed: petite-france-namsan-tower
+    anchor_seed: { person: 도민준, year: 2013, platform: 가평·남산·한강, key_motif: 1박 코스 }
+    cross_links: [k-food/chimaek-fried-chicken-beer]
+    url:
+      ko: /content/travels/petite-france-namsan-tower-ko.html
+      en: /content/travels/petite-france-namsan-tower-en.html
+    hero_image: { source: unsplash, license: unsplash-license, seasonal_tone: spring }
+
+  - domain: k-literature
+    seed: do-min-joon-bookshelf-classics
+    anchor_seed: { person: 도민준, year: 2013, platform: 책장, key_motif: 한국 고전 4선 }
+    cross_links: [k-drama/anchor]
+    url:
+      ko: /content/literatures/do-min-joon-bookshelf-classics-ko.md
+      en: /content/literatures/do-min-joon-bookshelf-classics-en.md
+    hero_image: { source: pexels, license: pexels-license, seasonal_tone: spring }
+
+review:
+  status: draft                              # draft | ready_for_board | gate2_pending | gate2_accepted | gate2_rejected
+  gate1_approval_id: 2bfb733b-...            # plan rev2 §6 — 게이트 1 승인된 confirmation id (시드 검토)
+  gate2_approval_id: null                    # 6편 self-check pass 후 자동 생성되는 게이트 2 confirmation id
+
+publish:
+  policy: bundle-only                        # 6편 동시에만 publish. 단일 article publish 금지.
+  bundle_id: my-love-from-the-star-2026-spring
+  blocked_until_gate2: true                  # 게이트 2 accept 전엔 main 머지·Cloudflare 배포 차단.
