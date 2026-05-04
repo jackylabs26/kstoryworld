@@ -1,0 +1,9 @@
+{
+  "paused": false,
+  "paused_reason": null,
+  "last_run": null,
+  "last_run_outcome": null,
+  "consecutive_dry_outs": 0,
+  "weekly_publish_count": 0,
+  "weekly_window_start": null
+}

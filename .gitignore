@@ -45,3 +45,6 @@ next-env.d.ts
 
 # scratch
 .tmp/
+
+# JAC-1899 drip-publish daily dispatch artifacts (cron-generated, not source)
+/artifacts/publish-dispatch/
