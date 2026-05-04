@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "check:no-ai-copy": "! grep -rEn 'AI(-| )(generated|curated|powered)|AI가 정리|자동 생성 콘텐츠|Generated:' components/ content/ || (echo 'AI/자동생성 표현이 검출되었습니다' && exit 1)"
+    "check:no-ai-copy": "! grep -rEn 'AI(-| )(generated|curated|powered)|AI가 정리|자동 생성 콘텐츠|Generated:' components/ content/ || (echo 'AI/자동생성 표현이 검출되었습니다' && exit 1)",
+    "check:hexagon": "node scripts/validate-hexagon.mjs"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",
@@ -22,8 +23,10 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "ajv": "^8.17.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.3",
+    "js-yaml": "^4.1.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
