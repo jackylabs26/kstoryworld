@@ -1,6 +1,13 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useSyncExternalStore,
+} from 'react';
+import { parseFrontmatter, renderMarkdownBody, type Frontmatter } from './_lib/markdown';
 
 const REPO = 'jackylabs26/kstoryworld';
 const SESSION_KEY = 'ksw-admin-auth-2026-05';
@@ -11,17 +18,34 @@ type Label = { name: string; color: string; description: string | null };
 type PullRequest = {
   number: number;
   title: string;
+  body: string | null;
   state: string;
   draft: boolean;
   user: { login: string; avatar_url: string };
   labels: Label[];
   created_at: string;
   updated_at: string;
+  merged_at: string | null;
   html_url: string;
   head: { ref: string };
   changed_files?: number;
   additions?: number;
   deletions?: number;
+};
+
+type GitHubFile = {
+  filename: string;
+  status: string;
+  additions: number;
+  deletions: number;
+  raw_url: string;
+  blob_url: string;
+};
+
+type ContentFile = {
+  file: GitHubFile;
+  fm: Frontmatter;
+  body: string;
 };
 
 async function sha256Hex(input: string): Promise<string> {
@@ -92,42 +116,196 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
   );
 }
 
-function categoryFromPR(pr: PullRequest): string {
-  const titleMatch = /content[:/](\w[\w-]*)/i.exec(pr.title);
-  if (titleMatch) return titleMatch[1].toLowerCase();
-  const branch = pr.head.ref || '';
-  if (branch.startsWith('content/backfill/')) return 'backfill';
-  if (branch.startsWith('content/')) {
-    const parts = branch.split('/');
-    return parts[1] || 'content';
-  }
-  if (branch.startsWith('feat/')) return 'feat';
-  if (branch.startsWith('chore/')) return 'chore';
-  return 'other';
+function isContentMarkdown(filename: string): boolean {
+  if (!filename.startsWith('content/')) return false;
+  return filename.endsWith('.md') || filename.endsWith('.mdx');
 }
 
-function PRCard({ pr }: { pr: PullRequest }) {
-  const cat = categoryFromPR(pr);
-  const created = new Date(pr.created_at).toLocaleString('ko-KR');
+function fmString(fm: Frontmatter, key: string): string | undefined {
+  const v = fm[key];
+  return typeof v === 'string' ? v : undefined;
+}
+
+function languageLabel(lang: string | undefined): string {
+  if (lang === 'ko') return '한국어';
+  if (lang === 'en') return 'English';
+  if (lang === 'ja') return '日本語';
+  if (lang === 'zh-Hans') return '简体中文';
+  if (lang === 'zh-Hant') return '繁體中文';
+  return lang ?? '?';
+}
+
+function FrontmatterCard({ fm, filename }: { fm: Frontmatter; filename: string }) {
+  const title = fmString(fm, 'title');
+  const description = fmString(fm, 'description');
+  const lang = fmString(fm, 'language');
+  const category = fmString(fm, 'category');
+  const hexagonId = fmString(fm, 'hexagon_id');
+  const anchorDrama = fmString(fm, 'anchor_drama');
+  const persona = fmString(fm, 'persona');
+  const publishDate = fmString(fm, 'publish_date');
+
   return (
-    <article className="rounded-lg border border-stone-200 bg-white p-4 shadow-sm transition hover:shadow">
-      <header className="mb-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <a
-          href={pr.html_url}
-          target="_blank"
-          rel="noreferrer"
+    <div className="rounded border border-stone-200 bg-stone-50 p-3">
+      <div className="mb-2 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-xs text-stone-500">
+        <code className="rounded bg-white px-1.5 py-0.5 font-mono text-stone-700">
+          {filename}
+        </code>
+        {lang ? (
+          <span className="rounded bg-blue-100 px-1.5 py-0.5 text-blue-800">
+            {languageLabel(lang)}
+          </span>
+        ) : null}
+        {category ? (
+          <span className="rounded bg-stone-200 px-1.5 py-0.5 uppercase text-stone-700">
+            {category}
+          </span>
+        ) : null}
+      </div>
+      {title ? (
+        <h3 className="mb-1 text-base font-semibold text-stone-900">{title}</h3>
+      ) : null}
+      {description ? (
+        <p className="mb-2 text-sm leading-6 text-stone-700">{description}</p>
+      ) : null}
+      <dl className="grid grid-cols-2 gap-x-3 gap-y-0.5 text-xs text-stone-600 md:grid-cols-4">
+        {hexagonId ? (
+          <div>
+            <dt className="text-stone-400">Hexagon</dt>
+            <dd className="truncate" title={hexagonId}>
+              {hexagonId}
+            </dd>
+          </div>
+        ) : null}
+        {anchorDrama ? (
+          <div>
+            <dt className="text-stone-400">Anchor</dt>
+            <dd className="truncate">{anchorDrama}</dd>
+          </div>
+        ) : null}
+        {persona ? (
+          <div>
+            <dt className="text-stone-400">Persona</dt>
+            <dd>{persona}</dd>
+          </div>
+        ) : null}
+        {publishDate ? (
+          <div>
+            <dt className="text-stone-400">Publish</dt>
+            <dd>{publishDate}</dd>
+          </div>
+        ) : null}
+      </dl>
+    </div>
+  );
+}
+
+function ContentArticle({ entry, idx }: { entry: ContentFile; idx: number }) {
+  const [open, setOpen] = useState(idx === 0);
+  const titleHint = fmString(entry.fm, 'title') ?? entry.file.filename.split('/').pop();
+  const lang = fmString(entry.fm, 'language');
+  return (
+    <div className="rounded border border-stone-200 bg-white">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-stone-50"
+      >
+        <span className="text-sm font-medium text-stone-900">
+          {open ? '▾' : '▸'} {titleHint}
+        </span>
+        {lang ? (
+          <span className="rounded bg-blue-100 px-1.5 py-0.5 text-xs text-blue-800">
+            {languageLabel(lang)}
+          </span>
+        ) : null}
+        <span className="ml-auto text-xs text-stone-500">
+          +{entry.file.additions} / −{entry.file.deletions}
+        </span>
+      </button>
+      {open ? (
+        <div className="space-y-3 border-t border-stone-200 px-3 py-3">
+          <FrontmatterCard fm={entry.fm} filename={entry.file.filename} />
+          <article className="prose-stone max-w-none text-stone-800">
+            {renderMarkdownBody(entry.body, `pr-${entry.file.filename}`)}
+          </article>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function PRReviewCard({ pr }: { pr: PullRequest }) {
+  const [files, setFiles] = useState<GitHubFile[] | null>(null);
+  const [contents, setContents] = useState<ContentFile[] | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState(false);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch(
+        `https://api.github.com/repos/${REPO}/pulls/${pr.number}/files?per_page=100`,
+        { headers: { Accept: 'application/vnd.github+json' } }
+      );
+      if (!res.ok) throw new Error(`files API ${res.status}`);
+      const list: GitHubFile[] = await res.json();
+      setFiles(list);
+      const contentFiles = list.filter((f) => isContentMarkdown(f.filename));
+      const loaded: ContentFile[] = await Promise.all(
+        contentFiles.map(async (f) => {
+          const raw = await fetch(f.raw_url);
+          if (!raw.ok) {
+            return { file: f, fm: {}, body: `(raw fetch failed: ${raw.status})` };
+          }
+          const text = await raw.text();
+          const { fm, body } = parseFrontmatter(text);
+          return { file: f, fm, body };
+        })
+      );
+      setContents(loaded);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '불러오기 실패');
+    } finally {
+      setLoading(false);
+    }
+  }, [pr.number]);
+
+  const onToggle = useCallback(() => {
+    setExpanded((v) => {
+      const next = !v;
+      if (next && files === null && !loading) {
+        void load();
+      }
+      return next;
+    });
+  }, [files, loading, load]);
+
+  const created = new Date(pr.created_at).toLocaleString('ko-KR');
+  const previewSlug = pr.head.ref.replace(/[/_]/g, '-').toLowerCase();
+  const previewUrl = `https://kstoryworld-git-${previewSlug}-jackylabs26.vercel.app`;
+  const otherFileCount = (files ?? []).filter((f) => !isContentMarkdown(f.filename)).length;
+
+  return (
+    <article className="rounded-lg border border-stone-200 bg-white shadow-sm">
+      <header className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-4 pt-4">
+        <button
+          type="button"
+          onClick={onToggle}
           className="text-base font-medium text-stone-900 hover:underline"
         >
-          #{pr.number} · {pr.title}
-        </a>
-        <span className="rounded bg-stone-100 px-2 py-0.5 text-xs uppercase text-stone-700">
-          {cat}
-        </span>
+          {expanded ? '▾' : '▸'} #{pr.number} · {pr.title}
+        </button>
         {pr.draft ? (
-          <span className="rounded bg-stone-200 px-2 py-0.5 text-xs text-stone-700">draft</span>
+          <span className="rounded bg-stone-200 px-2 py-0.5 text-xs text-stone-700">
+            draft
+          </span>
         ) : null}
+        <span className="ml-auto text-xs text-stone-500">{created}</span>
       </header>
-      <div className="mb-3 flex flex-wrap gap-1.5">
+      <div className="mt-2 flex flex-wrap gap-1.5 px-4">
         {pr.labels.map((l) => (
           <span
             key={l.name}
@@ -138,53 +316,71 @@ function PRCard({ pr }: { pr: PullRequest }) {
             {l.name}
           </span>
         ))}
+        <span className="text-xs text-stone-500">by {pr.user.login}</span>
       </div>
-      <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-stone-600 md:grid-cols-4">
-        <div>
-          <dt className="text-stone-400">작성자</dt>
-          <dd>{pr.user.login}</dd>
+
+      {expanded ? (
+        <div className="border-t border-stone-200 px-4 py-4">
+          {loading ? (
+            <p className="text-sm text-stone-500">콘텐츠 불러오는 중...</p>
+          ) : error ? (
+            <div className="rounded border border-red-300 bg-red-50 p-3 text-sm text-red-800">
+              {error}
+            </div>
+          ) : contents === null ? (
+            <p className="text-sm text-stone-500">로드 대기.</p>
+          ) : contents.length === 0 ? (
+            <p className="rounded border border-dashed border-stone-300 bg-stone-50 p-3 text-sm text-stone-500">
+              이 PR 에는 게재 가능한 컨텐츠 파일(content/**/*.md)이 없습니다.
+              {otherFileCount > 0 ? ` (기타 ${otherFileCount}개 파일)` : ''}
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {contents.map((entry, i) => (
+                <ContentArticle key={entry.file.filename} entry={entry} idx={i} />
+              ))}
+              {otherFileCount > 0 ? (
+                <p className="text-xs text-stone-500">
+                  기타 {otherFileCount}개 파일 (코드/설정 등) 은 GitHub diff 에서 확인하세요.
+                </p>
+              ) : null}
+            </div>
+          )}
         </div>
-        <div>
-          <dt className="text-stone-400">브랜치</dt>
-          <dd className="truncate" title={pr.head.ref}>
-            {pr.head.ref}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-stone-400">생성</dt>
-          <dd>{created}</dd>
-        </div>
-        <div>
-          <dt className="text-stone-400">변경</dt>
-          <dd>
-            {pr.changed_files ?? '?'} 파일 · +{pr.additions ?? '?'} / −{pr.deletions ?? '?'}
-          </dd>
-        </div>
-      </dl>
-      <div className="mt-3 flex flex-wrap gap-2">
+      ) : null}
+
+      <div className="flex flex-wrap gap-2 border-t border-stone-100 bg-stone-50 px-4 py-3">
         <a
           href={pr.html_url}
           target="_blank"
           rel="noreferrer"
-          className="rounded bg-stone-900 px-3 py-1.5 text-sm text-white hover:bg-stone-700"
+          className="rounded bg-emerald-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-800"
         >
-          GitHub 에서 검토
+          ✅ 게재 승인 (GitHub 머지)
+        </a>
+        <a
+          href={pr.html_url}
+          target="_blank"
+          rel="noreferrer"
+          className="rounded border border-red-300 bg-white px-3 py-1.5 text-sm text-red-700 hover:bg-red-50"
+        >
+          ❌ 반려 (GitHub 닫기)
+        </a>
+        <a
+          href={previewUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="rounded border border-stone-300 bg-white px-3 py-1.5 text-sm text-stone-700 hover:bg-stone-100"
+        >
+          Vercel 프리뷰
         </a>
         <a
           href={`${pr.html_url}/files`}
           target="_blank"
           rel="noreferrer"
-          className="rounded border border-stone-300 px-3 py-1.5 text-sm text-stone-700 hover:bg-stone-100"
+          className="ml-auto rounded border border-stone-300 bg-white px-3 py-1.5 text-sm text-stone-700 hover:bg-stone-100"
         >
-          파일 변경
-        </a>
-        <a
-          href={`https://kstoryworld-git-${pr.head.ref.replace(/[/_]/g, '-')}-jackylabs26.vercel.app`}
-          target="_blank"
-          rel="noreferrer"
-          className="rounded border border-stone-300 px-3 py-1.5 text-sm text-stone-700 hover:bg-stone-100"
-        >
-          Vercel preview
+          전체 diff
         </a>
       </div>
     </article>
@@ -233,25 +429,24 @@ function AdminDashboard() {
       ),
     [openPRs]
   );
-  const otherOpenPRs = useMemo(
-    () =>
-      (openPRs ?? []).filter(
-        (pr) => !pr.labels.some((l) => l.name === 'content-review')
-      ),
-    [openPRs]
-  );
-  const recentMerged = useMemo(
-    () => (closedPRs ?? []).filter((pr) => pr.state === 'closed').slice(0, 10),
-    [closedPRs]
-  );
+
+  const recentMerged = useMemo(() => {
+    const cutoff = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    return (closedPRs ?? [])
+      .filter((pr) => pr.merged_at !== null)
+      .filter((pr) => new Date(pr.merged_at!).getTime() >= cutoff)
+      .filter((pr) =>
+        pr.labels.some((l) => l.name === 'content-review' || l.name.startsWith('cat:'))
+      );
+  }, [closedPRs]);
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8">
+    <div className="mx-auto max-w-4xl px-4 py-8">
       <div className="mb-6 flex items-baseline justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">컨텐츠 검토 보드</h1>
+          <h1 className="text-2xl font-semibold">콘텐츠 검토</h1>
           <p className="text-sm text-stone-600">
-            content-review 라벨이 붙은 열린 PR 우선 표시. 액션은 GitHub 에서 라벨/머지로 수행.
+            kstoryworld.com 게재 여부를 결정합니다. 펼쳐서 본문을 읽고 게재 / 반려를 선택하세요.
           </p>
         </div>
         <button
@@ -270,35 +465,18 @@ function AdminDashboard() {
 
       <section className="mb-10">
         <h2 className="mb-3 border-b border-stone-200 pb-1 text-lg font-medium">
-          검토 대기 ({reviewPRs.length})
+          게재 대기 ({reviewPRs.length})
         </h2>
         {openPRs === null ? (
           <p className="text-sm text-stone-500">불러오는 중...</p>
         ) : reviewPRs.length === 0 ? (
           <p className="rounded border border-dashed border-stone-300 bg-white p-4 text-sm text-stone-500">
-            검토 대기 컨텐츠가 없습니다.
+            검토 대기 컨텐츠가 없습니다. n8n 자동 PR 또는 수동 PR 에 <code>content-review</code> 라벨을 붙이면 여기에 표시됩니다.
           </p>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {reviewPRs.map((pr) => (
-              <PRCard key={pr.number} pr={pr} />
-            ))}
-          </div>
-        )}
-      </section>
-
-      <section className="mb-10">
-        <h2 className="mb-3 border-b border-stone-200 pb-1 text-lg font-medium">
-          기타 열린 PR ({otherOpenPRs.length})
-        </h2>
-        {otherOpenPRs.length === 0 ? (
-          <p className="rounded border border-dashed border-stone-300 bg-white p-4 text-sm text-stone-500">
-            없음.
-          </p>
-        ) : (
-          <div className="space-y-3">
-            {otherOpenPRs.map((pr) => (
-              <PRCard key={pr.number} pr={pr} />
+              <PRReviewCard key={pr.number} pr={pr} />
             ))}
           </div>
         )}
@@ -306,7 +484,7 @@ function AdminDashboard() {
 
       <section>
         <h2 className="mb-3 border-b border-stone-200 pb-1 text-lg font-medium">
-          최근 마감/머지 ({recentMerged.length})
+          최근 7일 게재 ({recentMerged.length})
         </h2>
         {recentMerged.length === 0 ? (
           <p className="text-sm text-stone-500">없음.</p>
@@ -323,7 +501,7 @@ function AdminDashboard() {
                   #{pr.number} {pr.title}
                 </a>
                 <span className="text-xs text-stone-500">
-                  {new Date(pr.updated_at).toLocaleString('ko-KR')}
+                  {pr.merged_at ? new Date(pr.merged_at).toLocaleString('ko-KR') : ''}
                 </span>
               </li>
             ))}
@@ -332,7 +510,9 @@ function AdminDashboard() {
       </section>
 
       <footer className="mt-12 border-t border-stone-200 pt-4 text-xs text-stone-500">
-        v0 — 정적 export 호환 client-side 페이지. JAC-1991 Phase 2-v0. 진짜 admin (편집·계정·이메일)은 Phase 3 별도 Vercel 프로젝트로 이전.
+        v0.1 — 정적 export 호환 client-side 페이지. 본문 미리보기는 GitHub raw 에서 client-fetch
+        합니다. 게재/반려는 GitHub PR 에서 머지/닫기로 수행하세요. 진짜 인증·1-click 게재는 Phase 3
+        (Supabase) 에서 도입.
       </footer>
     </div>
   );
