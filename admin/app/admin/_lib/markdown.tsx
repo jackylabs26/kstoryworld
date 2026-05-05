@@ -1,33 +1,110 @@
 import type { ReactNode } from 'react';
 
-export type Frontmatter = Record<string, string | string[]>;
+/**
+ * Frontmatter values come in three shapes:
+ * - scalar string (e.g. `title: ...`)
+ * - flat list of strings (e.g. `tags:` followed by `  - foo`)
+ * - list of mappings (e.g. `images:` followed by `  - role: hero`).
+ *
+ * Hexagon `images:` entries land as `FrontmatterImage[]` so the article
+ * preview can surface the credit/license footer. Unknown keys with that
+ * shape are also preserved generically.
+ */
+export type FrontmatterImage = Record<string, string>;
+export type FrontmatterValue = string | string[] | FrontmatterImage[];
+export type Frontmatter = Record<string, FrontmatterValue>;
 
 export function parseFrontmatter(src: string): { fm: Frontmatter; body: string } {
   const m = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/.exec(src);
   if (!m) return { fm: {}, body: src };
   const fm: Frontmatter = {};
-  let currentList: { key: string; items: string[] } | null = null;
-  for (const rawLine of m[1].split(/\r?\n/)) {
-    if (currentList && /^\s+-\s/.test(rawLine)) {
-      currentList.items.push(stripQuotes(rawLine.replace(/^\s+-\s+/, '')));
+  const lines = m[1].split(/\r?\n/);
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+    if (!line.trim() || line.trim().startsWith('#')) {
+      i++;
       continue;
     }
-    if (currentList) {
-      fm[currentList.key] = currentList.items;
-      currentList = null;
+    const indent = line.match(/^ */)![0].length;
+    if (indent !== 0) {
+      i++;
+      continue;
     }
-    const km = /^([\w-]+)\s*:\s*(.*)$/.exec(rawLine);
-    if (!km) continue;
+    const km = /^([\w-]+)\s*:\s*(.*)$/.exec(line);
+    if (!km) {
+      i++;
+      continue;
+    }
     const key = km[1];
     const val = km[2].trim();
-    if (val === '') {
-      currentList = { key, items: [] };
-    } else {
+    if (val !== '') {
       fm[key] = stripQuotes(val);
+      i++;
+      continue;
+    }
+    const block: string[] = [];
+    i++;
+    while (i < lines.length) {
+      const nl = lines[i];
+      if (nl.trim() === '') {
+        i++;
+        continue;
+      }
+      if (/^\s/.test(nl)) {
+        block.push(nl);
+        i++;
+        continue;
+      }
+      break;
+    }
+    if (block.length === 0) {
+      fm[key] = [];
+      continue;
+    }
+    if (block.some((l) => /^\s*-\s+[\w-]+\s*:/.test(l))) {
+      fm[key] = parseListOfMappings(block);
+    } else if (block.some((l) => /^\s*-\s/.test(l))) {
+      fm[key] = block
+        .filter((l) => /^\s*-\s/.test(l))
+        .map((l) => stripQuotes(l.replace(/^\s*-\s+/, '')));
+    } else {
+      // Flat mapping under an unknown key — flatten to "k=v" strings so we
+      // don't drop the data; existing string-only consumers still ignore it.
+      fm[key] = block
+        .map((l) => l.trim())
+        .filter(Boolean)
+        .map((l) => {
+          const colon = l.indexOf(':');
+          return colon === -1 ? l : `${l.slice(0, colon).trim()}=${stripQuotes(l.slice(colon + 1).trim())}`;
+        });
     }
   }
-  if (currentList) fm[currentList.key] = currentList.items;
   return { fm, body: m[2] };
+}
+
+function parseListOfMappings(lines: string[]): FrontmatterImage[] {
+  const items: FrontmatterImage[] = [];
+  let cur: FrontmatterImage | null = null;
+  for (const l of lines) {
+    if (!l.trim() || l.trim().startsWith('#')) continue;
+    const trimmed = l.trim();
+    if (trimmed.startsWith('- ')) {
+      if (cur) items.push(cur);
+      cur = {};
+      const rest = trimmed.slice(2);
+      const colon = rest.indexOf(':');
+      if (colon !== -1) {
+        cur[rest.slice(0, colon).trim()] = stripQuotes(rest.slice(colon + 1).trim());
+      }
+    } else if (cur) {
+      const colon = trimmed.indexOf(':');
+      if (colon === -1) continue;
+      cur[trimmed.slice(0, colon).trim()] = stripQuotes(trimmed.slice(colon + 1).trim());
+    }
+  }
+  if (cur) items.push(cur);
+  return items;
 }
 
 function stripQuotes(s: string): string {

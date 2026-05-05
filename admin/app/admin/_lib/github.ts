@@ -65,8 +65,25 @@ export async function fetchPullRequestFiles(
   return res.json();
 }
 
+function toCorsRawUrl(rawUrl: string): string {
+  const m = /^https:\/\/github\.com\/([^/]+)\/([^/]+)\/raw\/([^/]+)\/(.+)$/.exec(rawUrl);
+  if (!m) return rawUrl;
+  const [, owner, repo, sha, encodedPath] = m;
+  let path: string;
+  try {
+    path = decodeURIComponent(encodedPath);
+  } catch {
+    path = encodedPath;
+  }
+  return `https://raw.githubusercontent.com/${owner}/${repo}/${sha}/${path
+    .split('/')
+    .map(encodeURIComponent)
+    .join('/')}`;
+}
+
 export async function fetchRawText(rawUrl: string, token: string | null): Promise<string> {
-  const res = await fetch(rawUrl, {
+  const url = toCorsRawUrl(rawUrl);
+  const res = await fetch(url, {
     headers: token ? { Authorization: `Bearer ${token}` } : undefined,
   });
   if (!res.ok) throw new Error(`raw ${res.status}`);
@@ -159,6 +176,21 @@ export async function saveFileContent(args: {
   if (!res.ok) {
     const body = await res.text();
     throw new Error(`save ${res.status}: ${body.slice(0, 200)}`);
+  }
+}
+
+export async function addPRComment(token: string, number: number, body: string): Promise<void> {
+  const res = await fetch(
+    `https://api.github.com/repos/${GITHUB_REPO}/issues/${number}/comments`,
+    {
+      method: 'POST',
+      headers: authHeaders(token, { 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ body }),
+    }
+  );
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`comment ${res.status}: ${text.slice(0, 200)}`);
   }
 }
 
