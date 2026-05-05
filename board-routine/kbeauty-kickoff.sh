@@ -42,6 +42,9 @@ JSON
 )
 
 echo "[kbeauty-kickoff] task=$TASK_ID date=$DATE keyword=$KEYWORD"
+if [[ -n "${HEXAGON_ID:-}" ]]; then
+  echo "[kbeauty-kickoff] hexagon mode: hexagon_id=$HEXAGON_ID anchor_drama=${ANCHOR_DRAMA_JSON:+set}"
+fi
 
 RESPONSE_FILE="$(br_dryrun_path "kbeauty" "$DATE" "$SLUG")"
 mkdir -p "$(dirname "$RESPONSE_FILE")"
@@ -76,5 +79,22 @@ sys.exit(2)
 PY
   then
     exit 2
+  fi
+fi
+
+# JAC-1984: optionally open a board-review PR with the dry-run sample.
+# Gated by BOARD_AUTO_PR so daily routines don't auto-fire until the board
+# opts in. Skips when the response is an N8N_DRYRUN=1 stub (no real draft).
+if [[ "${BOARD_AUTO_PR:-0}" == "1" ]]; then
+  if command -v python3 >/dev/null 2>&1 && \
+     python3 -c 'import json,sys; d=json.load(open(sys.argv[1])); sys.exit(0 if isinstance(d,dict) and d.get("dryrun") else 1)' "$RESPONSE_FILE"; then
+    echo "[kbeauty-kickoff] dryrun stub — skipping content-pr-adapter"
+  else
+    echo "[kbeauty-kickoff] BOARD_AUTO_PR=1 — handing off to content-pr-adapter"
+    "$SCRIPT_DIR/content-pr-adapter.sh" \
+      --dryrun-json "$RESPONSE_FILE" \
+      --category kbeauty \
+      --source-issue "${PAPERCLIP_TASK_ID:-JAC-1984}" \
+      || echo "[kbeauty-kickoff] content-pr-adapter failed (non-fatal)" >&2
   fi
 fi

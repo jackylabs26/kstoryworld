@@ -1,0 +1,20 @@
+{
+  "issue": "JAC-1984",
+  "parent_issue": "JAC-1982",
+  "phase": "Phase 1 / c1",
+  "adapter": "board-routine/content-pr-adapter.sh",
+  "ran_at_kst": "2026-05-05T02:30:00Z",
+  "category": "k-pop",
+  "input_dryrun_sample": "n8n-workflows/_dryrun-samples/kpop-2026-04-30-bts-v3.json",
+  "branch_created": "content/kpop/2026-05-05-bts-full-group-comeback-cultural-economic-impact-korea",
+  "pr_title": "[Content Review] k-pop — BTS 완전체 복귀가 한국 경제까지 움직였다? 그 문화적 파워를 파헤쳐 보자",
+  "pr_number": 26,
+  "pr_url": "https://github.com/jackylabs26/kstoryworld/pull/26",
+  "labels_attached": [
+    "content-review",
+    "phase1-pending"
+  ],
+  "self_check_at_pr_open": "13/13",
+  "template_used": ".github/PULL_REQUEST_TEMPLATE/content-review.md (JAC-1983 c3)",
+  "notes": "Adapter ran from an ephemeral git worktree off origin/main; no caller WIP was committed."
+}

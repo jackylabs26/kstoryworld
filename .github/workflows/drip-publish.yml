@@ -1,0 +1,63 @@
+name: Drip Publish (daily 09:00 KST)
+
+on:
+  schedule:
+    # 00:00 UTC = 09:00 KST
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: 'Mutate state files (else dry-run)'
+        required: false
+        default: 'true'
+
+concurrency:
+  group: drip-publish
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run dispatch
+        id: dispatch
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.apply }}" != "true" ]; then
+            node scripts/publish-queue/dispatch.mjs > dispatch.json
+          else
+            node scripts/publish-queue/dispatch.mjs --apply > dispatch.json
+          fi
+          OUTCOME=$(node -e "console.log(JSON.parse(require('fs').readFileSync('dispatch.json','utf8')).outcome)")
+          echo "outcome=$OUTCOME" >> "$GITHUB_OUTPUT"
+
+      - name: Append job summary
+        run: |
+          {
+            echo "## Drip dispatch — outcome: \`${{ steps.dispatch.outputs.outcome }}\`"
+            echo
+            echo '```json'
+            cat dispatch.json
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload dispatch artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: drip-dispatch-${{ github.run_id }}
+          path: |
+            dispatch.json
+            artifacts/publish-dispatch/
+
+      # TODO(JAC-1899 follow-up): when outcome=published, open a PR with the
+      # locale files referenced in dispatch.json so Cloudflare deploy fires on
+      # merge. v1 stops at artifact emission so the board can review behavior
+      # before turning on automated PR creation.
