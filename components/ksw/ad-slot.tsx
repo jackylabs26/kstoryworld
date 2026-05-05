@@ -27,7 +27,7 @@ interface AdSlotProps {
  */
 export function AdSlot({ variant = 'banner', className }: AdSlotProps) {
   const { lang, dark } = useKSWTheme();
-  const label = SLOT_LABELS[variant][lang];
+  const label = SLOT_LABELS[variant][lang as 'ko' | 'en'];
 
   const heights: Record<AdSlotVariant, number> = {
     banner: 90,
