@@ -26,6 +26,7 @@ reject-style	D93F0B	톤/문체 부적합 (KStoryWorld 브랜드 보이스 미스
 reject-source	D93F0B	출처/이미지 라이선스 문제 (화이트리스트 외, 크레딧 누락 등)
 reject-tone	D93F0B	페르소나/카테고리 톤 미스매치 (narrator_persona_slug 부적합)
 reject-other	D93F0B	기타 거절 사유 — PR 본문 코멘트에 사유 명시 필수
+hexagon-validation-failed	D93F0B	hexagon 검증 실패 — content-pr-adapter 자동 부착 (JAC-2051). PR 코멘트의 검증 오류 해소 후 라벨 제거.
 TSV
 )
 
