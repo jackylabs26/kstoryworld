@@ -18,6 +18,23 @@ export const CATEGORY_LABELS: Record<ReviewCategory, { ko: string; en: string }>
   'k-travel': { ko: 'K-트래블', en: 'K-Travel' },
 };
 
+export const CATEGORY_CONTENT_DIRS: Record<ReviewCategory, string> = {
+  'k-drama': 'dramas',
+  'k-food': 'foods',
+  'k-pop': 'songs',
+  'k-beauty': 'beauties',
+  'k-travel': 'travels',
+  'k-literature': 'literatures',
+};
+
+const DIR_TO_CATEGORY = Object.fromEntries(
+  Object.entries(CATEGORY_CONTENT_DIRS).map(([cat, dir]) => [dir, cat]),
+) as Record<string, ReviewCategory>;
+
+export function dirToCategory(dir: string): ReviewCategory | undefined {
+  return DIR_TO_CATEGORY[dir];
+}
+
 export function isReviewCategory(value: unknown): value is ReviewCategory {
   return typeof value === 'string' && (REVIEW_CATEGORIES as readonly string[]).includes(value);
 }
