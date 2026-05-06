@@ -10,7 +10,8 @@
     "lint": "eslint",
     "check:no-ai-copy": "! grep -rEn 'AI(-| )(generated|curated|powered)|AI가 정리|자동 생성 콘텐츠|Generated:' components/ content/ || (echo 'AI/자동생성 표현이 검출되었습니다' && exit 1)",
     "check:no-bold-emphasis": "! grep -rEn --include='*.md' --include='*.html' --include='*.tsx' --include='*.ts' '\\*\\*[^*]+\\*\\*' components/ content/ || (echo 'Markdown bold ** ** 가 검출되었습니다 (JAC-1952). 강조가 필요하면 자연어로 풀거나 <strong> 태그를 사용하세요.' && exit 1)",
-    "check:hexagon": "node scripts/validate-hexagon.mjs"
+    "check:hexagon": "node scripts/validate-hexagon.mjs",
+    "check:hexagon-pr": "node scripts/validate-hexagon-pr.mjs"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",

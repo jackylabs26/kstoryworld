@@ -350,6 +350,41 @@ cp "$DRYRUN_JSON" "$WT_DIR/$DEST_REL"
 
 git -C "$WT_DIR" add "$DEST_REL"
 
+# ----- JAC-2051: hexagon validation gate (pre-commit, dryrun JSON pass) ------
+# Catches hexagon-aware n8n payloads where the dryrun JSON itself carries an
+# embedded `hexagon_manifest` or `draft.{ko,en}.images`. This pass is cheap
+# and runs before commit so a fatal invocation error aborts before pushing.
+# A second pass (worktree-diff mode) runs after the commit, below.
+HEX_VAL_JSON_FILE="$(mktemp -t jac2051-hex.XXXXXX).json"
+HEX_VAL_LOG_FILE="$(mktemp -t jac2051-hex.XXXXXX).log"
+: > "$HEX_VAL_JSON_FILE"; : > "$HEX_VAL_LOG_FILE"
+HEX_VAL_FAILED=0
+HEX_VAL_DETECTED=0
+
+HEX_DR_OUT="$(mktemp -t jac2051-hex-dr.XXXXXX).json"
+HEX_DR_ERR="$(mktemp -t jac2051-hex-dr.XXXXXX).log"
+HEX_DR_CODE=0
+node "$REPO_ROOT/scripts/validate-hexagon-pr.mjs" \
+  --dryrun-json "$WT_DIR/$DEST_REL" \
+  >"$HEX_DR_OUT" 2>"$HEX_DR_ERR" || HEX_DR_CODE=$?
+if [[ "$HEX_DR_CODE" == "2" ]]; then
+  echo "[content-pr-adapter] hexagon dryrun validator invocation error:" >&2
+  cat "$HEX_DR_ERR" >&2
+  exit 2
+fi
+HEX_DR_DETECTED="$(python3 -c "import json,sys
+try: d=json.load(open(sys.argv[1]))
+except Exception: print(0); sys.exit(0)
+print(int(bool(d.get('detectedAny'))))" "$HEX_DR_OUT" 2>/dev/null || echo 0)"
+if [[ "$HEX_DR_DETECTED" == "1" ]]; then
+  HEX_VAL_DETECTED=1
+  cat "$HEX_DR_OUT" >> "$HEX_VAL_JSON_FILE"
+  printf '\n--- dryrun-json pass ---\n' >> "$HEX_VAL_LOG_FILE"
+  cat "$HEX_DR_ERR" >> "$HEX_VAL_LOG_FILE"
+  [[ "$HEX_DR_CODE" == "1" ]] && HEX_VAL_FAILED=1
+fi
+rm -f "$HEX_DR_OUT" "$HEX_DR_ERR"
+
 COMMIT_MSG="content(${CAT_LABEL}): ${KO_TITLE}
 
 Auto-generated draft for board review (JAC-1982 Phase 1 / JAC-1984).
@@ -366,6 +401,45 @@ git -C "$WT_DIR" -c user.email="content-bot@jackylabs.dev" \
   -c user.name="KStoryWorld Content Bot" \
   commit --quiet -m "$COMMIT_MSG"
 
+# ----- JAC-2051: hexagon validation gate (post-commit, worktree-diff pass) ---
+# Catches manual hexagon backfill style PRs (the failure mode of PR #18,
+# JAC-1988): when the worktree contains added/modified `content/hexagons/*.yaml`
+# manifests or hexagon-mode `content/**/*-{ko,en}.md` articles, validate them
+# against the canonical contract before the PR is opened.
+HEX_WT_OUT="$(mktemp -t jac2051-hex-wt.XXXXXX).json"
+HEX_WT_ERR="$(mktemp -t jac2051-hex-wt.XXXXXX).log"
+HEX_WT_CODE=0
+node "$REPO_ROOT/scripts/validate-hexagon-pr.mjs" \
+  --worktree "$WT_DIR" --base origin/main \
+  >"$HEX_WT_OUT" 2>"$HEX_WT_ERR" || HEX_WT_CODE=$?
+if [[ "$HEX_WT_CODE" == "2" ]]; then
+  echo "[content-pr-adapter] hexagon worktree validator invocation error:" >&2
+  cat "$HEX_WT_ERR" >&2
+  exit 2
+fi
+HEX_WT_DETECTED="$(python3 -c "import json,sys
+try: d=json.load(open(sys.argv[1]))
+except Exception: print(0); sys.exit(0)
+print(int(bool(d.get('detectedAny'))))" "$HEX_WT_OUT" 2>/dev/null || echo 0)"
+if [[ "$HEX_WT_DETECTED" == "1" ]]; then
+  HEX_VAL_DETECTED=1
+  printf '\n--- worktree pass ---\n' >> "$HEX_VAL_JSON_FILE"
+  cat "$HEX_WT_OUT" >> "$HEX_VAL_JSON_FILE"
+  printf '\n--- worktree pass ---\n' >> "$HEX_VAL_LOG_FILE"
+  cat "$HEX_WT_ERR" >> "$HEX_VAL_LOG_FILE"
+  [[ "$HEX_WT_CODE" == "1" ]] && HEX_VAL_FAILED=1
+fi
+rm -f "$HEX_WT_OUT" "$HEX_WT_ERR"
+
+if [[ "$HEX_VAL_DETECTED" == "1" ]]; then
+  if [[ "$HEX_VAL_FAILED" == "1" ]]; then
+    echo "[content-pr-adapter] hexagon validation FAILED — PR will be opened with merge-blocked label" >&2
+    sed -n '1,200p' "$HEX_VAL_LOG_FILE" >&2
+  else
+    echo "[content-pr-adapter] hexagon validation passed (detected hexagon content)"
+  fi
+fi
+
 git -C "$WT_DIR" push --quiet -u origin "$BRANCH"
 
 # gh CLI accepts --body-file; --label arg requires labels to exist.
@@ -381,10 +455,45 @@ PR_URL="$(gh pr create \
 case "$PR_URL" in
   https://github.com/*)
     echo "[content-pr-adapter] PR opened: $PR_URL"
-    echo "$PR_URL"
     ;;
   *)
     echo "[content-pr-adapter] gh pr create failed: $PR_URL" >&2
     exit 2
     ;;
 esac
+
+# ----- JAC-2051: failure path — apply merge-blocked label + post comment -----
+if [[ "$HEX_VAL_DETECTED" == "1" && "$HEX_VAL_FAILED" == "1" ]]; then
+  PR_NUM="${PR_URL##*/}"
+  HEX_COMMENT_FILE="$(mktemp -t jac2051-hex-comment.XXXXXX).md"
+  {
+    echo "## ⛔ hexagon 검증 실패 (JAC-2051 자동 게이트)"
+    echo ""
+    echo "본 PR 의 hexagon 콘텐츠가 \`scripts/validate-hexagon-pr.mjs\` 검증에 실패했습니다."
+    echo "아래 오류를 모두 해소한 뒤 \`merge-blocked\` 라벨을 제거해주세요."
+    echo ""
+    echo "### 오류"
+    echo ""
+    echo '```'
+    grep -E '^✗ ' "$HEX_VAL_LOG_FILE" | head -50 || cat "$HEX_VAL_LOG_FILE" | head -50
+    echo '```'
+    echo ""
+    echo "<sub>출처: JAC-2051 (PR #18 / JAC-1988 사고 후속) · 검증 룰: \`scripts/lib/hexagon-rules.mjs\`</sub>"
+  } > "$HEX_COMMENT_FILE"
+
+  if ! gh pr edit "$PR_NUM" --repo jackylabs26/kstoryworld \
+        --add-label merge-blocked \
+        --add-label hexagon-validation-failed >/dev/null 2>&1; then
+    echo "[content-pr-adapter] WARN: failed to attach merge-blocked label (label may not exist — run scripts/sync-labels.sh)" >&2
+  fi
+  if ! gh pr comment "$PR_NUM" --repo jackylabs26/kstoryworld \
+        --body-file "$HEX_COMMENT_FILE" >/dev/null 2>&1; then
+    echo "[content-pr-adapter] WARN: failed to post hexagon validation comment to PR" >&2
+  fi
+  rm -f "$HEX_COMMENT_FILE"
+  echo "[content-pr-adapter] hexagon validation FAILED on $PR_URL — labels applied, comment posted" >&2
+fi
+
+rm -f "$HEX_VAL_JSON_FILE" "$HEX_VAL_LOG_FILE"
+
+echo "$PR_URL"
