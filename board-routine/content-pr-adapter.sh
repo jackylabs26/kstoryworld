@@ -388,3 +388,51 @@ case "$PR_URL" in
     exit 2
     ;;
 esac
+
+# ----- Hexagon validation gate (JAC-2051) ------------------------------------
+# Runs the per-PR hexagon validator inside the same worktree so the diff is
+# scoped to whatever this branch actually changes vs origin/main. If the PR
+# does not touch any hexagon manifests or hexagon articles the validator
+# emits a "gate skipped" summary and exits 0; we still post that as a thread
+# comment so reviewers see the gate ran. Failures post the failure summary
+# and add a merge-block label.
+if command -v node >/dev/null 2>&1; then
+  HEX_SUMMARY="$(mktemp -t jac2051-hex.XXXXXX.md)"
+  trap 'rm -f "$PR_BODY_FILE" "$HEX_SUMMARY"; git -C "$REPO_ROOT" worktree remove --force "$WT_DIR" >/dev/null 2>&1 || true; rm -rf "$WT_DIR"' EXIT
+
+  set +e
+  node "$REPO_ROOT/scripts/validate-hexagon-pr.mjs" \
+    --changed-from "origin/main" \
+    --summary-out "$HEX_SUMMARY" \
+    >/dev/null 2>"$HEX_SUMMARY.err"
+  HEX_RC=$?
+  set -e
+
+  if [[ ! -s "$HEX_SUMMARY" ]]; then
+    {
+      echo "## Hexagon validation"
+      echo ""
+      echo "Validator exited with rc=$HEX_RC but produced no summary. See workflow logs."
+      if [[ -s "$HEX_SUMMARY.err" ]]; then
+        echo ""
+        echo '```'
+        cat "$HEX_SUMMARY.err"
+        echo '```'
+      fi
+    } > "$HEX_SUMMARY"
+  fi
+  rm -f "$HEX_SUMMARY.err"
+
+  gh pr comment "$PR_URL" --body-file "$HEX_SUMMARY" >/dev/null \
+    || echo "[content-pr-adapter] hexagon summary comment failed (continuing)" >&2
+
+  if [[ "$HEX_RC" -ne 0 ]]; then
+    gh pr edit "$PR_URL" --add-label "hexagon-validation-failed" >/dev/null 2>&1 \
+      || echo "[content-pr-adapter] hexagon-validation-failed label not present yet (skipping)" >&2
+    echo "[content-pr-adapter] hexagon validation FAILED — PR labelled hexagon-validation-failed" >&2
+    exit 2
+  fi
+  echo "[content-pr-adapter] hexagon validation passed"
+else
+  echo "[content-pr-adapter] node not on PATH — hexagon validation skipped" >&2
+fi
