@@ -1,6 +1,6 @@
 # About KStoryWorld
 
-> **Status:** READY — Echo(CMO) 톤 검수 + Tier C 승인 대기
+> **Status:** READY — Echo(CMO) 톤 검수 통과 (2026-05-08), Tier C 승인 대기
 > **Issue:** JAC-2079 (parent: JAC-2076 AdSense E-E-A-T 강화)
 > **Word count:** ~1,950 words
 
@@ -32,6 +32,7 @@ KStoryWorld is operated by **JackyAILabs**, a Seoul-based company specializing i
 <img src="/images/team/jacky.jpg" alt="Jacky, Founder & Editor-in-Chief of KStoryWorld" width="200" height="200" style="border-radius: 50%;" />
 
 > *"제주 막걸리집 카운터 톤으로 한국 문화를 외국인에게 풀어주는 형"*
+> *("The guy who explains Korean culture to foreigners in the tone of a Jeju makgeolli bar counter.")*
 
 **Background.** Born and raised in Korea, Jacky spent 25 years building and operating IT systems for global hotels and casinos — the kind of environments where VIP guests from every continent arrive nightly with their own questions about Korean dramas, K-Pop, and Korean food. He moved to Seoul in his mid-40s, then founded JackyAILabs to build AI-powered content infrastructure, and launched KStoryWorld as its flagship editorial property. He lives between Jeju and Seoul.
 
@@ -164,12 +165,11 @@ We are committed to accuracy. When errors are identified:
 - **Significant errors** that materially change the meaning of an article are corrected with a prominent notice at the top of the article.
 - **Outdated information** (a restaurant that has closed, a drama that has been removed from streaming) is updated and marked accordingly.
 
-Readers can report errors or request corrections through the contact details below.
+Readers can report errors or request corrections by emailing [hello@kstoryworld.com](mailto:hello@kstoryworld.com). We respond within five business days.
 
-<!-- 🔗 PLACEHOLDER: /editorial-guidelines 페이지 링크 (현재 미발행 → 발행 후 교체) -->
-<!-- 🔗 PLACEHOLDER: /corrections-policy 페이지 링크 (현재 미발행 → 발행 후 교체) -->
+<!-- 🔗 PLACEHOLDER: /editorial-guidelines 및 /corrections-policy 전용 페이지는 향후 발행 시 본 단락에 인라인된 정책 요약을 대체 링크로 교체 예정 -->
 
-For our complete editorial standards, see our [Editorial Guidelines](/editorial-guidelines) and [Corrections Policy](/corrections-policy).
+Our complete editorial pipeline (5-stage research-to-publish workflow with bilingual review) is documented in the **Editorial & Publishing Policy** section above. Dedicated standards pages will be added as the publication grows.
 
 ---
 
@@ -209,10 +209,10 @@ We publish under our real identities because we stand behind our work.
 - [x] Jacky 프로필 완성 (가필 완료, 2026-05-07)
 - [x] Sabina 프로필 완성 (가필 완료, 2026-05-07)
 - [x] 프로필 사진 2장 업로드 (`public/images/team/jacky.jpg` 164KB · `public/images/team/sabina.jpg` 151KB · 800×800 JPG)
-- [ ] `/editorial-guidelines` 페이지 발행 또는 placeholder 처리
-- [ ] `/corrections-policy` 페이지 발행 또는 placeholder 처리
+- [x] `/editorial-guidelines` 페이지 — 인라인 단락 흡수 + 향후 발행 명시 (2026-05-08)
+- [x] `/corrections-policy` 페이지 — `mailto:hello@kstoryworld.com` 직통으로 대체 (2026-05-08)
 - [ ] Contact form 구현 여부 결정
-- [ ] Echo(CMO) 톤 검수
+- [x] Echo(CMO) 톤 검수 — H1(Jacky 헤드 인용문 한영 병기) + H2(미발행 링크 처리) 적용 (2026-05-08)
 - [ ] Jacky 최종 승인 (Tier C)
 - [ ] 기존 `app/about/page.tsx` → 본 초안 기반 TSX로 변환·배포 (별도 fan-out)
 - [ ] 발행 시 본 체크리스트 섹션 삭제
@@ -224,7 +224,7 @@ We publish under our real identities because we stand behind our work.
 
 ### 가필 정책 메모 (발행 시 삭제)
 
-- 인용문은 한국어 원문 + 영어 번역 병기 (Sabina) 또는 영어 단일 (Jacky) — 약력 질문지 16번 항목 베이스
+- 헤드 인용문은 한국어 원문 + 영어 번역 병기 (Jacky·Sabina 둘 다) — 약력 질문지 16번 항목 베이스, AdSense Reviewer 영어 가독성 확보 (2026-05-08 톤 검수 결과)
 - 다문화 가정 정보는 "the same dual lens... shows up daily in the multicultural household she lives in" 한 줄로만 노출 (가족 구성원 이름·국적·직업 등 구체 정보는 외부 비공개)
 - 17세 자녀 정보는 외부 노출 0
 - K-Fashion 카테고리는 페르소나 yaml에는 등록되어 있으나 **사이트 발행 트랙(JAC-2076 트랙 2)이 AdSense 승인 후 노출 예정**이므로 본 about 페이지에서는 6개 카테고리만 노출
