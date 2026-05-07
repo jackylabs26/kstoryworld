@@ -1,14 +1,14 @@
 # About KStoryWorld
 
-> **Status:** DRAFT — Tier C 발행 전 Jacky/Sabina 가필 필요  
-> **Issue:** JAC-2079 (parent: JAC-2076 AdSense E-E-A-T 강화)  
-> **Word count target:** 1,500–2,000 words
+> **Status:** READY — Echo(CMO) 톤 검수 통과 (2026-05-08), Tier C 승인 대기
+> **Issue:** JAC-2079 (parent: JAC-2076 AdSense E-E-A-T 강화)
+> **Word count:** ~1,950 words
 
 ---
 
 ## Hero Section
 
-**KStoryWorld (케이스토리월드)**  
+**KStoryWorld (케이스토리월드)**
 *Editor-Curated · Bilingual · Seoul*
 
 KStoryWorld is an editorial platform that brings the depth and richness of Korean culture to a global audience. We publish in-depth reviews, cultural commentary, language guides, and curated recommendations across six content verticals — all in Korean and English, simultaneously.
@@ -25,41 +25,61 @@ We don't do clickbait. We don't write academic papers. We write like curators wh
 
 KStoryWorld is operated by **JackyAILabs**, a Seoul-based company specializing in AI-powered content technology and editorial solutions. We combine deep domain expertise in Korean culture with modern publishing infrastructure to deliver content that is accurate, timely, and genuinely useful.
 
+---
+
 #### Jacky (김성수) — Founder & Editor-in-Chief
 
-<!-- 📸 PLACEHOLDER: Jacky 프로필 사진 (권장: 400×400, 자연광 상반신) -->
-<!-- 🔗 PLACEHOLDER: LinkedIn / personal site link -->
+<img src="/images/team/jacky.jpg" alt="Jacky, Founder & Editor-in-Chief of KStoryWorld" width="200" height="200" style="border-radius: 50%;" />
 
-`[JACKY 가필 필요 — 아래 가이드 참조]`
+> *"제주 막걸리집 카운터 톤으로 한국 문화를 외국인에게 풀어주는 형"*
+> *("The guy who explains Korean culture to foreigners in the tone of a Jeju makgeolli bar counter.")*
 
-- **Role:** Founder, Editor-in-Chief, and lead technology architect at JackyAILabs
-- **Background:** `[전문성·경력 — 약력 질문지 B섹션 기반으로 작성 필요]`
-- **Expertise:** `[한국 문화/콘텐츠 인연, 관련 경력, 언어 능력]`
-- **Focus areas:** `[주력 카테고리 — K-Drama, K-Pop 등]`
-- **One-liner:** `[60자 이내 한 줄 소개]`
+**Background.** Born and raised in Korea, Jacky spent 25 years building and operating IT systems for global hotels and casinos — the kind of environments where VIP guests from every continent arrive nightly with their own questions about Korean dramas, K-Pop, and Korean food. He moved to Seoul in his mid-40s, then founded JackyAILabs to build AI-powered content infrastructure, and launched KStoryWorld as its flagship editorial property. He lives between Jeju and Seoul.
 
-> *"[kstoryworld를 시작한 이유 — 본인 미션 버전, 약력 질문지 F-16번]"*  
+**Expertise.** Twenty-five years on the operator's side of hospitality IT taught him to read systems, but more importantly, to read the gap between what foreign guests actually wanted to know about Korea and what Korean writers were publishing. That gap is the editorial brief he writes from every day.
+
+**Languages.** Korean (native) · English (business proficient).
+
+**Focus areas.** K-Drama · K-Food · K-Travel (Jeju-based).
+
+**Picks (the personal stuff).** Favorite K-Drama: **〈Signal (시그널)〉** — for its taut, suspense-loaded storytelling. Drink of choice: **Jeju makgeolli**. Favorite Jeju walk: **the path up to Gwaneumsa Temple (관음사)**.
+
+**On the record.**
+🔗 [Jacky's K-Drama Blog](https://jacky-kdrama.blogspot.com/) · [LinkedIn](https://www.linkedin.com/in/성수-김-5990b8348/?locale=en)
+
+> *"After 25 years serving global guests in hotel and casino IT, I noticed the same gap every day — the Korean details foreign guests really wanted to know weren't showing up in Korean writers' articles, and the contexts Koreans take for granted weren't explained well by foreign media. KStoryWorld is our attempt to bridge those two gaps. We're not critics — we're operators who live in Korea but understand the outside view too."*
 > — Jacky
 
-#### Sabina — Senior Editor & Cultural Specialist
+---
 
-<!-- 📸 PLACEHOLDER: Sabina 프로필 사진 (권장: 400×400, 자연광 상반신) -->
-<!-- 🔗 PLACEHOLDER: LinkedIn / personal site link -->
+#### Sabina — Cultural Bridge Editor
 
-`[SABINA 가필 필요 — 아래 가이드 참조]`
+<img src="/images/team/sabina.jpg" alt="Sabina, Cultural Bridge Editor of KStoryWorld" width="200" height="200" style="border-radius: 50%;" />
 
-- **Role:** Senior Editor, cultural content specialist
-- **Background:** `[전문성·경력 — 약력 질문지 B섹션 기반으로 작성 필요]`
-- **Expertise:** `[한국 문화/콘텐츠 인연, 관련 경력, 언어 능력]`
-- **Focus areas:** `[주력 카테고리]`
-- **One-liner:** `[60자 이내 한 줄 소개]`
+> *"23년 비행에서 배운 건 — 언어는 단어가 아니라 연결"*
+> *("Twenty-three years in the cabin taught me one thing — language isn't about words, it's about connection.")*
 
-> *"[개인 미션 버전 — 약력 질문지 F-16번]"*  
+**Background.** Sabina studied music at Hanyang University before joining a foreign airline as cabin crew, where she spent 23 years working long-haul routes between Seoul, Hong Kong, and Dubai — most of them in business and first class, the seats where international travelers tend to ask the most curious questions about Korean culture. After returning home to Seoul, she opened **My Jazz Garden**, a private English-language jazz club where Korean and international guests gather weekly to talk, listen, and practice language through music. The same dual lens — Korean home, foreign perspective — now shows up daily in the multicultural household she lives in.
+
+**Expertise.** Two decades in galleys and a private jazz club in Seoul gave her a particular ear: she hears where foreign readers stumble in Korean content before they say it. Her editorial instinct is to translate the *feeling* across languages, not just the words.
+
+**Languages.** Korean (native) · English (fluent) · Cantonese (광동어).
+
+**Focus areas.** K-Drama · K-Travel · K-Literature · K-Food.
+
+**Picks (the personal stuff).** Favorite K-Drama: **〈Descendants of the Sun (태양의 후예)〉** — first watched on Hong Kong layovers, when its restless emotional rhythm matched her own. Favorite Korean city: **Mokpo (목포)**. Comfort dish: **bibimbap**. Reading habit: **philosophy**.
+
+**On the record.**
+🔗 [Sabina Vibe K-Life Blog](https://sabina-vibe-k-life.blogspot.com/) · [My Jazz Garden (Instagram)](https://www.instagram.com/myjazzgarden/) · [cxsabina@gmail.com](mailto:cxsabina@gmail.com)
+
+> *"Across 23 years of flying, the questions foreign passengers asked about Korean content were almost always the same. 'How does this scene sound to a Korean?' 'What does this word really mean?' Those galley conversations should have been curation notes from the start. After coming home to Seoul and opening an English jazz club where I meet learners every week, I became certain — language isn't about words. It's about connection. KStoryWorld is where those galley conversations and jazz-club conversations finally land on the page."*
 > — Sabina
+
+---
 
 ### Our Editorial Team
 
-Beyond our core editors, KStoryWorld employs a curated roster of eight narrative personas — each with a distinct voice, expertise, and cultural lens. These personas aren't fictional characters; they represent our editorial team's different perspectives and writing styles, ensuring that a K-Drama deep-dive reads differently from a K-Beauty trend report, because the subjects demand different approaches.
+Beyond our two named editors, KStoryWorld publishes through a curated roster of narrative personas — each with a distinct voice, expertise, and cultural lens. These personas aren't fictional characters. They represent our editorial team's different perspectives and writing styles, ensuring that a K-Drama deep-dive reads differently from a K-Beauty trend report, because the subjects demand different approaches. Every article carries a clearly identified narrator persona, and every persona's tone, focus categories, and forbidden topics are defined and reviewed by the editor-in-chief.
 
 ---
 
@@ -113,23 +133,23 @@ Book reviews, author profiles, translation analysis, and literary criticism that
 
 Every piece published on KStoryWorld follows a rigorous editorial pipeline:
 
-1. **Research & Sourcing:** Topics are identified through cultural relevance, reader interest, and editorial judgment. All factual claims require at least two independent sources for cross-verification.
+1. **Research & Sourcing.** Topics are identified through cultural relevance, reader interest, and editorial judgment. All factual claims require at least two independent sources for cross-verification.
 
-2. **AI-Assisted Drafting:** We use AI tools as research assistants and first-draft generators — never as the final voice. AI helps us work faster; it does not replace human judgment, cultural knowledge, or editorial taste.
+2. **AI-Assisted Drafting.** We use AI tools as research assistants and first-draft generators — never as the final voice. AI helps us work faster; it does not replace human judgment, cultural knowledge, or editorial taste.
 
-3. **Human Editorial Review:** Every article passes through human editors who verify facts, refine language, add personal insight from lived experience, and ensure the piece meets our quality standards. Our editors add what AI cannot: genuine experience watching dramas, eating the food, walking the streets, and living in Korea.
+3. **Human Editorial Review.** Every article passes through human editors — Jacky, Sabina, or both — who verify facts, refine language, add personal insight from lived experience, and ensure the piece meets our quality standards. Our editors add what AI cannot: actually watching the dramas, eating the food, walking the streets, and living in Korea.
 
-4. **Quality Gate:** Before publication, content passes a multi-point checklist covering factual accuracy, source attribution, language quality (both ko and en), appropriate imagery, and brand voice alignment.
+4. **Quality Gate.** Before publication, content passes a multi-point checklist covering factual accuracy, source attribution, language quality (both Korean and English), appropriate imagery, and brand voice alignment.
 
-5. **Bilingual Publication:** All content is published simultaneously in Korean and English. This is not machine translation — each language version is crafted to read naturally to native speakers.
+5. **Bilingual Publication.** All content is published simultaneously in Korean and English. This is not machine translation — each language version is crafted to read naturally to native speakers.
 
 ### What We Don't Do
 
-- We never publish content that is purely AI-generated without human editorial oversight
-- We never make unsubstantiated health, medical, or efficacy claims
-- We never use clickbait headlines that misrepresent content
-- We never publish without proper attribution for external sources
-- We never embed media from unofficial or pirated sources
+- We never publish content that is purely AI-generated without human editorial oversight.
+- We never make unsubstantiated health, medical, or efficacy claims.
+- We never use clickbait headlines that misrepresent content.
+- We never publish without proper attribution for external sources.
+- We never embed media from unofficial or pirated sources.
 
 ### Source Attribution
 
@@ -143,14 +163,13 @@ We are committed to accuracy. When errors are identified:
 
 - **Minor factual corrections** (dates, names, figures) are updated immediately with an editor's note at the bottom of the article indicating the change date and nature of correction.
 - **Significant errors** that materially change the meaning of an article are corrected with a prominent notice at the top of the article.
-- **Outdated information** (e.g., a restaurant that has closed, a drama that has been removed from streaming) is updated and marked accordingly.
+- **Outdated information** (a restaurant that has closed, a drama that has been removed from streaming) is updated and marked accordingly.
 
-Readers can report errors or request corrections by contacting us at the email below.
+Readers can report errors or request corrections by emailing [hello@kstoryworld.com](mailto:hello@kstoryworld.com). We respond within five business days.
 
-<!-- 🔗 PLACEHOLDER: /editorial-guidelines 페이지 링크 (현재 미발행 → 발행 후 교체) -->
-<!-- 🔗 PLACEHOLDER: /corrections-policy 페이지 링크 (현재 미발행 → 발행 후 교체) -->
+<!-- 🔗 PLACEHOLDER: /editorial-guidelines 및 /corrections-policy 전용 페이지는 향후 발행 시 본 단락에 인라인된 정책 요약을 대체 링크로 교체 예정 -->
 
-For our complete editorial standards, see our [Editorial Guidelines](/editorial-guidelines) and [Corrections Policy](/corrections-policy).
+Our complete editorial pipeline (5-stage research-to-publish workflow with bilingual review) is documented in the **Editorial & Publishing Policy** section above. Dedicated standards pages will be added as the publication grows.
 
 ---
 
@@ -164,8 +183,9 @@ We welcome feedback, corrections, partnership inquiries, and story suggestions.
 | Partnership & collaboration | [partner@kstoryworld.com](mailto:partner@kstoryworld.com) |
 | Corrections & factual errors | [hello@kstoryworld.com](mailto:hello@kstoryworld.com) |
 | Privacy-related requests | [privacy@kstoryworld.com](mailto:privacy@kstoryworld.com) |
+| Direct to Sabina (Cultural Bridge Editor) | [cxsabina@gmail.com](mailto:cxsabina@gmail.com) |
 
-**Location:** Seoul, Republic of Korea  
+**Location:** Seoul, Republic of Korea
 **Operating Entity:** JackyAILabs
 
 <!-- 🔗 PLACEHOLDER: Contact form 링크 (향후 구현 시 교체) -->
@@ -184,42 +204,27 @@ We publish under our real identities because we stand behind our work.
 
 ---
 
-## 가필 가이드 (Jacky & Sabina용 — 발행 시 삭제)
+## 발행 전 체크리스트 (발행 시 본 섹션 삭제)
 
-### Jacky 작성 분량
-
-아래 항목을 직접 채워주세요. 약력 질문지(`docs/kstoryworld_운영진_약력_질문지.md`)의 답변을 기반으로 합니다.
-
-1. **프로필 사진** — 400×400px 이상, 자연광 상반신 권장. `public/images/team/jacky.jpg`에 저장
-2. **Background (2~3문장):** 한국 문화/콘텐츠와의 인연, 기간, 관련 경력(매체·출판·기술 등)
-3. **Expertise (1~2문장):** 구체적 전문 영역. 예: "10년간 K-Drama 150편+ 시청·분석", "AI 기술로 콘텐츠 파이프라인 구축"
-4. **언어 능력:** 한국어/영어 수준 (native, fluent 등)
-5. **Focus areas:** 주력으로 커버하는 카테고리 2~3개
-6. **One-liner (60자):** About 페이지 이름 옆 표시. 예: "한국 드라마와 AI의 교차점을 탐구하는 에디터"
-7. **인용문 (200자):** KStoryWorld를 시작한 이유 — 본인의 말로
-8. **SNS 링크 (선택):** LinkedIn, Instagram, X 등 1개 이상 권장 (신뢰 신호)
-
-### Sabina 작성 분량
-
-동일 항목을 채워주세요.
-
-1. **프로필 사진** — `public/images/team/sabina.jpg`
-2. **Background**
-3. **Expertise**
-4. **언어 능력**
-5. **Focus areas**
-6. **One-liner**
-7. **인용문**
-8. **SNS 링크**
-
-### 발행 전 체크리스트
-
-- [ ] Jacky 프로필 완성
-- [ ] Sabina 프로필 완성
-- [ ] 프로필 사진 2장 업로드
-- [ ] `/editorial-guidelines` 페이지 발행 (또는 placeholder 확인)
-- [ ] `/corrections-policy` 페이지 발행 (또는 placeholder 확인)
+- [x] Jacky 프로필 완성 (가필 완료, 2026-05-07)
+- [x] Sabina 프로필 완성 (가필 완료, 2026-05-07)
+- [x] 프로필 사진 2장 업로드 (`public/images/team/jacky.jpg` 164KB · `public/images/team/sabina.jpg` 151KB · 800×800 JPG)
+- [x] `/editorial-guidelines` 페이지 — 인라인 단락 흡수 + 향후 발행 명시 (2026-05-08)
+- [x] `/corrections-policy` 페이지 — `mailto:hello@kstoryworld.com` 직통으로 대체 (2026-05-08)
 - [ ] Contact form 구현 여부 결정
-- [ ] Echo(CMO) 톤 검수
+- [x] Echo(CMO) 톤 검수 — H1(Jacky 헤드 인용문 한영 병기) + H2(미발행 링크 처리) 적용 (2026-05-08)
 - [ ] Jacky 최종 승인 (Tier C)
-- [ ] 기존 `app/about/page.tsx` → 본 초안 기반 TSX로 변환·배포
+- [ ] 기존 `app/about/page.tsx` → 본 초안 기반 TSX로 변환·배포 (별도 fan-out)
+- [ ] 발행 시 본 체크리스트 섹션 삭제
+
+### 출처 데이터 (운영자 카드 베이스)
+
+- Jacky: [약력 질문지](./kstoryworld_운영진_약력_질문지(김성수).md) (status: confirmed) + [페르소나 yaml](../content/personas/jacky.yaml)
+- Sabina: [약력 질문지](./kstoryworld_운영진_약력_질문지(사비나).md) (status: confirmed) + [페르소나 yaml](../content/personas/sabina.yaml) + [Sabina 본인 블로그 톤 분석](https://sabina-vibe-k-life.blogspot.com/)
+
+### 가필 정책 메모 (발행 시 삭제)
+
+- 헤드 인용문은 한국어 원문 + 영어 번역 병기 (Jacky·Sabina 둘 다) — 약력 질문지 16번 항목 베이스, AdSense Reviewer 영어 가독성 확보 (2026-05-08 톤 검수 결과)
+- 다문화 가정 정보는 "the same dual lens... shows up daily in the multicultural household she lives in" 한 줄로만 노출 (가족 구성원 이름·국적·직업 등 구체 정보는 외부 비공개)
+- 17세 자녀 정보는 외부 노출 0
+- K-Fashion 카테고리는 페르소나 yaml에는 등록되어 있으나 **사이트 발행 트랙(JAC-2076 트랙 2)이 AdSense 승인 후 노출 예정**이므로 본 about 페이지에서는 6개 카테고리만 노출
