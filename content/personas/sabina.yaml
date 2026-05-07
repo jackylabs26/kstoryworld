@@ -67,6 +67,7 @@ category_fit:
   k_travel: 1
   k_literature: 1
   k_food: 1
+  k_fashion: 1
   k_pop: 2
   k_beauty: 2
 secondary_focus:
@@ -111,19 +112,35 @@ external_channels:
     role: experience_signal
 personal_context:
   family: "17세 아들 1명, 다문화 가정 (남편 = Sam, 홍콩계 호주국적의 금융계 출신)"
+  education:
+    school: "한양대학교 음악학과"
+    school_en: "Hanyang University, Department of Music"
+    relevance: "음악학 학사 → 재즈 클럽(My Jazz Garden) 운영의 학문적 기반. 음악·언어·문화 서사를 잇는 일관된 정체성"
   return_year: ""
   signature_locations:
     - 서울 (현 거주·재즈 클럽 운영)
     - 홍콩 (전 비행 베이스)
     - 두바이 (전 비행 노선)
 avatar_image:
-  asset_url: ""
-  license: ""
-  credit: ""
+  asset_url: /images/team/sabina.jpg
+  asset_path: public/images/team/sabina.jpg
+  license: owned_by_subject
+  credit: Sabina (KStoryWorld Cultural Bridge Editor)
 created_at: 2026-05-02
 updated_at: 2026-05-07
 notes: |
   보드 시드 페르소나 #1. JAC-1952 wake에서 직접 제안.
+
+  2026-05-07 추가 업데이트 (Sabina 본인 가필 결과 반영):
+  - category_fit.k_fashion: 1 신규 (Sabina 본인 주력 영역으로 확정)
+  - avatar_image: public/images/team/sabina.jpg 등록 (본인 제공 400x400)
+  - 직책 확정: "Cultural Bridge Editor"
+  - 외국어 추가: 광동어
+  - 좋아하는 영역: K-Drama=태양의 후예, K-Travel=목포, K-Food=비빔밥,
+    철학(K-Literature/재즈 슬롯 대체)
+  - personal_context.education: 한양대학교 음악학과 (학사) —
+    재즈 클럽 운영의 학문적 기반. "음악학 → 비행 23년 → 재즈 클럽 →
+    콘텐츠 큐레이션" 일관된 서사 라인 확보
 
   2026-05-07 업데이트 (JAC-2079 컨텍스트):
   Sabina 본인이 운영하는 블로그(https://sabina-vibe-k-life.blogspot.com/) 7개
