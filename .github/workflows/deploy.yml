@@ -26,6 +26,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Validate image credits
+        run: npm run check:image-credits
+
       - name: Build static export
         env:
           NEXT_PUBLIC_NAVER_SITE_VERIFICATION: 98fbc877e00c1f552ebb530b2a1ac902d27a7cc7

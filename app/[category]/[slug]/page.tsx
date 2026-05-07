@@ -6,7 +6,9 @@ import { ReviewArticle } from '@/components/ksw/review-article';
 import {
   loadAllReviews,
   REVIEW_CATEGORIES,
+  CATEGORY_CONTENT_DIRS,
   isReviewCategory,
+  type ReviewMeta,
   type Season,
 } from '@/lib/reviews';
 
@@ -18,6 +20,17 @@ function reviewsDir() {
   return path.join(process.cwd(), 'content/reviews');
 }
 
+function findReview(category: string, slug: string): ReviewMeta | undefined {
+  return loadAllReviews().find((r) => r.category === category && r.slug === slug);
+}
+
+function findSiblingPath(category: string, siblingSlug: string): string | null {
+  const sibling = loadAllReviews().find(
+    (r) => r.category === category && r.slug === siblingSlug,
+  );
+  return sibling ? sibling.contentPath : null;
+}
+
 export async function generateStaticParams() {
   const reviews = loadAllReviews();
   return reviews.map((r) => ({ category: r.category, slug: r.slug }));
@@ -27,22 +40,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { category, slug } = await params;
   if (!isReviewCategory(category)) return { title: 'Not Found' };
 
-  const filePath = path.join(reviewsDir(), `${slug}.html`);
-  if (!fs.existsSync(filePath)) return { title: 'Review Not Found' };
+  const meta = findReview(category, slug);
+  if (!meta) return { title: 'Review Not Found' };
 
-  const html = fs.readFileSync(filePath, 'utf-8');
-  const titleMatch = html.match(/<title>([\s\S]*?)<\/title>/i);
-  const descMatch = html.match(/<meta name="description" content="([\s\S]*?)"/i);
-  const title = titleMatch ? titleMatch[1].trim() : slug;
-  const description = descMatch ? descMatch[1].trim() : 'KStoryWorld 리뷰';
+  const title = meta.title;
+  const description = meta.excerpt || 'KStoryWorld 리뷰';
 
   const isEn = slug.endsWith('-en');
   const isKo = slug.endsWith('-ko');
   const baseSlug = isEn || isKo ? slug.slice(0, -3) : slug;
   const siblingSlug = isEn ? `${baseSlug}-ko` : isKo ? `${baseSlug}-en` : null;
-  const hasSibling = siblingSlug
-    ? fs.existsSync(path.join(reviewsDir(), `${siblingSlug}.html`))
-    : false;
+  const hasSibling = siblingSlug ? !!findSiblingPath(category, siblingSlug) : false;
 
   const path_ = `/${category}/${slug}`;
   const url = `https://kstoryworld.com${path_}`;
@@ -69,43 +77,50 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: 'article',
       siteName: 'KStoryWorld',
       locale,
+      ...(meta.datePublished ? { publishedTime: meta.datePublished } : {}),
+      ...(meta.dateModified ? { modifiedTime: meta.dateModified } : {}),
+      ...(meta.author ? { authors: [meta.author] } : {}),
     },
     twitter: { card: 'summary_large_image', title, description },
   };
+}
+
+function extractBody(filePath: string, raw: string): string {
+  if (filePath.endsWith('.md')) {
+    if (!raw.startsWith('---')) return raw;
+    const end = raw.indexOf('\n---', 3);
+    return end === -1 ? raw : raw.slice(end + 4).trimStart();
+  }
+  const bodyMatch = raw.match(/<body>([\s\S]*?)<\/body>/i);
+  return bodyMatch ? bodyMatch[1] : raw;
 }
 
 export default async function CategorySlugPage({ params }: Props) {
   const { category, slug } = await params;
   if (!isReviewCategory(category)) notFound();
 
-  const filePath = path.join(reviewsDir(), `${slug}.html`);
-  if (!fs.existsSync(filePath)) notFound();
+  const meta = findReview(category, slug);
+  if (!meta) notFound();
 
-  const html = fs.readFileSync(filePath, 'utf-8');
+  const raw = fs.readFileSync(meta.contentPath, 'utf-8');
+  const bodyContent = extractBody(meta.contentPath, raw);
 
-  const allReviews = loadAllReviews();
-  const meta = allReviews.find((r) => r.slug === slug);
-  if (!meta || meta.category !== category) notFound();
-
-  const bodyMatch = html.match(/<body>([\s\S]*?)<\/body>/i);
-  const bodyContent = bodyMatch ? bodyMatch[1] : html;
-
-  const titleMatch = html.match(/<title>([\s\S]*?)<\/title>/i);
-  const title = titleMatch ? titleMatch[1].trim() : slug;
-  const descMatch = html.match(/<meta name="description" content="([\s\S]*?)"/i);
-  const description = descMatch ? descMatch[1].trim() : '';
+  const title = meta.title;
+  const description = meta.excerpt;
 
   const isEn = slug.endsWith('-en');
   const isKo = slug.endsWith('-ko');
   const lang = isEn ? ('en' as const) : ('ko' as const);
   const baseSlug = isEn ? slug.slice(0, -3) : isKo ? slug.slice(0, -3) : slug;
   const siblingSlug = isEn ? `${baseSlug}-ko` : `${baseSlug}-en`;
-  const siblingPath = path.join(reviewsDir(), `${siblingSlug}.html`);
-  const hasSibling = fs.existsSync(siblingPath);
+  const hasSibling = !!findSiblingPath(category, siblingSlug);
 
   const season: Season = meta.season ?? 'winter';
 
   const url = `https://kstoryworld.com/${category}/${slug}`;
+  const authorJsonLd = meta.author
+    ? { '@type': 'Person' as const, name: meta.author }
+    : { '@type': 'Organization' as const, name: 'KStoryWorld' };
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -114,7 +129,7 @@ export default async function CategorySlugPage({ params }: Props) {
     inLanguage: lang,
     image: meta.image ? `https://kstoryworld.com${meta.image}` : undefined,
     mainEntityOfPage: { '@type': 'WebPage', '@id': url },
-    author: { '@type': 'Organization', name: 'KStoryWorld' },
+    author: authorJsonLd,
     publisher: {
       '@type': 'Organization',
       name: 'KStoryWorld',
@@ -123,6 +138,8 @@ export default async function CategorySlugPage({ params }: Props) {
         url: 'https://kstoryworld.com/design-assets/logo.png',
       },
     },
+    ...(meta.datePublished ? { datePublished: meta.datePublished } : {}),
+    ...(meta.dateModified ? { dateModified: meta.dateModified } : {}),
   };
 
   const breadcrumbJsonLd = {
@@ -158,6 +175,9 @@ export default async function CategorySlugPage({ params }: Props) {
         lang={lang}
         siblingSlug={hasSibling ? siblingSlug : undefined}
         category={category}
+        author={meta.author}
+        datePublished={meta.datePublished}
+        dateModified={meta.dateModified}
       />
     </>
   );

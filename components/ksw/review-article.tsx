@@ -12,9 +12,20 @@ interface ReviewArticleProps {
   lang: 'ko' | 'en';
   siblingSlug?: string;
   category?: string;
+  author?: string;
+  datePublished?: string;
+  dateModified?: string;
 }
 
-export function ReviewArticle({ bodyHtml, slug, season, title, lang: reviewLang, siblingSlug, category }: ReviewArticleProps) {
+function formatDate(iso: string, lang: 'ko' | 'en'): string {
+  const d = new Date(iso);
+  if (lang === 'ko') {
+    return `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}.`;
+  }
+  return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
+export function ReviewArticle({ bodyHtml, slug, season, title, lang: reviewLang, siblingSlug, category, author, datePublished, dateModified }: ReviewArticleProps) {
   const { dark, lang } = useKSWTheme();
   const s = SEASONS[season];
 
@@ -97,6 +108,33 @@ export function ReviewArticle({ bodyHtml, slug, season, title, lang: reviewLang,
             {title}
           </h1>
 
+          {(author || datePublished) && (
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                marginTop: 16,
+                fontSize: 14,
+                fontFamily: 'var(--font-mono)',
+                color: dark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)',
+                flexWrap: 'wrap',
+              }}
+            >
+              {author && (
+                <span>{reviewLang === 'ko' ? '글' : 'By'} {author}</span>
+              )}
+              {author && datePublished && (
+                <span style={{ opacity: 0.4 }}>·</span>
+              )}
+              {datePublished && (
+                <time dateTime={datePublished}>
+                  {formatDate(datePublished, reviewLang)}
+                </time>
+              )}
+            </div>
+          )}
+
           {siblingSlug && (
             <Link
               href={category ? `/${category}/${siblingSlug}` : `/reviews/${siblingSlug}`}
@@ -127,8 +165,24 @@ export function ReviewArticle({ bodyHtml, slug, season, title, lang: reviewLang,
           dangerouslySetInnerHTML={{ __html: bodyHtml }}
         />
 
+        {dateModified && (
+          <div
+            style={{
+              marginTop: 48,
+              paddingTop: 16,
+              borderTop: `1px solid ${dark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'}`,
+              fontSize: 13,
+              fontFamily: 'var(--font-mono)',
+              color: dark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)',
+            }}
+          >
+            {reviewLang === 'ko' ? '최종 업데이트' : 'Last updated'}{' '}
+            <time dateTime={dateModified}>{formatDate(dateModified, reviewLang)}</time>
+          </div>
+        )}
+
         {/* In-article ad slot */}
-        <div style={{ marginTop: 48, paddingTop: 48, borderTop: `1px solid ${dark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'}` }}>
+        <div style={{ marginTop: dateModified ? 24 : 48, paddingTop: 48, borderTop: dateModified ? 'none' : `1px solid ${dark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'}` }}>
           <AdSlot variant="in-article" />
         </div>
       </div>
