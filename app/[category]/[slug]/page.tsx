@@ -77,6 +77,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: 'article',
       siteName: 'KStoryWorld',
       locale,
+      ...(meta.datePublished ? { publishedTime: meta.datePublished } : {}),
+      ...(meta.dateModified ? { modifiedTime: meta.dateModified } : {}),
+      ...(meta.author ? { authors: [meta.author] } : {}),
     },
     twitter: { card: 'summary_large_image', title, description },
   };
@@ -115,6 +118,9 @@ export default async function CategorySlugPage({ params }: Props) {
   const season: Season = meta.season ?? 'winter';
 
   const url = `https://kstoryworld.com/${category}/${slug}`;
+  const authorJsonLd = meta.author
+    ? { '@type': 'Person' as const, name: meta.author }
+    : { '@type': 'Organization' as const, name: 'KStoryWorld' };
   const articleJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -123,7 +129,7 @@ export default async function CategorySlugPage({ params }: Props) {
     inLanguage: lang,
     image: meta.image ? `https://kstoryworld.com${meta.image}` : undefined,
     mainEntityOfPage: { '@type': 'WebPage', '@id': url },
-    author: { '@type': 'Organization', name: 'KStoryWorld' },
+    author: authorJsonLd,
     publisher: {
       '@type': 'Organization',
       name: 'KStoryWorld',
@@ -132,6 +138,8 @@ export default async function CategorySlugPage({ params }: Props) {
         url: 'https://kstoryworld.com/design-assets/logo.png',
       },
     },
+    ...(meta.datePublished ? { datePublished: meta.datePublished } : {}),
+    ...(meta.dateModified ? { dateModified: meta.dateModified } : {}),
   };
 
   const breadcrumbJsonLd = {
@@ -167,6 +175,9 @@ export default async function CategorySlugPage({ params }: Props) {
         lang={lang}
         siblingSlug={hasSibling ? siblingSlug : undefined}
         category={category}
+        author={meta.author}
+        datePublished={meta.datePublished}
+        dateModified={meta.dateModified}
       />
     </>
   );

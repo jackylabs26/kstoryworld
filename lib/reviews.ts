@@ -25,6 +25,36 @@ export interface ReviewMeta {
   category: ReviewCategory;
   /** Absolute path to the source content file. */
   contentPath: string;
+  author?: string;
+  datePublished?: string;
+  dateModified?: string;
+}
+
+interface ArticleMetaEntry {
+  author: string | null;
+  datePublished: string;
+  dateModified: string;
+}
+
+let _articleMetaCache: Record<string, ArticleMetaEntry> | null = null;
+
+function loadArticleMeta(): Record<string, ArticleMetaEntry> {
+  if (_articleMetaCache) return _articleMetaCache;
+  const metaPath = path.join(process.cwd(), 'content/article-meta.json');
+  if (!fs.existsSync(metaPath)) return {};
+  _articleMetaCache = JSON.parse(fs.readFileSync(metaPath, 'utf-8'));
+  return _articleMetaCache!;
+}
+
+function applyArticleMeta(review: ReviewMeta): ReviewMeta {
+  const meta = loadArticleMeta()[review.slug];
+  if (!meta) return review;
+  return {
+    ...review,
+    author: meta.author ?? undefined,
+    datePublished: meta.datePublished,
+    dateModified: meta.dateModified,
+  };
 }
 
 const SEASON_CYCLE: Season[] = ['spring', 'summer', 'autumn', 'winter'];
@@ -97,7 +127,7 @@ function loadReviewsFromDir(dir: string): ReviewMeta[] {
     const isEn = slug.endsWith('-en');
     const isKo = slug.endsWith('-ko');
     const baseSlug = isEn ? slug.slice(0, -3) : isKo ? slug.slice(0, -3) : slug;
-    return {
+    return applyArticleMeta({
       slug,
       baseSlug,
       title: titleMatch ? titleMatch[1].trim() : slug,
@@ -107,7 +137,7 @@ function loadReviewsFromDir(dir: string): ReviewMeta[] {
       season: seasonForSlug(baseSlug),
       category: extractCategory(content, slug),
       contentPath: fullPath,
-    };
+    });
   });
 }
 
@@ -144,7 +174,7 @@ function loadDomainDir(dirName: string, category: ReviewCategory): ReviewMeta[] 
       image = imgMatch ? imgMatch[1] : '';
     }
 
-    results.push({
+    results.push(applyArticleMeta({
       slug,
       baseSlug,
       title,
@@ -154,7 +184,7 @@ function loadDomainDir(dirName: string, category: ReviewCategory): ReviewMeta[] 
       season: seasonForSlug(baseSlug),
       category,
       contentPath: fullPath,
-    });
+    }));
   }
   return results;
 }
