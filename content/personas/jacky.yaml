@@ -52,10 +52,42 @@ signature_phrases_en:
 forbidden_topics:
   - medical_assertions
   - partisan_politics
+external_channels:
+  - name: Jacky's K-Drama Blog
+    url: https://jacky-kdrama.blogspot.com/
+    purpose: 본인 운영 K-Drama 블로그 (외국인 시점 K-Drama 큐레이션)
+    role: trust_signal
+  - name: LinkedIn (Sungsu Kim)
+    url: https://www.linkedin.com/in/성수-김-5990b8348/?locale=en
+    purpose: 호텔·카지노 IT 25년 경력 검증
+    role: experience_signal
+personal_context:
+  education:
+    school: 비공개
+    relevance: ""
+  signature_locations:
+    - 제주 (현 거주·막걸리 베이스)
+    - 서울 (40대 중반부터 시작한 도시 거점·JackyAILabs 본거지)
+  favorites:
+    k_drama: "〈시그널〉 — 긴장감·서스펜스가 가득한 드라마"
+    makgeolli: "제주막걸리"
+    k_travel: "제주 관음사 가는 길"
 avatar_image:
-  asset_url: ""
-  license: ""
-  credit: ""
+  asset_url: /images/team/jacky.jpg
+  asset_path: public/images/team/jacky.jpg
+  license: owned_by_subject
+  credit: Jacky (KStoryWorld Founder & Editor-in-Chief)
 created_at: 2026-05-02
+updated_at: 2026-05-07
 notes: |
   보드 시드 페르소나 #2. JAC-1952 wake에서 직접 제안.
+
+  2026-05-07 업데이트 (JAC-2079 약력 질문지 가필 결과 반영):
+  - avatar_image: public/images/team/jacky.jpg 등록 (본인 제공 400x400 컷)
+  - external_channels: Jacky's K-Drama Blog (jacky-kdrama.blogspot.com) +
+    LinkedIn 등록 (E-E-A-T Authority/Experience 신호 강화)
+  - personal_context.favorites: 시그널 / 제주막걸리 / 관음사 가는 길
+    (저자 톤 차별화·진정성 핵심 항목 확정)
+  - personal_context.signature_locations: "40대 중반 시작한 서울살이"
+    명시 (제주 → 서울 layered home_base)
+  - 학력: 비공개 결정

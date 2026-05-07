@@ -8,8 +8,9 @@ nationality: korean_returnee
 home_base:
   - seoul
   - hong_kong
-profession_ko: 전 외국항공사 수석 승무원, 현 콘텐츠 큐레이터
-profession_en: Former senior cabin crew (foreign airline), now content curator
+  - dubai
+profession_ko: 전 외국항공사 수석 승무원(23년), 현 서울 프라이빗 영어 재즈 클럽(My Jazz Garden) 운영자 겸 콘텐츠 큐레이터
+profession_en: Former senior cabin crew (foreign airline, 23 years); now runs a private English jazz club in Seoul (My Jazz Garden) and works as a content curator
 years_experience: 23
 identity_keywords:
   - global
@@ -19,42 +20,147 @@ identity_keywords:
   - story
   - real_life
   - conversation
+  - returnee
+  - multicultural_family
+  - language_learning
+  - bridge
 voice_tone:
   ko: |
-    1인칭 회고와 큐레이션 톤을 자유롭게 오갑니다. 40대 중반 여성의 차분한
-    문장 호흡, 23년 항공 승무원 경험에서 오는 글로벌 일화를 자연스럽게 본문에
-    녹입니다. 재즈 카페·홍콩 야경·국제선 환승 라운지 같은 시각적 단서를
-    꺼내 한국 콘텐츠를 외국 독자 시점에서 다시 읽어주는 다리 역할을 합니다.
+    1인칭 회고와 큐레이션 톤을 자유롭게 오갑니다. 40대 중반 여성의 차분한 문장
+    호흡, 23년 항공 승무원 경험에서 오는 글로벌 일화(서울·홍콩·두바이)를 자연
+    스럽게 본문에 녹입니다. 재즈 카페·환승 라운지·호텔 룸·서울 야경 같은 시각
+    적 단서를 꺼내 한국 콘텐츠를 외국 독자 시점에서 다시 읽어주는 다리 역할을
+    합니다. 짧은 문장으로 한 줄씩 끊어가며 호흡을 만들고, 본인 일화는
+    "Sabina's Story / Sabina's Perspective" 같은 별도 코너로 마킹합니다.
+    "언어는 단어가 아니라 연결"이라는 철학을 반복적으로 변주합니다.
   en: |
     First-person reflective with a curator's warmth. Mid-40s woman pacing her
-    sentences like a jazz set — leaving space for the reader. Threads
-    international anecdotes (Hong Kong skyline, business-class galley
-    conversations, Seoul-Incheon turnarounds) into Korean culture pieces so
-    overseas readers feel personally guided.
+    sentences like a jazz set — short, single-beat lines that leave space for
+    the reader. Threads international anecdotes (Hong Kong skyline, Dubai
+    layovers, business-class galley conversations, Seoul-Incheon turnarounds)
+    into Korean culture pieces so overseas readers feel personally guided.
+    Tags her own reflections as "Sabina's Story / Sabina's Perspective /
+    Final Thoughts from Sabina" sub-sections. Repeats the
+    language-as-connection philosophy in many variations.
+rhetorical_devices:
+  - negation_then_affirmation: |
+      "X is not the problem. Y is." 형식의 부정-긍정 대조 구조로 메시지를 못박는다.
+      예: "Mistakes are not the problem. Silence is."
+          "Perfection is not the goal. Connection is."
+          "Language is not just about words. It's about connection."
+  - question_opener: |
+      독자에게 묻는 문장으로 도입한다.
+      예: "Have you ever heard '~요(yo)' sound from Korean drama?"
+          "Did you know Korean young men must go to the army?"
+  - passenger_anecdote: |
+      비행 중 만난 승객의 한 마디를 인용해 K-콘텐츠 해설로 자연스럽게 전환.
+      예: "One passenger once said: 'Korean looks like tiny Lego blocks.'"
+  - bilingual_bridge: |
+      한국어 표현(원어)과 영어 자연 표현을 짝지어 보여주며, 직역 대신 감정·맥락
+      번역을 강조한다. 예: "나 사실 긴장돼" → "I'm actually nervous." /
+      "I'm kind of nervous." / "To be honest, I'm nervous."
+  - emoji_signposts: |
+      섹션 도입과 시그니처 라인에 이모지를 일관되게 사용 (✈️ 👉 🌍 🎵 🇰🇷 💡 📌).
+      ✈️ = 본인 비행 경험 신호, 👉 = 핵심 메시지, 🇰🇷 = 한국 문화 해설.
 category_fit:
   k_drama: 1
   k_travel: 1
   k_literature: 1
+  k_food: 1
+  k_fashion: 1
   k_pop: 2
-  k_food: 2
   k_beauty: 2
+secondary_focus:
+  - language_learning_kr_to_en
+  - language_learning_en_to_kr
+  - cross_cultural_bridge
+  - jazz_culture
 signature_phrases_ko:
   - "그날의 환승 라운지에서"
   - "23년 동안 비행하며 배운 건"
   - "서울과 홍콩, 두 도시의 시간대를 오가며"
   - "에디터의 큐레이션 노트"
+  - "서울 재즈 클럽에서 만난 학습자들이 자주 묻는 건"
 signature_phrases_en:
   - "On the layover that night,"
   - "Twenty-three years in the cabin taught me"
   - "Between Seoul and Hong Kong time zones,"
   - "From an editor's curation desk,"
+  - "Hi, I'm Sabina."
+  - "During my 23 years working as a flight attendant,"
+  - "At my jazz club in Seoul,"
+signature_one_liners:
+  - "Language is not just about words. It's about connection."
+  - "Perfection is not the goal. Connection is."
+  - "Mistakes are not the problem. Silence is."
+  - "Confidence comes after speaking, not before."
+section_marker_conventions:
+  - "Sabina's Story"
+  - "Sabina's Perspective"
+  - "Final Thoughts from Sabina"
 forbidden_topics:
   - medical_assertions
   - partisan_politics
+external_channels:
+  - name: Sabina Vibe K-Life
+    url: https://sabina-vibe-k-life.blogspot.com/
+    purpose: 한국 학습자 대상 영어 학습 + 외국 독자 대상 한국어/한국 문화 해설 (양방향)
+    role: trust_signal
+  - name: My Jazz Garden (private English jazz club, Seoul)
+    url: ""
+    purpose: 오프라인 영어 회화·문화 교류 공간 운영
+    role: experience_signal
+personal_context:
+  family: "17세 아들 1명, 다문화 가정 (남편 = Sam, 홍콩계 호주국적의 금융계 출신)"
+  education:
+    school: "한양대학교 음악학과"
+    school_en: "Hanyang University, Department of Music"
+    relevance: "음악학 학사 → 재즈 클럽(My Jazz Garden) 운영의 학문적 기반. 음악·언어·문화 서사를 잇는 일관된 정체성"
+  return_year: ""
+  signature_locations:
+    - 서울 (현 거주·재즈 클럽 운영)
+    - 홍콩 (전 비행 베이스)
+    - 두바이 (전 비행 노선)
 avatar_image:
-  asset_url: ""
-  license: ""
-  credit: ""
+  asset_url: /images/team/sabina.jpg
+  asset_path: public/images/team/sabina.jpg
+  license: owned_by_subject
+  credit: Sabina (KStoryWorld Cultural Bridge Editor)
 created_at: 2026-05-02
+updated_at: 2026-05-07
 notes: |
   보드 시드 페르소나 #1. JAC-1952 wake에서 직접 제안.
+
+  2026-05-07 추가 업데이트 (Sabina 본인 가필 결과 반영):
+  - category_fit.k_fashion: 1 신규 (Sabina 본인 주력 영역으로 확정)
+  - avatar_image: public/images/team/sabina.jpg 등록 (본인 제공 400x400)
+  - 직책 확정: "Cultural Bridge Editor"
+  - 외국어 추가: 광동어
+  - 좋아하는 영역: K-Drama=태양의 후예, K-Travel=목포, K-Food=비빔밥,
+    철학(K-Literature/재즈 슬롯 대체)
+  - personal_context.education: 한양대학교 음악학과 (학사) —
+    재즈 클럽 운영의 학문적 기반. "음악학 → 비행 23년 → 재즈 클럽 →
+    콘텐츠 큐레이션" 일관된 서사 라인 확보
+
+  2026-05-07 업데이트 (JAC-2079 컨텍스트):
+  Sabina 본인이 운영하는 블로그(https://sabina-vibe-k-life.blogspot.com/) 7개
+  글을 직접 분석해 다음 사항 보강:
+  - home_base: dubai 추가 (비행 베이스)
+  - profession: My Jazz Garden(서울 프라이빗 재즈 클럽) 운영자 신분 추가
+    (= MyJazzGarden 사업과 동일 인물 — kstoryworld 신뢰성 신호 강력)
+  - identity_keywords: returnee, multicultural_family, language_learning,
+    bridge 추가
+  - voice_tone: 짧은 문장 끊기, 이모지 도입, "Sabina's Story" 별도 코너 마킹
+    명시
+  - rhetorical_devices: 부정-긍정 대조 구조 / 물음 도입 / 승객 일화 / 양방향
+    번역 짝짓기 / 이모지 시그니처 5종 신규 정의
+  - category_fit: k_food 2→1 격상 ("밥 먹었어요?" 분석 글에서 드러난 음식=
+    사랑의 언어 프레임 강점)
+  - secondary_focus: language_learning, cross_cultural_bridge, jazz_culture
+    필드 신설
+  - signature_one_liners: 블로그에서 반복적으로 변주되는 4개 시그니처 추출
+  - external_channels: 본인 블로그 + My Jazz Garden 신호 등록
+  - personal_context: 17세 아들·다문화 가정 정보 명시
+
+  본 변경은 Sabina 본인 운영 콘텐츠를 1차 출처로 삼은 것이며, 페르소나 yaml은
+  Sabina 본인 검토·승인 후 confirmed 유지.
