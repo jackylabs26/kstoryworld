@@ -7,6 +7,7 @@ import { KSWThemeProvider } from '@/components/ksw/theme-provider';
 
 const GOOGLE_SITE_VERIFICATION = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
 const NAVER_SITE_VERIFICATION = process.env.NEXT_PUBLIC_NAVER_SITE_VERIFICATION;
+const BING_SITE_VERIFICATION = process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION;
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://kstoryworld.com'),
@@ -60,9 +61,14 @@ export const metadata: Metadata = {
   },
   verification: {
     ...(GOOGLE_SITE_VERIFICATION ? { google: GOOGLE_SITE_VERIFICATION } : {}),
-    ...(NAVER_SITE_VERIFICATION
-      ? { other: { 'naver-site-verification': NAVER_SITE_VERIFICATION } }
-      : {}),
+    other: {
+      ...(NAVER_SITE_VERIFICATION
+        ? { 'naver-site-verification': NAVER_SITE_VERIFICATION }
+        : {}),
+      ...(BING_SITE_VERIFICATION
+        ? { 'msvalidate.01': BING_SITE_VERIFICATION }
+        : {}),
+    },
   },
 };
 
