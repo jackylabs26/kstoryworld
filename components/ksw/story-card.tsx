@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { SEASONS, useKSWTheme, type Season } from './theme-provider';
+import { CATEGORY_LABELS, isReviewCategory } from '@/lib/categories';
 
 interface Props {
   href: string;
@@ -16,10 +17,20 @@ interface Props {
   large?: boolean;
 }
 
+function categoryLabel(category: string, locale: 'ko' | 'en'): string {
+  if (isReviewCategory(category)) {
+    return CATEGORY_LABELS[category][locale];
+  }
+  return category.toUpperCase();
+}
+
 export function StoryCard({ href, title, excerpt, image, num, season, category, large }: Props) {
   const { dark, lang } = useKSWTheme();
   const [hover, setHover] = useState(false);
   const s = SEASONS[season];
+
+  const labelKo = categoryLabel(category, 'ko');
+  const labelEn = categoryLabel(category, 'en');
 
   return (
     <Link
@@ -59,7 +70,7 @@ export function StoryCard({ href, title, excerpt, image, num, season, category, 
             zIndex: 2,
           }}
         >
-          {num} · {category.toUpperCase()}
+          {num} · {labelEn.toUpperCase()}
         </span>
         <div
           style={{
@@ -67,16 +78,18 @@ export function StoryCard({ href, title, excerpt, image, num, season, category, 
             right: 14,
             bottom: 14,
             fontFamily: 'var(--font-display)',
-            fontSize: large ? 72 : 54,
+            fontSize: large ? 56 : 42,
             fontWeight: 500,
-            letterSpacing: '-2px',
-            lineHeight: 0.9,
+            letterSpacing: '-1px',
+            lineHeight: 0.95,
             color: 'rgba(255,255,255,0.85)',
             mixBlendMode: 'overlay',
             zIndex: 2,
+            maxWidth: '60%',
+            textAlign: 'right',
           }}
         >
-          {s.kor}
+          {labelKo}
         </div>
         <div
           style={{
@@ -91,7 +104,7 @@ export function StoryCard({ href, title, excerpt, image, num, season, category, 
       </div>
       <div style={{ padding: '22px 24px 26px' }}>
         <div className="t-mono-sm" style={{ color: dark ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.55)' }}>
-          {category.toUpperCase()} · {s.kor}
+          {lang === 'ko' ? labelKo : labelEn.toUpperCase()}
         </div>
         <h3
           style={{

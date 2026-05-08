@@ -7,8 +7,12 @@ import { SEASONS, useKSWTheme, type Lang } from './ksw/theme-provider';
 
 const NAV = [
   { href: '/', ko: '홈', en: 'Home' },
-  { href: '/reviews', ko: '스토리', en: 'Stories' },
-  { href: '/reviews?cat=drama', ko: 'K-드라마', en: 'K-Drama' },
+  { href: '/k-drama', ko: 'K-드라마', en: 'K-Drama' },
+  { href: '/k-pop', ko: 'K-팝', en: 'K-Pop' },
+  { href: '/k-beauty', ko: 'K-뷰티', en: 'K-Beauty' },
+  { href: '/k-food', ko: 'K-푸드', en: 'K-Food' },
+  { href: '/k-travel', ko: 'K-트래블', en: 'K-Travel' },
+  { href: '/k-literature', ko: 'K-문학', en: 'K-Literature' },
 ];
 
 const LANG_OPTS: { c: Lang; l: string }[] = [
