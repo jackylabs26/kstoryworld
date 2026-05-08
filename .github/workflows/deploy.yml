@@ -39,4 +39,10 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy out --project-name=kstoryworld --branch=main --commit-dirty=true
+          command: >-
+            pages deploy out
+            --project-name=kstoryworld
+            --branch=main
+            --commit-hash=${{ github.sha }}
+            --commit-message="GitHub Actions deploy ${{ github.sha }}"
+            --commit-dirty=true
