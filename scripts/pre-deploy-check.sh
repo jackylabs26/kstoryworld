@@ -55,6 +55,7 @@ fi
 
 must "git status clean (or --allow-dirty)" check_clean_tree
 must "git fetch origin + git log origin/main..HEAD" show_outgoing
+must "HEAD commit message is ASCII-safe" scripts/validate-commit-message.sh HEAD
 must "npm ci" npm ci
 must "npm run build" npm run build
 must "out/index.html exists" must_file out/index.html

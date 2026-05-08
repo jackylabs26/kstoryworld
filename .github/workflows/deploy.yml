@@ -15,8 +15,14 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
     steps:
       - uses: actions/checkout@v4
+
+      - name: Validate commit message is ASCII-safe
+        run: ./scripts/validate-commit-message.sh ${{ github.sha }}
 
       - uses: actions/setup-node@v4
         with:

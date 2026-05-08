@@ -119,7 +119,7 @@ KStoryWorld 운영 체계를 Strategy → Editorial → Production → QA → Di
 | **입력** | QA 통과 초안 + Auditor 승인 + (Hexagon) 게이트 2 accept |
 | **산출물** | (1) GitHub PR (main 머지), (2) Cloudflare Pages 배포, (3) SEO 메타 확정(canonical/hreflang/JSON-LD), (4) Telegram 발행 알림 |
 | **인계 기준** | Cloudflare 배포 성공 URL + `daily-aggregate.sh` 카운트 증가 확인 |
-| **사용 도구** | GitHub (PR + Actions), Cloudflare Pages, `scripts/pre-deploy-check.sh`, Paperclip routine |
+| **사용 도구** | GitHub (PR + Actions), Cloudflare Pages, `scripts/pre-deploy-check.sh`, `scripts/validate-commit-message.sh`, Paperclip routine |
 
 **발행 정책 핵심 제약**
 
@@ -212,6 +212,7 @@ Analytics
 | `scripts/hexagon/validate-article.mjs` | QA | 단건 아티팩트 검증 |
 | Telegram Bot (QC 채널) | QA | Self-check 실패 알림 |
 | `scripts/pre-deploy-check.sh` | Distribution | 배포 전 최종 게이트 |
+| `scripts/validate-commit-message.sh` | Distribution | Cloudflare Pages 안전용 ASCII commit message 게이트 |
 | GitHub PR + Actions | Distribution | 코드 리뷰 + 자동 빌드/배포 |
 | Cloudflare Pages | Distribution | 실제 독자 서빙 |
 | `board-routine/kpop-publish.sh` | Distribution | K-Pop draft → repo HTML 렌더 |
