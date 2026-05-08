@@ -1,3 +1,8 @@
+# Manual canonicalization overrides for retired duplicate slugs.
+/reviews/michelin-hansik-korean-fine-dining-guide-ko /k-food/michelin-starred-hansik-korean-fine-dining-guide-ko/ 301
+/reviews/michelin-hansik-korean-fine-dining-guide-ko/ /k-food/michelin-starred-hansik-korean-fine-dining-guide-ko/ 301
+/k-food/michelin-hansik-korean-fine-dining-guide-ko /k-food/michelin-starred-hansik-korean-fine-dining-guide-ko/ 301
+/k-food/michelin-hansik-korean-fine-dining-guide-ko/ /k-food/michelin-starred-hansik-korean-fine-dining-guide-ko/ 301
 # === AUTO-GENERATED REVIEW REDIRECTS (do not edit below) ===
 /reviews/aespa-new-song-korean-lyrics-self-confidence-language-learning-en /k-pop/aespa-new-song-korean-lyrics-self-confidence-language-learning-en/ 301
 /reviews/aespa-new-song-korean-lyrics-self-confidence-language-learning-en/ /k-pop/aespa-new-song-korean-lyrics-self-confidence-language-learning-en/ 301
@@ -39,6 +44,8 @@
 /reviews/extraordinary-attorney-woo-en/ /k-drama/extraordinary-attorney-woo-en/ 301
 /reviews/extraordinary-attorney-woo-ko /k-drama/extraordinary-attorney-woo-ko/ 301
 /reviews/extraordinary-attorney-woo-ko/ /k-drama/extraordinary-attorney-woo-ko/ 301
+/reviews/fifth-generation-kpop-newjeans-illit-rewriting-playbook-en /k-pop/fifth-generation-kpop-newjeans-illit-rewriting-playbook-en/ 301
+/reviews/fifth-generation-kpop-newjeans-illit-rewriting-playbook-en/ /k-pop/fifth-generation-kpop-newjeans-illit-rewriting-playbook-en/ 301
 /reviews/flower-of-evil-en /k-drama/flower-of-evil-en/ 301
 /reviews/flower-of-evil-en/ /k-drama/flower-of-evil-en/ 301
 /reviews/flower-of-evil-ko /k-drama/flower-of-evil-ko/ 301
@@ -67,6 +74,10 @@
 /reviews/its-okay-to-not-be-okay-en/ /k-drama/its-okay-to-not-be-okay-en/ 301
 /reviews/its-okay-to-not-be-okay-ko /k-drama/its-okay-to-not-be-okay-ko/ 301
 /reviews/its-okay-to-not-be-okay-ko/ /k-drama/its-okay-to-not-be-okay-ko/ 301
+/reviews/japchae-korean-glass-noodles-guide-en /k-food/japchae-korean-glass-noodles-guide-en/ 301
+/reviews/japchae-korean-glass-noodles-guide-en/ /k-food/japchae-korean-glass-noodles-guide-en/ 301
+/reviews/japchae-korean-glass-noodles-guide-ko /k-food/japchae-korean-glass-noodles-guide-ko/ 301
+/reviews/japchae-korean-glass-noodles-guide-ko/ /k-food/japchae-korean-glass-noodles-guide-ko/ 301
 /reviews/king-the-land-en /k-drama/king-the-land-en/ 301
 /reviews/king-the-land-en/ /k-drama/king-the-land-en/ 301
 /reviews/king-the-land-ko /k-drama/king-the-land-ko/ 301
@@ -75,6 +86,8 @@
 /reviews/kingdom-en/ /k-drama/kingdom-en/ 301
 /reviews/kingdom-ko /k-drama/kingdom-ko/ 301
 /reviews/kingdom-ko/ /k-drama/kingdom-ko/ 301
+/reviews/kpop-fan-culture-lightsticks-streaming-wars-en /k-pop/kpop-fan-culture-lightsticks-streaming-wars-en/ 301
+/reviews/kpop-fan-culture-lightsticks-streaming-wars-en/ /k-pop/kpop-fan-culture-lightsticks-streaming-wars-en/ 301
 /reviews/love-alarm-en /k-drama/love-alarm-en/ 301
 /reviews/love-alarm-en/ /k-drama/love-alarm-en/ 301
 /reviews/love-alarm-ko /k-drama/love-alarm-ko/ 301
@@ -83,10 +96,10 @@
 /reviews/marry-my-husband-en/ /k-drama/marry-my-husband-en/ 301
 /reviews/marry-my-husband-ko /k-drama/marry-my-husband-ko/ 301
 /reviews/marry-my-husband-ko/ /k-drama/marry-my-husband-ko/ 301
-/reviews/michelin-hansik-korean-fine-dining-guide-ko /k-food/michelin-hansik-korean-fine-dining-guide-ko/ 301
-/reviews/michelin-hansik-korean-fine-dining-guide-ko/ /k-food/michelin-hansik-korean-fine-dining-guide-ko/ 301
 /reviews/michelin-starred-hansik-korean-fine-dining-guide-en /k-food/michelin-starred-hansik-korean-fine-dining-guide-en/ 301
 /reviews/michelin-starred-hansik-korean-fine-dining-guide-en/ /k-food/michelin-starred-hansik-korean-fine-dining-guide-en/ 301
+/reviews/michelin-starred-hansik-korean-fine-dining-guide-ko /k-food/michelin-starred-hansik-korean-fine-dining-guide-ko/ 301
+/reviews/michelin-starred-hansik-korean-fine-dining-guide-ko/ /k-food/michelin-starred-hansik-korean-fine-dining-guide-ko/ 301
 /reviews/mlbb-lip-color-natural-korean-beauty-guide-en /k-beauty/mlbb-lip-color-natural-korean-beauty-guide-en/ 301
 /reviews/mlbb-lip-color-natural-korean-beauty-guide-en/ /k-beauty/mlbb-lip-color-natural-korean-beauty-guide-en/ 301
 /reviews/mlbb-lip-color-natural-korean-beauty-guide-ko /k-beauty/mlbb-lip-color-natural-korean-beauty-guide-ko/ 301
