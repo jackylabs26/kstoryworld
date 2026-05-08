@@ -109,7 +109,7 @@ export function CategoryBoard({ items, category }: { items: Item[]; category: Re
                   image={s.image}
                   num={String(i + 1).padStart(2, '0')}
                   season={s.season}
-                  category={label.en}
+                  category={s.category}
                 />
               ))}
             </div>

@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { SEASONS, useKSWTheme, type Season } from './theme-provider';
-import { CATEGORY_LABELS, isReviewCategory } from '@/lib/categories';
+import { CATEGORY_LABELS, type ReviewCategory } from '@/lib/categories';
 
 interface Props {
   href: string;
@@ -13,15 +13,8 @@ interface Props {
   image?: string;
   num: string;
   season: Season;
-  category: string;
+  category: ReviewCategory;
   large?: boolean;
-}
-
-function categoryLabel(category: string, locale: 'ko' | 'en'): string {
-  if (isReviewCategory(category)) {
-    return CATEGORY_LABELS[category][locale];
-  }
-  return category.toUpperCase();
 }
 
 export function StoryCard({ href, title, excerpt, image, num, season, category, large }: Props) {
@@ -29,8 +22,8 @@ export function StoryCard({ href, title, excerpt, image, num, season, category, 
   const [hover, setHover] = useState(false);
   const s = SEASONS[season];
 
-  const labelKo = categoryLabel(category, 'ko');
-  const labelEn = categoryLabel(category, 'en');
+  const labelKo = CATEGORY_LABELS[category].ko;
+  const labelEn = CATEGORY_LABELS[category].en;
 
   return (
     <Link
