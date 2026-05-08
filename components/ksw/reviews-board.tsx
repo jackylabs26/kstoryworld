@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { StoryCard } from './story-card';
 import { useKSWTheme, type Season } from './theme-provider';
-import { CATEGORY_LABELS, type ReviewCategory } from '@/lib/categories';
+import { type ReviewCategory } from '@/lib/categories';
 
 interface Item {
   slug: string;
@@ -110,7 +110,7 @@ export function ReviewsBoard({ items }: { items: Item[] }) {
                   image={s.image}
                   num={String(i + 1).padStart(2, '0')}
                   season={s.season}
-                  category={CATEGORY_LABELS[s.category].en}
+                  category={s.category}
                 />
               ))}
             </div>

@@ -80,7 +80,7 @@ export function CollectionGrid({ items }: Props) {
                   image={s.image}
                   num={String(i + 1).padStart(2, '0')}
                   season={s.season}
-                  category={CATEGORY_LABELS[s.category].en}
+                  category={s.category}
                 />
               ))}
             </div>
