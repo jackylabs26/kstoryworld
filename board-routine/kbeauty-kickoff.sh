@@ -1,14 +1,20 @@
 #!/usr/bin/env bash
 # board-routine/kbeauty-kickoff.sh
 #
-# Daily K-Beauty content kickoff for KStoryWorld. Mirrors the kdrama-kickoff
-# pattern (JAC-1750) and is invoked by the Paperclip "K-Beauty Daily Content"
-# routine with `bash _default/board-routine/kbeauty-kickoff.sh "$PAPERCLIP_TASK_ID"`.
+# Daily K-Beauty content kickoff for KStoryWorld. Invoked by the Paperclip
+# routine "K-Beauty Daily Content (4-6 KST Random)" with
+# `bash _default/board-routine/kbeauty-kickoff.sh "$PAPERCLIP_TASK_ID"`.
+#
+# Routine cron is `0 4 * * *` Asia/Seoul; this script applies a 0..119 minute
+# random sleep so the actual fire is uniformly distributed across the
+# 04:00..06:00 KST window. Set KBEAUTY_KICKOFF_NO_SLEEP=1 to bypass for
+# manual dry-runs.
 #
 # Responsibilities:
-#   1. Pick the day's K-Beauty keyword from the rotating pool.
-#   2. Call the kbeauty-content-generator n8n webhook (or skip in dry-run mode).
-#   3. Persist the dry-run sample artifact under
+#   1. Sleep 0..119 minutes (skippable).
+#   2. Pick the day's K-Beauty keyword from the rotating pool.
+#   3. Call the kbeauty-content-generator n8n webhook (or skip in dry-run mode).
+#   4. Persist the dry-run sample artifact under
 #      n8n-workflows/_dryrun-samples/ so the 12-check + no-ai-copy gates can
 #      run offline against the latest payload.
 #
@@ -24,6 +30,14 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib.sh"
 
 TASK_ID="${1:-${PAPERCLIP_TASK_ID:-manual}}"
+
+if [[ "${KBEAUTY_KICKOFF_NO_SLEEP:-0}" != "1" && "${N8N_DRYRUN:-0}" != "1" ]]; then
+  SLEEP_MIN=$(( RANDOM % 120 ))
+  SLEEP_SEC=$(( SLEEP_MIN * 60 ))
+  echo "[kbeauty-kickoff] task=$TASK_ID sleeping ${SLEEP_MIN}m to spread 04:00-06:00 KST window"
+  sleep "$SLEEP_SEC"
+fi
+
 DATE="$(br_today_seoul)"
 KEYWORD="$(br_pick_kbeauty_keyword)"
 SLUG="$(printf '%s' "$KEYWORD" | tr ' ' '-' | tr '[:upper:]' '[:lower:]')"
@@ -67,8 +81,20 @@ with open(p) as f:
     data = json.load(f)
 if isinstance(data, dict) and data.get('dryrun'):
     sys.exit(0)
-passed = data.get('passed')
-total = data.get('total')
+candidate = data.get('final_output') if isinstance(data, dict) else None
+if not isinstance(candidate, dict):
+    candidate = data if isinstance(data, dict) else {}
+self_check = candidate.get('self_check') if isinstance(candidate, dict) else None
+if isinstance(self_check, dict):
+    passed = sum(1 for value in self_check.values() if value)
+    total = len(self_check)
+    if passed == total:
+        print(f'[kbeauty-kickoff] self-check {passed}/{total} pass')
+        sys.exit(0)
+    print(f'[kbeauty-kickoff] self-check {passed}/{total} FAIL', file=sys.stderr)
+    sys.exit(2)
+passed = candidate.get('passed') if isinstance(candidate, dict) else None
+total = candidate.get('total') if isinstance(candidate, dict) else None
 if passed is None or total is None:
     sys.exit(0)
 if passed == total:
