@@ -28,7 +28,7 @@ Paperclip "Daily Content" 루틴이 호출하는 카테고리별 kickoff 스크�
 ```bash
 # 운영(루트에서):
 N8N_BASE_URL=https://n8n.jackyailabs.com \
-KPOP_WEBHOOK_TOKEN=*** \
+KBEAUTY_WEBHOOK_TOKEN=*** \
 bash board-routine/kbeauty-kickoff.sh "$PAPERCLIP_TASK_ID"
 
 # 운영(루트에서, K-Food):
@@ -39,6 +39,7 @@ bash board-routine/kfood-kickoff.sh "$PAPERCLIP_TASK_ID"
 # 로컬 dry-run (네트워크 X, 스텁 응답을 dry-run 샘플로 저장):
 N8N_DRYRUN=1 bash board-routine/kbeauty-kickoff.sh manual-test
 N8N_DRYRUN=1 bash board-routine/kfood-kickoff.sh manual-test
+KBEAUTY_KICKOFF_NO_SLEEP=1 bash board-routine/kbeauty-kickoff.sh manual-test  # 04:00~06:00 분산 sleep 우회
 
 # Daily Publish Aggregate (cron 0 9 * * * KST, JAC-1966 routine):
 bash board-routine/daily-aggregate.sh "$PAPERCLIP_TASK_ID"
@@ -58,6 +59,7 @@ DAILY_AGGREGATE_DRYRUN=1 DAILY_AGGREGATE_DATE=2026-04-29 \
 | `KFOOD_WEBHOOK_TOKEN` | 선택 | K-Food 전용 webhook header auth 토큰. |
 | `KBEAUTY_WEBHOOK_TOKEN` | 선택 | K-Beauty 전용 webhook header auth 토큰. |
 | `N8N_DRYRUN` | 선택 | `1`이면 webhook 호출을 건너뛰고 스텁 응답을 echo. |
+| `KBEAUTY_KICKOFF_NO_SLEEP` | 선택 | `1`이면 K-Beauty routine의 0~119분 분산 sleep을 우회합니다. |
 | `ALERT_ISSUE_ID` | 선택 | `daily-aggregate.sh` 0편 알림 대상. 기본 `JAC-1737`. |
 | `DAILY_AGGREGATE_DRYRUN` | 선택 | `1`이면 Paperclip API 호출 없이 의도된 POST/PATCH payload만 출력. |
 | `DAILY_AGGREGATE_DATE` | 선택 | `daily-aggregate.sh` 카운트 기준일 override (YYYY-MM-DD). 기본은 KST 기준 어제. |
