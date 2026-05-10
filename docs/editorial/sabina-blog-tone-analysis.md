@@ -56,7 +56,7 @@ generation 시 기본 target = **750 단어 ± 100**, 단락 ≤ 4 문장, 한 �
 - **alt text**: 한국 문화 키워드 + 영어 짧은 설명 ("kimchi served at a Seoul jeongol restaurant").
 - **금지**: AI 생성 표기 그대로 노출, 워터마크 가시 사진, 출처 미상 stock.
 
-draft 단계에서는 이미지 URL placeholder (`<!-- HERO_IMAGE_URL -->`)만 끼워두고 Sabina가 Blogger UI에서 본인 사진/소장 이미지로 교체하도록 한다. **자동 stock 검색은 본 파이프라인 범위 외.**
+draft 단계에서는 모델이 `<!-- HERO_IMAGE_URL -->` placeholder 만 emit 하고, n8n 파이프라인이 Blogger 업로드 직전에 **Pexels 자동 검색** 결과로 substitution 한다 (Jacky directive 2026-05-10 — 모든 cxsabina draft 는 사진 1장 mandatory). 검색 cascade: `image_query` → `topic_en` → category 매핑 → `Seoul Korea`. Sabina 가 Blogger UI 에서 검수 시점에 사진을 본인 자료로 교체할 수 있음.
 
 ## 6. 단락 / 섹션 패턴 (Paragraph)
 
