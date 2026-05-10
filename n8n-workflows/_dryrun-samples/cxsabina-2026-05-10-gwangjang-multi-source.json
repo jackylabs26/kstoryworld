@@ -1,0 +1,58 @@
+{
+  "live_run": true,
+  "issue": "JAC-2167",
+  "executed_at": "2026-05-10T09:50Z",
+  "n8n_workflow_id": "OrecDjSeTYpHshGO",
+  "n8n_execution_id": 155,
+  "request": {
+    "task_id": "JAC-2167-gwangjang-llm-rank-2",
+    "channel": "cxsabina",
+    "topic_en": "Eat Like a Local in Seoul: Hidden Gems of Gwangjang Market",
+    "topic_ko": "마약김밥",
+    "category": "k-food"
+  },
+  "image_pipeline": {
+    "step_1_query_planner": {
+      "model": "claude-haiku-4-5-20251001",
+      "planned_queries": [
+        "Gwangjang Market Seoul food stalls",
+        "마약김밥 Korean kimbap street food",
+        "Seoul local market eating experience",
+        "전통시장 먹거리 서울",
+        "Korean street food culture"
+      ]
+    },
+    "step_2_collect": {
+      "sources_enabled_at_runtime": ["Pexels"],
+      "sources_pending_keys": ["Pixabay", "Unsplash"],
+      "candidate_count": 15
+    },
+    "step_3_llm_rank": {
+      "model": "claude-haiku-4-5-20251001",
+      "rank_reason": "Shows bustling Seoul market with vendors and diners, matching the local market dining experience"
+    },
+    "step_4_chosen": {
+      "source": "Pexels",
+      "raw_id": 16858588,
+      "alt": "Vibrant street food scene at a bustling Seoul market, featuring vendors and diners.",
+      "photographer": "Nuhyil Ahammed",
+      "url": "https://images.pexels.com/photos/16858588/pexels-photo-16858588.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
+      "query_used": "Korean street food culture"
+    }
+  },
+  "anthropic_body": {
+    "model": "claude-sonnet-4-6",
+    "body_length_chars": 4391,
+    "signature_phrase_hits": 6,
+    "one_liner_hits": ["Perfection is not the goal. Connection is."]
+  },
+  "selfcheck_pass": "13/13 + img_count=1",
+  "blogger_upload": {
+    "ok": true,
+    "draft_id": "8374209397064245986",
+    "blog_id": "1299498210363078526",
+    "status": "DRAFT",
+    "title": "Eat Like a Local in Seoul: Hidden Gems of Gwangjang Market",
+    "img_tag_count_in_body": 1
+  }
+}
