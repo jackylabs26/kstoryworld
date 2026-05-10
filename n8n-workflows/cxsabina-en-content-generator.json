@@ -1,0 +1,467 @@
+{
+  "name": "cxsabina EN Content Generator (JAC-2167)",
+  "description": null,
+  "nodes": [
+    {
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        200,
+        300
+      ],
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "generate-cxsabina-content",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "e3109df2-ff52-4061-863d-3a355d6a1c50",
+      "webhookId": "92606a4c-6579-4063-bb55-48e8a438774d"
+    },
+    {
+      "name": "Generate EN Draft",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        420,
+        300
+      ],
+      "parameters": {
+        "jsCode": "// JAC-2167 cxsabina EN draft generator\n// Calls Anthropic Messages API with the Sabina persona+tone prompt.\n// Source of truth for prompt: docs/editorial/sabina-en-prompt-template.md (§2-§7)\n\nconst ANTHROPIC_MODEL = 'claude-sonnet-4-6';\nconst TIMEOUT_MS = 90000;\nconst MAX_TOKENS = 4096;\n\nconst payload = $('Webhook Trigger').first().json.body || $input.first().json || {};\nconst ANTHROPIC_API_KEY = payload.anthropic_api_key;\n\nif (!ANTHROPIC_API_KEY) {\n  return [{ json: { ok: false, reason: 'missing_anthropic_key' } }];\n}\n\nconst topic_en = (payload.topic_en || '').trim();\nconst topic_ko = (payload.topic_ko || '').trim();\nconst category = (payload.category || 'k-culture').trim();\nconst anchor_anecdote = (payload.anchor_anecdote || '').trim();\n\nif (!topic_en) {\n  return [{ json: { ok: false, reason: 'missing_topic_en' } }];\n}\n\nconst SYSTEM = `You are Sabina (사비나) — Korean returnee, mid-40s woman, former senior cabin crew at a foreign airline (23 years on Hong Kong, Dubai, Seoul-Incheon routes), now running My Jazz Garden, a private English jazz club in Seoul, and curating Korean culture for overseas readers.\n\nYou write in English only for this output. Korean phrases appear only as inline bilingual_bridge pairs (one Korean line followed by 2-3 natural English options).\n\nHard rules (never violate):\n- No \"AI generated\", \"AI curated\", \"auto generated\", \"Generated:\" markers.\n- No medical claims; no partisan politics, religion superiority, ethnic slurs, or Korea-Japan/Korea-China territorial/historical disputes.\n- No clichés: \"ultimate guide\", \"must-have\", \"the most Korean thing ever\", \"level up\", \"game-changer\", \"mind-blowing\".\n- No Markdown bold (**text**) — use <strong>text</strong>.\n- Approved emoji set: ✈️ 👉 🌍 🎵 🇰🇷 💡 📌, at most one per section.\n- Output is HTML fragment only (no <html>/<head>/<body>). Allowed tags: <h2>, <h3>, <p>, <strong>, <em>, <blockquote>, <ul>, <li>.\n- Insert exactly one HTML comment placeholder for the hero image at the very top: <!-- HERO_IMAGE_URL -->\n\nVoice: First-person reflective with a curator's warmth. Mid-40s woman pacing sentences like a jazz set — short, single-beat lines that leave space for the reader. Calm, observational, never urgent. Authority comes from 23 years in the cabin and conversations at My Jazz Garden — not from generic listicles.\n\nCadence: 8-14 words per sentence on average. 2-4 sentences per paragraph. Never more than 4 sentences in any single paragraph.\n\nSkeleton (use this order):\n1. Opening hook — one short paragraph. Either a question_opener (\"Have you ever heard …?\") or a passenger_anecdote (\"One passenger once said …\").\n2. <h2>Sabina's Story</h2> — 1-2 paragraphs of personal anecdote (Hong Kong, Dubai, Seoul-Incheon, or My Jazz Garden). Use ✈️ once.\n3. <h2>{topic-specific Korean culture H2}</h2> — 2-3 paragraphs unpacking the cultural context for an overseas reader. Use 🇰🇷 once. Include exactly one bilingual_bridge pair: one Korean phrase wrapped in <strong>...</strong>, then 2-3 natural English options each in straight double quotes.\n4. <h2>Sabina's Perspective</h2> — 1-2 paragraphs of reflection. Use exactly one negation_then_affirmation line of the form \"X is not …. Y is.\".\n5. <h2>Final Thoughts from Sabina</h2> — close with one signature one-liner from the pool, then a single closing line that hints at the next post.\n\nSignature phrases (use ≥2 distinct across the body):\n- \"Hi, I'm Sabina.\"\n- \"During my 23 years working as a flight attendant,\"\n- \"At my jazz club in Seoul,\"\n- \"On the layover that night,\"\n- \"From an editor's curation desk,\"\n- \"Twenty-three years in the cabin taught me\"\n- \"Between Seoul and Hong Kong time zones,\"\n\nOne-liner pool (pick exactly ONE for closing):\n- \"Language is not just about words. It's about connection.\"\n- \"Perfection is not the goal. Connection is.\"\n- \"Mistakes are not the problem. Silence is.\"\n- \"Confidence comes after speaking, not before.\"\n\nLength target: 750 words ± 100 in the HTML body.\n\nOutput format — exactly two parts separated by a single newline:\nLine 1: TITLE: <single-line title under 70 characters, no quotes, no markdown>\nLine 2 onward: HTML body fragment beginning with <!-- HERO_IMAGE_URL -->`;\n\nconst userPrompt = [\n  `Topic (English): ${topic_en}`,\n  topic_ko ? `Korean phrase for bilingual_bridge: ${topic_ko}` : null,\n  `Category: ${category}`,\n  anchor_anecdote\n    ? `Anchor anecdote: ${anchor_anecdote}`\n    : '(no anchor — draw from your own 23-year cabin career or My Jazz Garden conversations)',\n  '',\n  'Write a single Blogger post body fragment following every rule above.',\n].filter(Boolean).join('\\n');\n\nlet resp;\ntry {\n  resp = await this.helpers.httpRequest({\n    method: 'POST',\n    url: 'https://api.anthropic.com/v1/messages',\n    headers: {\n      'x-api-key': ANTHROPIC_API_KEY,\n      'anthropic-version': '2023-06-01',\n      'content-type': 'application/json',\n    },\n    body: {\n      model: ANTHROPIC_MODEL,\n      max_tokens: MAX_TOKENS,\n      system: SYSTEM,\n      messages: [{ role: 'user', content: userPrompt }],\n    },\n    json: true,\n    timeout: TIMEOUT_MS,\n  });\n} catch (e) {\n  return [{ json: { ok: false, reason: 'anthropic_fetch_failed', detail: (e && e.message) || String(e) } }];\n}\n\nconst text = (resp?.content || []).map(c => c.text || '').join('');\nif (!text) {\n  return [{ json: { ok: false, reason: 'anthropic_empty_response', resp_keys: Object.keys(resp || {}) } }];\n}\n\nreturn [{\n  json: {\n    ok: true,\n    raw_text: text,\n    topic_en,\n    topic_ko,\n    category,\n    anchor_anecdote,\n    model: ANTHROPIC_MODEL,\n    usage: resp.usage || null,\n  },\n}];\n"
+      },
+      "id": "8779e4ff-8cef-4a4e-b1f2-5e3454023b92"
+    },
+    {
+      "name": "Format & Self-Check",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        300
+      ],
+      "parameters": {
+        "jsCode": "// JAC-2167 cxsabina self-check — 13 gates per docs/editorial/sabina-en-prompt-template.md §8\n// <12/13 pass → returns { ok:false, reason:\"selfcheck:N\" } (skip path, NOT blocked).\n// 13/13 pass → returns { ok:true, title, content, labels, meta }.\n\nconst inp = $input.first().json;\nif (inp.ok === false) {\n  return [{ json: inp }];\n}\n\nconst text = inp.raw_text || '';\n\nlet title = '';\nlet body = text;\nconst titleMatch = text.match(/^\\s*TITLE:\\s*([^\\n]+)\\n([\\s\\S]*)$/);\nif (titleMatch) {\n  title = titleMatch[1].trim().replace(/^[\"']|[\"']$/g, '');\n  body = titleMatch[2].trim();\n}\nif (!title) {\n  return [{ json: { ok: false, reason: 'selfcheck:title_missing', details: { raw_head: text.slice(0, 200) } } }];\n}\n\nconst fail = (reason, details) => [{ json: { ok: false, reason, details: details || null, raw_text: text } }];\n\n// 1) body length\nif (body.length < 3500 || body.length > 6500) {\n  return fail('selfcheck:1_length', { length: body.length });\n}\n\n// 2) exactly one HERO_IMAGE_URL placeholder\nconst hero = body.match(/<!--\\s*HERO_IMAGE_URL\\s*-->/g) || [];\nif (hero.length !== 1) {\n  return fail('selfcheck:2_hero_placeholder', { count: hero.length });\n}\n\n// 3) no markdown bold\nif (/\\*\\*[^*\\n]+\\*\\*/.test(body)) {\n  return fail('selfcheck:3_markdown_bold');\n}\n\n// 4) no AI auto-generation markers\nif (/AI[\\s\\-](generated|curated|powered)|auto[\\s\\-]generated|Generated:/i.test(body)) {\n  return fail('selfcheck:4_ai_marker');\n}\n\n// 5) ≥2 distinct signature phrases\nconst sigs = [\n  \"Hi, I'm Sabina.\",\n  'During my 23 years working as a flight attendant,',\n  'At my jazz club in Seoul,',\n  'On the layover that night,',\n  \"From an editor's curation desk,\",\n  'Twenty-three years in the cabin taught me',\n  'Between Seoul and Hong Kong time zones,',\n];\nconst sigHits = sigs.filter(p => body.includes(p));\nif (sigHits.length < 2) {\n  return fail('selfcheck:5_signature_phrases', { hits: sigHits });\n}\n\n// 6) exactly one one-liner from pool\nconst liners = [\n  \"Language is not just about words. It's about connection.\",\n  'Perfection is not the goal. Connection is.',\n  'Mistakes are not the problem. Silence is.',\n  'Confidence comes after speaking, not before.',\n];\nconst linerHits = liners.filter(p => body.includes(p));\nif (linerHits.length !== 1) {\n  return fail('selfcheck:6_one_liner', { hits: linerHits });\n}\n\n// 7) negation_then_affirmation\nif (!/(?:is|are|was|were)\\s+not\\b[^.]*\\.\\s+[A-Z][^.]*\\b(?:is|are)\\b/.test(body)) {\n  return fail('selfcheck:7_negation_then_affirmation');\n}\n\n// 8) required headings\nconst requiredHeadings = [\n  \"<h2>Sabina's Story\",\n  \"<h2>Sabina's Perspective\",\n  '<h2>Final Thoughts from Sabina',\n];\nconst missingHeads = requiredHeadings.filter(h => !body.includes(h));\nif (missingHeads.length) {\n  return fail('selfcheck:8_required_headings', { missing: missingHeads });\n}\n\n// 9) ≥1 bilingual_bridge — Hangul + ≥2 quoted English options in same paragraph\nconst paragraphs = body.split(/<\\/p>/);\nconst hasBridge = paragraphs.some(p => {\n  if (!/[가-힣]/.test(p)) return false;\n  const quoted = p.match(/\"[^\"\\n]{2,}\"/g) || [];\n  return quoted.length >= 2;\n});\nif (!hasBridge) {\n  return fail('selfcheck:9_bilingual_bridge');\n}\n\n// 10) no clichés\nconst cliches = [\n  /\\bultimate guide\\b/i,\n  /\\bmust[\\s\\-]have\\b/i,\n  /\\bthe most Korean thing ever\\b/i,\n  /\\blevel[\\s\\-]up\\b/i,\n  /\\bgame[\\s\\-]changer\\b/i,\n  /\\bmind[\\s\\-]blowing\\b/i,\n];\nconst cliHits = cliches.filter(re => re.test(body)).map(r => r.source);\nif (cliHits.length) {\n  return fail('selfcheck:10_cliches', { hits: cliHits });\n}\n\n// 11) no medical claim\nif (/\\b(cure|cures|cured|completely heal|no side effects|completely safe)\\b/i.test(body)) {\n  return fail('selfcheck:11_medical_claim');\n}\n\n// 12) no partisan politics\nconst politics = ['이재명', '윤석열', '한동훈', '조국', '민주당', '국민의힘'];\nconst polHits = politics.filter(n => body.includes(n));\nif (polHits.length) {\n  return fail('selfcheck:12_partisan', { hits: polHits });\n}\n\n// 13) HTML tag balance for the common allowed tags\nconst tagsToCheck = ['p', 'h2', 'h3', 'strong', 'em', 'blockquote', 'ul', 'li'];\nconst unbalanced = tagsToCheck.filter(t => {\n  const open = (body.match(new RegExp(`<${t}(?:\\\\s[^>]*)?>`, 'g')) || []).length;\n  const close = (body.match(new RegExp(`</${t}>`, 'g')) || []).length;\n  return open !== close;\n});\nif (unbalanced.length) {\n  return fail('selfcheck:13_html_balance', { unbalanced });\n}\n\nconst labels = [inp.category || 'k-culture', 'Sabina'];\n\nreturn [{\n  json: {\n    ok: true,\n    title,\n    content: body,\n    labels,\n    meta: {\n      length: body.length,\n      sigHits,\n      linerHits,\n      model: inp.model,\n      usage: inp.usage,\n      topic_en: inp.topic_en,\n      category: inp.category,\n    },\n  },\n}];\n"
+      },
+      "id": "0ade5bfd-3185-4cca-b1c7-6878125aeac8"
+    },
+    {
+      "name": "Decide",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        860,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "ok-true",
+              "leftValue": "={{ $json.ok }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "03f28e1d-de24-4423-a6e0-afe433257a50"
+    },
+    {
+      "name": "Blogger Draft Upload",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1080,
+        200
+      ],
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "VTiQnvRQLwOjRPx1",
+          "name": "Google account-cxsabina"
+        }
+      },
+      "parameters": {
+        "method": "POST",
+        "url": "=https://blogger.googleapis.com/v3/blogs/1299498210363078526/posts/?isDraft=true",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ kind: \"blogger#post\", title: $json.title, content: $json.content, labels: $json.labels }) }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 30000
+        }
+      },
+      "id": "1736cf01-b1fc-4601-b3c2-7bf206bccc48"
+    },
+    {
+      "name": "Respond OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1300,
+        200
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: true, channel: \"cxsabina\", draft_id: $json.id, draft_url: $json.url, draft_self_link: $json.selfLink, draft_title: $json.title }) }}",
+        "options": {}
+      },
+      "id": "bfce4316-1447-4281-a1af-47bf77f82209"
+    },
+    {
+      "name": "Respond Skip",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1080,
+        400
+      ],
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: false, channel: \"cxsabina\", reason: $json.reason, details: $json.details || null }) }}",
+        "options": {}
+      },
+      "id": "88312d2b-f68e-4fb7-a788-849d89cab944"
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Generate EN Draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate EN Draft": {
+      "main": [
+        [
+          {
+            "node": "Format & Self-Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format & Self-Check": {
+      "main": [
+        [
+          {
+            "node": "Decide",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decide": {
+      "main": [
+        [
+          {
+            "node": "Blogger Draft Upload",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond Skip",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Blogger Draft Upload": {
+      "main": [
+        [
+          {
+            "node": "Respond OK",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "pinData": null,
+  "activeVersionId": "ee4386f5-5ff0-4ba7-b83d-dcace3ff8d33",
+  "versionCounter": 12,
+  "activeVersion": {
+    "updatedAt": "2026-05-10T08:11:34.781Z",
+    "createdAt": "2026-05-10T08:11:34.781Z",
+    "versionId": "ee4386f5-5ff0-4ba7-b83d-dcace3ff8d33",
+    "workflowId": "OrecDjSeTYpHshGO",
+    "nodes": [
+      {
+        "name": "Webhook Trigger",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2,
+        "position": [
+          200,
+          300
+        ],
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "generate-cxsabina-content",
+          "responseMode": "responseNode",
+          "options": {}
+        },
+        "id": "e3109df2-ff52-4061-863d-3a355d6a1c50",
+        "webhookId": "92606a4c-6579-4063-bb55-48e8a438774d"
+      },
+      {
+        "name": "Generate EN Draft",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          420,
+          300
+        ],
+        "parameters": {
+          "jsCode": "// JAC-2167 cxsabina EN draft generator\n// Calls Anthropic Messages API with the Sabina persona+tone prompt.\n// Source of truth for prompt: docs/editorial/sabina-en-prompt-template.md (§2-§7)\n\nconst ANTHROPIC_MODEL = 'claude-sonnet-4-6';\nconst TIMEOUT_MS = 90000;\nconst MAX_TOKENS = 4096;\n\nconst payload = $('Webhook Trigger').first().json.body || $input.first().json || {};\nconst ANTHROPIC_API_KEY = payload.anthropic_api_key;\n\nif (!ANTHROPIC_API_KEY) {\n  return [{ json: { ok: false, reason: 'missing_anthropic_key' } }];\n}\n\nconst topic_en = (payload.topic_en || '').trim();\nconst topic_ko = (payload.topic_ko || '').trim();\nconst category = (payload.category || 'k-culture').trim();\nconst anchor_anecdote = (payload.anchor_anecdote || '').trim();\n\nif (!topic_en) {\n  return [{ json: { ok: false, reason: 'missing_topic_en' } }];\n}\n\nconst SYSTEM = `You are Sabina (사비나) — Korean returnee, mid-40s woman, former senior cabin crew at a foreign airline (23 years on Hong Kong, Dubai, Seoul-Incheon routes), now running My Jazz Garden, a private English jazz club in Seoul, and curating Korean culture for overseas readers.\n\nYou write in English only for this output. Korean phrases appear only as inline bilingual_bridge pairs (one Korean line followed by 2-3 natural English options).\n\nHard rules (never violate):\n- No \"AI generated\", \"AI curated\", \"auto generated\", \"Generated:\" markers.\n- No medical claims; no partisan politics, religion superiority, ethnic slurs, or Korea-Japan/Korea-China territorial/historical disputes.\n- No clichés: \"ultimate guide\", \"must-have\", \"the most Korean thing ever\", \"level up\", \"game-changer\", \"mind-blowing\".\n- No Markdown bold (**text**) — use <strong>text</strong>.\n- Approved emoji set: ✈️ 👉 🌍 🎵 🇰🇷 💡 📌, at most one per section.\n- Output is HTML fragment only (no <html>/<head>/<body>). Allowed tags: <h2>, <h3>, <p>, <strong>, <em>, <blockquote>, <ul>, <li>.\n- Insert exactly one HTML comment placeholder for the hero image at the very top: <!-- HERO_IMAGE_URL -->\n\nVoice: First-person reflective with a curator's warmth. Mid-40s woman pacing sentences like a jazz set — short, single-beat lines that leave space for the reader. Calm, observational, never urgent. Authority comes from 23 years in the cabin and conversations at My Jazz Garden — not from generic listicles.\n\nCadence: 8-14 words per sentence on average. 2-4 sentences per paragraph. Never more than 4 sentences in any single paragraph.\n\nSkeleton (use this order):\n1. Opening hook — one short paragraph. Either a question_opener (\"Have you ever heard …?\") or a passenger_anecdote (\"One passenger once said …\").\n2. <h2>Sabina's Story</h2> — 1-2 paragraphs of personal anecdote (Hong Kong, Dubai, Seoul-Incheon, or My Jazz Garden). Use ✈️ once.\n3. <h2>{topic-specific Korean culture H2}</h2> — 2-3 paragraphs unpacking the cultural context for an overseas reader. Use 🇰🇷 once. Include exactly one bilingual_bridge pair: one Korean phrase wrapped in <strong>...</strong>, then 2-3 natural English options each in straight double quotes.\n4. <h2>Sabina's Perspective</h2> — 1-2 paragraphs of reflection. Use exactly one negation_then_affirmation line of the form \"X is not …. Y is.\".\n5. <h2>Final Thoughts from Sabina</h2> — close with one signature one-liner from the pool, then a single closing line that hints at the next post.\n\nSignature phrases (use ≥2 distinct across the body):\n- \"Hi, I'm Sabina.\"\n- \"During my 23 years working as a flight attendant,\"\n- \"At my jazz club in Seoul,\"\n- \"On the layover that night,\"\n- \"From an editor's curation desk,\"\n- \"Twenty-three years in the cabin taught me\"\n- \"Between Seoul and Hong Kong time zones,\"\n\nOne-liner pool (pick exactly ONE for closing):\n- \"Language is not just about words. It's about connection.\"\n- \"Perfection is not the goal. Connection is.\"\n- \"Mistakes are not the problem. Silence is.\"\n- \"Confidence comes after speaking, not before.\"\n\nLength target: 750 words ± 100 in the HTML body.\n\nOutput format — exactly two parts separated by a single newline:\nLine 1: TITLE: <single-line title under 70 characters, no quotes, no markdown>\nLine 2 onward: HTML body fragment beginning with <!-- HERO_IMAGE_URL -->`;\n\nconst userPrompt = [\n  `Topic (English): ${topic_en}`,\n  topic_ko ? `Korean phrase for bilingual_bridge: ${topic_ko}` : null,\n  `Category: ${category}`,\n  anchor_anecdote\n    ? `Anchor anecdote: ${anchor_anecdote}`\n    : '(no anchor — draw from your own 23-year cabin career or My Jazz Garden conversations)',\n  '',\n  'Write a single Blogger post body fragment following every rule above.',\n].filter(Boolean).join('\\n');\n\nlet resp;\ntry {\n  resp = await this.helpers.httpRequest({\n    method: 'POST',\n    url: 'https://api.anthropic.com/v1/messages',\n    headers: {\n      'x-api-key': ANTHROPIC_API_KEY,\n      'anthropic-version': '2023-06-01',\n      'content-type': 'application/json',\n    },\n    body: {\n      model: ANTHROPIC_MODEL,\n      max_tokens: MAX_TOKENS,\n      system: SYSTEM,\n      messages: [{ role: 'user', content: userPrompt }],\n    },\n    json: true,\n    timeout: TIMEOUT_MS,\n  });\n} catch (e) {\n  return [{ json: { ok: false, reason: 'anthropic_fetch_failed', detail: (e && e.message) || String(e) } }];\n}\n\nconst text = (resp?.content || []).map(c => c.text || '').join('');\nif (!text) {\n  return [{ json: { ok: false, reason: 'anthropic_empty_response', resp_keys: Object.keys(resp || {}) } }];\n}\n\nreturn [{\n  json: {\n    ok: true,\n    raw_text: text,\n    topic_en,\n    topic_ko,\n    category,\n    anchor_anecdote,\n    model: ANTHROPIC_MODEL,\n    usage: resp.usage || null,\n  },\n}];\n"
+        },
+        "id": "8779e4ff-8cef-4a4e-b1f2-5e3454023b92"
+      },
+      {
+        "name": "Format & Self-Check",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          640,
+          300
+        ],
+        "parameters": {
+          "jsCode": "// JAC-2167 cxsabina self-check — 13 gates per docs/editorial/sabina-en-prompt-template.md §8\n// <12/13 pass → returns { ok:false, reason:\"selfcheck:N\" } (skip path, NOT blocked).\n// 13/13 pass → returns { ok:true, title, content, labels, meta }.\n\nconst inp = $input.first().json;\nif (inp.ok === false) {\n  return [{ json: inp }];\n}\n\nconst text = inp.raw_text || '';\n\nlet title = '';\nlet body = text;\nconst titleMatch = text.match(/^\\s*TITLE:\\s*([^\\n]+)\\n([\\s\\S]*)$/);\nif (titleMatch) {\n  title = titleMatch[1].trim().replace(/^[\"']|[\"']$/g, '');\n  body = titleMatch[2].trim();\n}\nif (!title) {\n  return [{ json: { ok: false, reason: 'selfcheck:title_missing', details: { raw_head: text.slice(0, 200) } } }];\n}\n\nconst fail = (reason, details) => [{ json: { ok: false, reason, details: details || null, raw_text: text } }];\n\n// 1) body length\nif (body.length < 3500 || body.length > 6500) {\n  return fail('selfcheck:1_length', { length: body.length });\n}\n\n// 2) exactly one HERO_IMAGE_URL placeholder\nconst hero = body.match(/<!--\\s*HERO_IMAGE_URL\\s*-->/g) || [];\nif (hero.length !== 1) {\n  return fail('selfcheck:2_hero_placeholder', { count: hero.length });\n}\n\n// 3) no markdown bold\nif (/\\*\\*[^*\\n]+\\*\\*/.test(body)) {\n  return fail('selfcheck:3_markdown_bold');\n}\n\n// 4) no AI auto-generation markers\nif (/AI[\\s\\-](generated|curated|powered)|auto[\\s\\-]generated|Generated:/i.test(body)) {\n  return fail('selfcheck:4_ai_marker');\n}\n\n// 5) ≥2 distinct signature phrases\nconst sigs = [\n  \"Hi, I'm Sabina.\",\n  'During my 23 years working as a flight attendant,',\n  'At my jazz club in Seoul,',\n  'On the layover that night,',\n  \"From an editor's curation desk,\",\n  'Twenty-three years in the cabin taught me',\n  'Between Seoul and Hong Kong time zones,',\n];\nconst sigHits = sigs.filter(p => body.includes(p));\nif (sigHits.length < 2) {\n  return fail('selfcheck:5_signature_phrases', { hits: sigHits });\n}\n\n// 6) exactly one one-liner from pool\nconst liners = [\n  \"Language is not just about words. It's about connection.\",\n  'Perfection is not the goal. Connection is.',\n  'Mistakes are not the problem. Silence is.',\n  'Confidence comes after speaking, not before.',\n];\nconst linerHits = liners.filter(p => body.includes(p));\nif (linerHits.length !== 1) {\n  return fail('selfcheck:6_one_liner', { hits: linerHits });\n}\n\n// 7) negation_then_affirmation\nif (!/(?:is|are|was|were)\\s+not\\b[^.]*\\.\\s+[A-Z][^.]*\\b(?:is|are)\\b/.test(body)) {\n  return fail('selfcheck:7_negation_then_affirmation');\n}\n\n// 8) required headings\nconst requiredHeadings = [\n  \"<h2>Sabina's Story\",\n  \"<h2>Sabina's Perspective\",\n  '<h2>Final Thoughts from Sabina',\n];\nconst missingHeads = requiredHeadings.filter(h => !body.includes(h));\nif (missingHeads.length) {\n  return fail('selfcheck:8_required_headings', { missing: missingHeads });\n}\n\n// 9) ≥1 bilingual_bridge — Hangul + ≥2 quoted English options in same paragraph\nconst paragraphs = body.split(/<\\/p>/);\nconst hasBridge = paragraphs.some(p => {\n  if (!/[가-힣]/.test(p)) return false;\n  const quoted = p.match(/\"[^\"\\n]{2,}\"/g) || [];\n  return quoted.length >= 2;\n});\nif (!hasBridge) {\n  return fail('selfcheck:9_bilingual_bridge');\n}\n\n// 10) no clichés\nconst cliches = [\n  /\\bultimate guide\\b/i,\n  /\\bmust[\\s\\-]have\\b/i,\n  /\\bthe most Korean thing ever\\b/i,\n  /\\blevel[\\s\\-]up\\b/i,\n  /\\bgame[\\s\\-]changer\\b/i,\n  /\\bmind[\\s\\-]blowing\\b/i,\n];\nconst cliHits = cliches.filter(re => re.test(body)).map(r => r.source);\nif (cliHits.length) {\n  return fail('selfcheck:10_cliches', { hits: cliHits });\n}\n\n// 11) no medical claim\nif (/\\b(cure|cures|cured|completely heal|no side effects|completely safe)\\b/i.test(body)) {\n  return fail('selfcheck:11_medical_claim');\n}\n\n// 12) no partisan politics\nconst politics = ['이재명', '윤석열', '한동훈', '조국', '민주당', '국민의힘'];\nconst polHits = politics.filter(n => body.includes(n));\nif (polHits.length) {\n  return fail('selfcheck:12_partisan', { hits: polHits });\n}\n\n// 13) HTML tag balance for the common allowed tags\nconst tagsToCheck = ['p', 'h2', 'h3', 'strong', 'em', 'blockquote', 'ul', 'li'];\nconst unbalanced = tagsToCheck.filter(t => {\n  const open = (body.match(new RegExp(`<${t}(?:\\\\s[^>]*)?>`, 'g')) || []).length;\n  const close = (body.match(new RegExp(`</${t}>`, 'g')) || []).length;\n  return open !== close;\n});\nif (unbalanced.length) {\n  return fail('selfcheck:13_html_balance', { unbalanced });\n}\n\nconst labels = [inp.category || 'k-culture', 'Sabina'];\n\nreturn [{\n  json: {\n    ok: true,\n    title,\n    content: body,\n    labels,\n    meta: {\n      length: body.length,\n      sigHits,\n      linerHits,\n      model: inp.model,\n      usage: inp.usage,\n      topic_en: inp.topic_en,\n      category: inp.category,\n    },\n  },\n}];\n"
+        },
+        "id": "0ade5bfd-3185-4cca-b1c7-6878125aeac8"
+      },
+      {
+        "name": "Decide",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2,
+        "position": [
+          860,
+          300
+        ],
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict"
+            },
+            "conditions": [
+              {
+                "id": "ok-true",
+                "leftValue": "={{ $json.ok }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "03f28e1d-de24-4423-a6e0-afe433257a50"
+      },
+      {
+        "name": "Blogger Draft Upload",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1080,
+          200
+        ],
+        "credentials": {
+          "googleOAuth2Api": {
+            "id": "VTiQnvRQLwOjRPx1",
+            "name": "Google account-cxsabina"
+          }
+        },
+        "parameters": {
+          "method": "POST",
+          "url": "=https://blogger.googleapis.com/v3/blogs/1299498210363078526/posts/?isDraft=true",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "googleOAuth2Api",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ kind: \"blogger#post\", title: $json.title, content: $json.content, labels: $json.labels }) }}",
+          "options": {
+            "response": {
+              "response": {
+                "responseFormat": "json"
+              }
+            },
+            "timeout": 30000
+          }
+        },
+        "id": "1736cf01-b1fc-4601-b3c2-7bf206bccc48"
+      },
+      {
+        "name": "Respond OK",
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.1,
+        "position": [
+          1300,
+          200
+        ],
+        "parameters": {
+          "respondWith": "json",
+          "responseBody": "={{ JSON.stringify({ ok: true, channel: \"cxsabina\", draft_id: $json.id, draft_url: $json.url, draft_self_link: $json.selfLink, draft_title: $json.title }) }}",
+          "options": {}
+        },
+        "id": "bfce4316-1447-4281-a1af-47bf77f82209"
+      },
+      {
+        "name": "Respond Skip",
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.1,
+        "position": [
+          1080,
+          400
+        ],
+        "parameters": {
+          "respondWith": "json",
+          "responseBody": "={{ JSON.stringify({ ok: false, channel: \"cxsabina\", reason: $json.reason, details: $json.details || null }) }}",
+          "options": {}
+        },
+        "id": "88312d2b-f68e-4fb7-a788-849d89cab944"
+      }
+    ],
+    "connections": {
+      "Webhook Trigger": {
+        "main": [
+          [
+            {
+              "node": "Generate EN Draft",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Generate EN Draft": {
+        "main": [
+          [
+            {
+              "node": "Format & Self-Check",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Format & Self-Check": {
+        "main": [
+          [
+            {
+              "node": "Decide",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Decide": {
+        "main": [
+          [
+            {
+              "node": "Blogger Draft Upload",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Respond Skip",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Blogger Draft Upload": {
+        "main": [
+          [
+            {
+              "node": "Respond OK",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "성수 김",
+    "name": null,
+    "description": null,
+    "autosaved": false,
+    "workflowPublishHistory": [
+      {
+        "createdAt": "2026-05-10T08:11:34.929Z",
+        "id": 63,
+        "workflowId": "OrecDjSeTYpHshGO",
+        "versionId": "ee4386f5-5ff0-4ba7-b83d-dcace3ff8d33",
+        "event": "activated",
+        "userId": "57b56580-e77f-4e1a-bc58-996093f319ec"
+      },
+      {
+        "createdAt": "2026-05-10T08:11:34.891Z",
+        "id": 62,
+        "workflowId": "OrecDjSeTYpHshGO",
+        "versionId": "ee4386f5-5ff0-4ba7-b83d-dcace3ff8d33",
+        "event": "deactivated",
+        "userId": "57b56580-e77f-4e1a-bc58-996093f319ec"
+      }
+    ]
+  }
+}

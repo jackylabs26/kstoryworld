@@ -1,0 +1,33 @@
+{
+  "live_run": true,
+  "issue": "JAC-2167",
+  "executed_at": "2026-05-10T08:11:41Z",
+  "n8n_workflow_id": "OrecDjSeTYpHshGO",
+  "n8n_workflow_name": "cxsabina EN Content Generator (JAC-2167)",
+  "n8n_execution_id": 146,
+  "request": {
+    "task_id": "JAC-2167-e2e-test-3",
+    "channel": "cxsabina",
+    "topic_en": "How Korean honorifics in K-dramas reveal the texture of friendship",
+    "topic_ko": "형 (hyung)",
+    "category": "k-drama",
+    "anchor_anecdote": "On a Hong Kong-Seoul red-eye, a Canadian passenger asked why Korean men seem to call each other 'older brother' even when they aren't related."
+  },
+  "anthropic": {
+    "model": "claude-sonnet-4-6",
+    "input_tokens": 1082,
+    "output_tokens": 1040,
+    "raw_text_length_chars": 4250
+  },
+  "selfcheck_pass": "13/13",
+  "blogger_upload": {
+    "ok": false,
+    "reason": "EAUTH",
+    "detail": "The provided authorization grant or refresh token is invalid, expired, revoked, does not match the redirection URI used in the authorization request, or was issued to another client.",
+    "n8n_credential_id": "VTiQnvRQLwOjRPx1",
+    "n8n_credential_name": "Google account-cxsabina",
+    "unblock_owner": "Sabina (Google consent) + Jacky (n8n UI re-auth)",
+    "unblock_action": "n8n UI → Credentials → 'Google account-cxsabina' → Sign in with Google → grant Blogger scope. Workflow auto-resumes; no code change needed."
+  },
+  "anthropic_output_excerpt": "TITLE: Korean Honorifics in K-Dramas and the Texture of Friendship\n\n<!-- HERO_IMAGE_URL -->\n\n<p>Have you ever watched a K-drama and sensed that a single word — just one syllable, really — shifted the entire relationship between two characters?</p>\n\n<h2>Sabina's Story</h2>\n\n<p>✈️ On a Hong Kong-Seoul red-eye, somewhere around 2 a.m., a Canadian passenger leaned across the aisle and asked me something I still think about. He had been watching a drama on his tablet the whole flight. \"Why,\" he said, \"do Korean men call each other 'older brother' when they clearly aren't related?\"</p>\n\n<p>Hi, I'm Sabina. During my 23 years working as a flight attendant, I answered thousands of questions about Korea at 35,000 feet. That particular question, though, settled somewhere deeper.</p>\n\n[…body continues with <h2>What Korean Honorifics Reveal About Closeness 🇰🇷</h2>, <strong>형 (hyung)</strong> bilingual_bridge pair, <h2>Sabina's Perspective</h2>, <h2>Final Thoughts from Sabina</h2>, closing one-liner \"Language is not just about words. It's about connection.\"]"
+}
