@@ -1,0 +1,53 @@
+{
+  "live_run": true,
+  "issue": "JAC-2167",
+  "executed_at": "2026-05-10T08:51:02Z",
+  "n8n_workflow_id": "OrecDjSeTYpHshGO",
+  "n8n_workflow_name": "cxsabina EN Content Generator (JAC-2167)",
+  "n8n_execution_id": 149,
+  "request": {
+    "task_id": "JAC-2167-e2e-test-final",
+    "channel": "cxsabina",
+    "topic_en": "The unspoken language of K-drama silence — what an extra second of eye contact actually says",
+    "topic_ko": "눈빛",
+    "category": "k-drama",
+    "anchor_anecdote": "A first-class passenger from Singapore once asked me why Korean dramas linger so long on faces saying nothing."
+  },
+  "anthropic": {
+    "model": "claude-sonnet-4-6",
+    "input_tokens": 1074,
+    "output_tokens": 1021,
+    "raw_text_length_chars": 4178
+  },
+  "selfcheck_pass": "13/13",
+  "selfcheck_meta": {
+    "body_length_chars": 4115,
+    "signature_phrase_hits": [
+      "Hi, I'm Sabina.",
+      "During my 23 years working as a flight attendant,",
+      "At my jazz club in Seoul,",
+      "From an editor's curation desk,",
+      "Twenty-three years in the cabin taught me",
+      "Between Seoul and Hong Kong time zones,"
+    ],
+    "one_liner_hits": [
+      "Language is not just about words. It's about connection."
+    ]
+  },
+  "blogger_upload": {
+    "ok": true,
+    "kind": "blogger#post",
+    "draft_id": "4058333309713530885",
+    "blog_id": "1299498210363078526",
+    "self_link": "https://blogger.googleapis.com/v3/blogs/1299498210363078526/posts/4058333309713530885",
+    "title": "The Unspoken Language of K-Drama Silence and Eye Contact",
+    "status": "DRAFT",
+    "published": "2026-05-10T17:51:02+09:00",
+    "author": {
+      "id": "11841696719321426839",
+      "displayName": "Sabina Vibe K-Life",
+      "profile_url": "https://www.blogger.com/profile/11841696719321426839"
+    }
+  },
+  "anthropic_output_excerpt": "TITLE: The Unspoken Language of K-Drama Silence and Eye Contact\n\n<!-- HERO_IMAGE_URL -->\n\n<p>A first-class passenger from Singapore once asked me why Korean dramas linger so long on faces saying nothing. She had been watching on the screen in front of her for three hours. No headphones. Just watching the expressions.</p>\n\n<h2>Sabina's Story</h2>\n\n<p>✈️ Hi, I'm Sabina. During my 23 years working as a flight attendant, I served routes between Seoul, Hong Kong, and Dubai. Long-haul passengers always had time to notice things. That question from Singapore stayed with me for the rest of the flight.</p>\n\n[…body continues with topic H2 + 🇰🇷 + <strong>눈빛</strong> bilingual_bridge, <h2>Sabina's Perspective</h2> with negation_then_affirmation, closing one-liner \"Language is not just about words. It's about connection.\" + next-post tease about silence at the Korean dinner table]"
+}
