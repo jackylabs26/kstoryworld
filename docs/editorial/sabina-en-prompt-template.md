@@ -20,9 +20,9 @@
   "image_query": "<Optional explicit search override prepended to the query list>",
   "language_pair": ["en"],
   "anthropic_api_key": "<injected by board-routine/lib.sh:br_inject_anthropic_key>",
-  "pexels_api_key": "<required-ish, from ~/.jackylabs/secrets/mjg.env>",
-  "pixabay_api_key": "<optional, from mjg.env once Jacky provisions key>",
-  "unsplash_access_key": "<optional, from mjg.env once Jacky provisions key>"
+  "pexels_api_key": "<required-ish, from ~/.jackylabs/secrets/kstoryworld.env>",
+  "pixabay_api_key": "<optional, from kstoryworld.env>",
+  "unsplash_access_key": "<optional, from kstoryworld.env>"
 }
 ```
 
@@ -166,9 +166,9 @@ are present in payload:
 
 | Source | Endpoint | Status (2026-05-10) |
 |---|---|---|
-| Pexels | `https://api.pexels.com/v1/search` | ✅ key in `mjg.env` |
-| Pixabay | `https://pixabay.com/api/` | ⏳ key TBD |
-| Unsplash | `https://api.unsplash.com/search/photos` | ⏳ key TBD |
+| Pexels | `https://api.pexels.com/v1/search` | ✅ key in `kstoryworld.env` |
+| Pixabay | `https://pixabay.com/api/` | ✅ key in `kstoryworld.env` |
+| Unsplash | `https://api.unsplash.com/search/photos` | ✅ key in `kstoryworld.env` |
 
 If `candidate_count == 0` → `{ ok: false, reason:
 "image_search_failed" }` (skip, no draft posted).
@@ -282,3 +282,10 @@ Body: { kind: "blogger#post", title: "<H1 derived from topic>", content:
   `unsplash_access_key` (선택) 필드 추가. 단일 소스(Pexels)
   + 1순위 결과 의존이던 첫 버전이 generic 한 사진을 잡던 회귀를
   막음.
+- 2026-05-10 (Cortex, JAC-2167 follow-up) — 3소스 키(Pexels +
+  Pixabay + Unsplash) 를 `mjg.env` → `kstoryworld.env` 로 이전
+  (Jacky directive: cxsabina 가 kstoryworld 파이프라인 소속).
+  exec 156 에서 Pixabay 가 \"gwangjang market\" 이 alt-text 에
+  명시된 사진(joelmarrinan, id 4701091) 을 직접 매칭, LLM 랭킹이
+  그것을 골라서 draft id `2698181293477367581` 에 삽입. 후보 풀
+  Pexels 6 + Pixabay 6 + Unsplash 3 = 15 candidates.

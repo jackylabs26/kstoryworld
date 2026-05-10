@@ -1,0 +1,48 @@
+{
+  "live_run": true,
+  "issue": "JAC-2167",
+  "executed_at": "2026-05-10T10:03Z",
+  "n8n_workflow_id": "OrecDjSeTYpHshGO",
+  "n8n_execution_id": 156,
+  "request": {
+    "task_id": "JAC-2167-gwangjang-3sources",
+    "channel": "cxsabina",
+    "topic_en": "Eat Like a Local in Seoul: Hidden Gems of Gwangjang Market",
+    "topic_ko": "마약김밥",
+    "category": "k-food"
+  },
+  "image_pipeline": {
+    "step_1_query_planner": {
+      "model": "claude-haiku-4-5-20251001"
+    },
+    "step_2_collect": {
+      "sources_enabled_at_runtime": ["Pexels", "Pixabay", "Unsplash"],
+      "candidate_count": 15,
+      "candidates_by_source": {
+        "Pexels": 6,
+        "Pixabay": 6,
+        "Unsplash": 3
+      }
+    },
+    "step_3_llm_rank": {
+      "model": "claude-haiku-4-5-20251001",
+      "rank_reason": "Only photo explicitly mentioning Gwangjang Market, the specific location in the topic"
+    },
+    "step_4_chosen": {
+      "source": "Pixabay",
+      "raw_id": 4701091,
+      "alt": "korea, south korea, market, traditional market, gwangjang market, seoul, south korea, gwangjang market, gwangjang market",
+      "photographer": "joelmarrinan",
+      "url_pattern": "https://pixabay.com/get/g60608b3f7b04620656481b4db19f866f...",
+      "query_used": "Gwangjang Market Seoul food stalls"
+    }
+  },
+  "blogger_upload": {
+    "ok": true,
+    "draft_id": "2698181293477367581",
+    "blog_id": "1299498210363078526",
+    "status": "DRAFT",
+    "title": "Eat Like a Local in Seoul: Hidden Gems of Gwangjang Market"
+  },
+  "notes": "All 3 stock sources active for the first time. LLM rank correctly preferred a Pixabay photo whose alt-text literally contains 'gwangjang market' over Pexels' generic Korean-market chili-pepper or Unsplash food-stand photos."
+}
