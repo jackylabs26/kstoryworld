@@ -17,10 +17,12 @@
   "topic_ko": "<Optional Korean phrase for bilingual_bridge slot>",
   "category": "<k-drama|k-travel|k-food|k-fashion|k-literature|language>",
   "anchor_anecdote": "<Optional 1-line Sabina passenger/layover hook>",
-  "image_query": "<Optional explicit Pexels search override; defaults to topic_en>",
+  "image_query": "<Optional explicit search override prepended to the query list>",
   "language_pair": ["en"],
   "anthropic_api_key": "<injected by board-routine/lib.sh:br_inject_anthropic_key>",
-  "pexels_api_key": "<from ~/.jackylabs/secrets/mjg.env>"
+  "pexels_api_key": "<required-ish, from ~/.jackylabs/secrets/kstoryworld.env>",
+  "pixabay_api_key": "<optional, from kstoryworld.env>",
+  "unsplash_access_key": "<optional, from kstoryworld.env>"
 }
 ```
 
@@ -123,42 +125,75 @@ H3 headings: 0–2, only inside the topic H2 if the topic naturally
 benefits from a sub-split.
 ```
 
-## 6. Image block
+## 6. Image block (model side)
 
 ```
 Insert one HTML comment placeholder at the very top:
   <!-- HERO_IMAGE_URL -->
 The model never emits <img> tags or stock URLs itself. The pipeline
-substitutes the placeholder with a real Pexels photo + photographer
-credit just before Blogger upload. Exactly one <img> appears in the
-final post body — Jacky directive 2026-05-10: every cxsabina draft
-must ship with at least one image.
+substitutes the placeholder with a real photo + photographer credit
+just before Blogger upload. Exactly one <img> appears in the final
+post body — Jacky directive 2026-05-10: every cxsabina draft must
+ship with at least one image.
 ```
 
-Image substitution (handled by the n8n Format & Self-Check node, not
-the model):
+### Image pipeline (n8n side, 4 steps)
+
+The `Generate EN Draft` node runs the image pipeline before the
+Anthropic body call. The `Format & Self-Check` node only substitutes
+the chosen image into the placeholder.
+
+**Step 1 — LLM query planner (Haiku 4.5).** Outputs 5 specific photo
+search queries (3 EN + 2 KO), ordered most-specific to most-generic.
+Example for `topic_en="Eat Like a Local in Seoul: Hidden Gems of
+Gwangjang Market"`:
 
 ```
-Pre-substitution body  →  <!-- HERO_IMAGE_URL -->
-Post-substitution body →
-  <p><img src="<pexels-large-url>" alt="<pexels-alt or topic_en>"
-          style="max-width:100%;height:auto;" /></p>
-  <p><em>Photo: <a href="<photographer_url>">photographer</a> via
-  <a href="<pexels_photo_url>">Pexels</a></em></p>
+[ "Gwangjang Market Seoul food stalls",
+  "마약김밥 Korean kimbap street food",
+  "Seoul local market eating experience",
+  "전통시장 먹거리 서울",
+  "Korean street food culture" ]
 ```
 
-Pexels search cascade — first non-empty result wins:
-1. `image_query` from payload (if provided)
-2. `topic_en`
-3. category-mapped fallback (`k-drama`→`Korean drama`,
-   `k-travel`→`Seoul Korea`, `k-food`→`Korean food`,
-   `k-fashion`→`Korean fashion`, `k-literature`→`Korean books`,
-   `k-pop`→`Korean concert`, `k-beauty`→`Korean beauty`,
-   `language`→`Korean language Seoul`)
-4. literal `Seoul Korea`
+The planner output is appended with `image_query`/`topic_en`/category
+fallback / `Seoul Korea` and deduped.
 
-If all four return zero photos → `{ ok: false, reason:
-"pexels_no_results" }` (skip, no draft posted).
+**Step 2 — Multi-source candidate collection.** For each query × each
+enabled stock source, take up to 3 photos and dedupe by `source:id`.
+Cap at 15 candidates total. Sources auto-enable based on which keys
+are present in payload:
+
+| Source | Endpoint | Status (2026-05-10) |
+|---|---|---|
+| Pexels | `https://api.pexels.com/v1/search` | ✅ key in `kstoryworld.env` |
+| Pixabay | `https://pixabay.com/api/` | ✅ key in `kstoryworld.env` |
+| Unsplash | `https://api.unsplash.com/search/photos` | ✅ key in `kstoryworld.env` |
+
+If `candidate_count == 0` → `{ ok: false, reason:
+"image_search_failed" }` (skip, no draft posted).
+
+**Step 3 — LLM rank (Haiku 4.5).** When ≥2 candidates collected, the
+ranker takes their alt-texts + sources + queries and emits
+`{"best_index": <int>, "reason": "<short>"}`. Picks the photo whose
+alt-text best matches the topic — biases toward photos that mention
+the specific entity over generic city skylines.
+
+**Step 4 — Substitution.** Format & Self-Check passes 13 gates, then
+replaces the placeholder with:
+
+```html
+<p><img src="<chosen.url>" alt="<chosen.alt or topic_en>"
+        style="max-width:100%;height:auto;" /></p>
+<p><em>Photo: <a href="<chosen.photographer_url>">photographer</a>
+via <a href="<chosen.source_url>">Pexels|Pixabay|Unsplash</a></em></p>
+```
+
+For Unsplash, photographer/source URLs receive
+`?utm_source=cxsabina&utm_medium=referral` per Unsplash API guidelines.
+
+A 14th post-substitution gate enforces exactly one `<img` tag in the
+final body.
 
 ## 7. User prompt template (n8n LLM node)
 
@@ -239,3 +274,18 @@ Body: { kind: "blogger#post", title: "<H1 derived from topic>", content:
   자동 substitution 으로 변경. §8 self-check 에 14번 (`<img` 1개)
   추가. webhook payload 에 `pexels_api_key` (필수) + `image_query`
   (선택) 필드 추가.
+- 2026-05-10 (Cortex, JAC-2167 follow-up) — 사진 품질 향상 directive.
+  §6 을 단순 Pexels 캐스케이드에서 4-step 파이프라인으로 확장:
+  LLM 쿼리 플래너(Haiku 4.5) → 다중 소스 collect (Pexels +
+  Pixabay + Unsplash, 키 있으면 자동 활성) → LLM 랭킹(Haiku 4.5)
+  → substitute. webhook payload 에 `pixabay_api_key`,
+  `unsplash_access_key` (선택) 필드 추가. 단일 소스(Pexels)
+  + 1순위 결과 의존이던 첫 버전이 generic 한 사진을 잡던 회귀를
+  막음.
+- 2026-05-10 (Cortex, JAC-2167 follow-up) — 3소스 키(Pexels +
+  Pixabay + Unsplash) 를 `mjg.env` → `kstoryworld.env` 로 이전
+  (Jacky directive: cxsabina 가 kstoryworld 파이프라인 소속).
+  exec 156 에서 Pixabay 가 \"gwangjang market\" 이 alt-text 에
+  명시된 사진(joelmarrinan, id 4701091) 을 직접 매칭, LLM 랭킹이
+  그것을 골라서 draft id `2698181293477367581` 에 삽입. 후보 풀
+  Pexels 6 + Pixabay 6 + Unsplash 3 = 15 candidates.
