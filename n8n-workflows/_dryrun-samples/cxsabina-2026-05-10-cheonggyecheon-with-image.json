@@ -1,0 +1,38 @@
+{
+  "live_run": true,
+  "issue": "JAC-2167",
+  "executed_at": "2026-05-10T09:15Z",
+  "n8n_workflow_id": "OrecDjSeTYpHshGO",
+  "n8n_execution_id": 151,
+  "request": {
+    "task_id": "JAC-2167-cheonggyecheon-with-image",
+    "channel": "cxsabina",
+    "topic_en": "Why Everyone Falls in Love with Seoul's Cheonggyecheon at Night",
+    "topic_ko": "청계천 야경",
+    "category": "k-travel"
+  },
+  "anthropic": {
+    "model": "claude-sonnet-4-6",
+    "input_tokens": 1042,
+    "output_tokens": 938
+  },
+  "selfcheck_pass": "13/13 + img_count=1",
+  "image": {
+    "source": "pexels",
+    "query_used": "Why Everyone Falls in Love with Seoul's Cheonggyecheon at Night",
+    "url": "https://images.pexels.com/photos/31629026/pexels-photo-31629026.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
+    "alt": "A beautiful sunset illuminating Cheonggyecheon Stream surrounded by modern skyscrapers in Seoul.",
+    "photographer": "Ayyeee Ayyeee",
+    "pexels_url": "https://www.pexels.com/photo/sunset-over-cheonggyecheon-stream-in-seoul-31629026/",
+    "pexels_id": 31629026
+  },
+  "blogger_upload": {
+    "ok": true,
+    "draft_id": "6836267747310945399",
+    "blog_id": "1299498210363078526",
+    "status": "DRAFT",
+    "title": "Why Everyone Falls in Love with Seoul's Cheonggyecheon at Night",
+    "img_tag_count_in_body": 1
+  },
+  "final_body_excerpt_first_600_chars": "<p><img src=\"https://images.pexels.com/photos/31629026/pexels-photo-31629026.jpeg?auto=compress&amp;cs=tinysrgb&amp;h=650&amp;w=940\" alt=\"A beautiful sunset illuminating Cheonggyecheon Stream surrounded by modern skyscrapers in Seoul.\" style=\"max-width:100%;height:auto;\" /></p>\n<p><em>Photo: <a href=\"https://www.pexels.com/@ayyeee-ayyeee-434363205\" target=\"_blank\" rel=\"noopener\">Ayyeee Ayyeee</a> via <a href=\"https://www.pexels.com/photo/sunset-over-cheonggyecheon-stream-in-seoul-31629026/\" target=\"_blank\" rel=\"noopener\">Pexels</a></em></p>\n\n<p>Have you ever heard someone describe a city strea"
+}

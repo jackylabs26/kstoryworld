@@ -17,8 +17,10 @@
   "topic_ko": "<Optional Korean phrase for bilingual_bridge slot>",
   "category": "<k-drama|k-travel|k-food|k-fashion|k-literature|language>",
   "anchor_anecdote": "<Optional 1-line Sabina passenger/layover hook>",
+  "image_query": "<Optional explicit Pexels search override; defaults to topic_en>",
   "language_pair": ["en"],
-  "anthropic_api_key": "<injected by board-routine/lib.sh:br_inject_anthropic_key>"
+  "anthropic_api_key": "<injected by board-routine/lib.sh:br_inject_anthropic_key>",
+  "pexels_api_key": "<from ~/.jackylabs/secrets/mjg.env>"
 }
 ```
 
@@ -126,13 +128,37 @@ benefits from a sub-split.
 ```
 Insert one HTML comment placeholder at the very top:
   <!-- HERO_IMAGE_URL -->
-Do not generate <img> tags or stock URLs. Sabina inserts the image in
-Blogger UI before publishing. If a second inline image is conceptually
-useful, insert a second placeholder:
-  <!-- INLINE_IMAGE_URL_1 -->
-Do not auto-search stock photography. Image sourcing is out of scope for
-this pipeline.
+The model never emits <img> tags or stock URLs itself. The pipeline
+substitutes the placeholder with a real Pexels photo + photographer
+credit just before Blogger upload. Exactly one <img> appears in the
+final post body — Jacky directive 2026-05-10: every cxsabina draft
+must ship with at least one image.
 ```
+
+Image substitution (handled by the n8n Format & Self-Check node, not
+the model):
+
+```
+Pre-substitution body  →  <!-- HERO_IMAGE_URL -->
+Post-substitution body →
+  <p><img src="<pexels-large-url>" alt="<pexels-alt or topic_en>"
+          style="max-width:100%;height:auto;" /></p>
+  <p><em>Photo: <a href="<photographer_url>">photographer</a> via
+  <a href="<pexels_photo_url>">Pexels</a></em></p>
+```
+
+Pexels search cascade — first non-empty result wins:
+1. `image_query` from payload (if provided)
+2. `topic_en`
+3. category-mapped fallback (`k-drama`→`Korean drama`,
+   `k-travel`→`Seoul Korea`, `k-food`→`Korean food`,
+   `k-fashion`→`Korean fashion`, `k-literature`→`Korean books`,
+   `k-pop`→`Korean concert`, `k-beauty`→`Korean beauty`,
+   `language`→`Korean language Seoul`)
+4. literal `Seoul Korea`
+
+If all four return zero photos → `{ ok: false, reason:
+"pexels_no_results" }` (skip, no draft posted).
 
 ## 7. User prompt template (n8n LLM node)
 
@@ -154,7 +180,7 @@ HTML only — no preamble, no closing remark, no Markdown.
 The workflow must enforce, before posting to Blogger draft:
 
 1. `body.length` between 3500 and 6500 chars (~650–900 words).
-2. Exactly one `<!-- HERO_IMAGE_URL -->` comment.
+2. Exactly one `<!-- HERO_IMAGE_URL -->` comment (pre-substitution gate; post-substitution body must contain exactly one `<img` tag — gate #14).
 3. Zero occurrences of `**` (Markdown bold).
 4. Zero occurrences (case-insensitive) of `AI generated`, `AI curated`,
    `auto generated`, `Generated:`.
@@ -171,6 +197,7 @@ The workflow must enforce, before posting to Blogger draft:
     side effects|completely safe)\b`).
 12. No partisan-politics regex (configured per `reference-card.md`).
 13. HTML parse cleanly (no unclosed tags).
+14. (post-substitution) Exactly one `<img` tag in final body.
 
 `<12/13` self-check pass → workflow returns `{ ok: false, reason:
 "selfcheck:<n>", details: [...] }` and the kickoff caller treats it as
@@ -207,3 +234,8 @@ Body: { kind: "blogger#post", title: "<H1 derived from topic>", content:
 - 2026-05-10 (Cortex) — JAC-2167 초안. 톤 reference §3-§6 은 sabina.yaml
   + sabina-blog-tone-analysis.md 인용. n8n cxsabina 분기 활성화 및
   blogger-cxsabina.env 발급은 별 트랙(외부 unblock 대기).
+- 2026-05-10 (Cortex) — Jacky directive: 모든 cxsabina draft 는 사진
+  1장 mandatory. §6 image block 을 placeholder-only 에서 Pexels
+  자동 substitution 으로 변경. §8 self-check 에 14번 (`<img` 1개)
+  추가. webhook payload 에 `pexels_api_key` (필수) + `image_query`
+  (선택) 필드 추가.
