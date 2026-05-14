@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect } from 'react';
 import { SEASONS, useKSWTheme } from './theme-provider';
 import { AdSlot } from './ad-slot';
 
@@ -26,8 +27,16 @@ function formatDate(iso: string, lang: 'ko' | 'en'): string {
 }
 
 export function ReviewArticle({ bodyHtml, slug, season, title, lang: reviewLang, siblingSlug, category, author, datePublished, dateModified }: ReviewArticleProps) {
-  const { dark, lang } = useKSWTheme();
+  const { dark, lang, setSiblingHref } = useKSWTheme();
   const s = SEASONS[season];
+
+  useEffect(() => {
+    const href = siblingSlug
+      ? (category ? `/${category}/${siblingSlug}/` : `/reviews/${siblingSlug}/`)
+      : null;
+    setSiblingHref(href);
+    return () => setSiblingHref(null);
+  }, [siblingSlug, category, setSiblingHref]);
 
   return (
     <div
