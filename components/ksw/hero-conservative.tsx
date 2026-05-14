@@ -8,10 +8,10 @@ export function HeroConservative() {
 
   return (
     <section
+      className="px-5 py-14 md:px-8 md:py-[100px] md:pb-[120px]"
       style={{
         position: 'relative',
         overflow: 'hidden',
-        padding: '100px 32px 120px',
         background: dark ? '#010120' : '#fff',
         color: dark ? '#fff' : '#000',
       }}

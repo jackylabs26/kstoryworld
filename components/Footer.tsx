@@ -33,10 +33,9 @@ export default function Footer() {
   ];
 
   return (
-    <footer style={{ background: '#010120', color: '#fff', position: 'relative', overflow: 'hidden', paddingTop: 80 }}>
+    <footer style={{ background: '#010120', color: '#fff', position: 'relative', overflow: 'hidden' }} className="pt-12 md:pt-20">
       <div
-        className="ksw-container"
-        style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: 48 }}
+        className="ksw-container grid grid-cols-2 md:grid-cols-[2fr_1fr_1fr_1fr] gap-6 md:gap-12"
       >
         <div>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
@@ -101,16 +100,15 @@ export default function Footer() {
 
       {/* Giant wordmark */}
       <div
+        className="mt-9 md:mt-16 pl-5 md:pl-8"
         style={{
           fontFamily: 'var(--font-display)',
-          fontSize: 'clamp(120px, 22vw, 280px)',
+          fontSize: 'clamp(96px, 22vw, 280px)',
           fontWeight: 500,
-          letterSpacing: '-9px',
+          letterSpacing: 'clamp(-2.88px, -0.6vw, -9px)',
           color: 'rgba(255,255,255,0.06)',
           lineHeight: 0.85,
           whiteSpace: 'nowrap',
-          marginTop: 60,
-          paddingLeft: 32,
           userSelect: 'none',
           overflow: 'hidden',
         }}
@@ -118,9 +116,9 @@ export default function Footer() {
         kstoryworld<span style={{ color: accent, opacity: 0.4 }}>·</span>
       </div>
       <div
+        className="px-5 py-3.5 md:px-8 md:py-5"
         style={{
           borderTop: '1px solid rgba(255,255,255,0.08)',
-          padding: '18px 32px',
           display: 'flex',
           justifyContent: 'space-between',
           fontSize: 12,

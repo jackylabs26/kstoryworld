@@ -36,7 +36,7 @@ export function HeroStandard() {
       )}
 
       {/* Meta line */}
-      <div style={{ position: 'relative', padding: '48px 32px 0' }}>
+      <div className="px-5 md:px-8" style={{ position: 'relative', paddingTop: 48 }}>
         <div
           className="ksw-container"
           style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 32, padding: 0 }}
@@ -48,7 +48,7 @@ export function HeroStandard() {
       </div>
 
       {/* Headline + subtext */}
-      <div style={{ position: 'relative', padding: '32px 32px 0' }}>
+      <div className="px-5 md:px-8" style={{ position: 'relative', paddingTop: 32 }}>
         <div className="ksw-container" style={{ padding: 0 }}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-end">
             <div>
@@ -120,9 +120,9 @@ export function HeroStandard() {
 
       {/* Season stat band inline */}
       <div
+        className="px-5 md:px-8 pt-8 pb-10 md:pt-12 md:pb-16"
         style={{
           position: 'relative',
-          padding: '48px 32px 64px',
           marginTop: 48,
           borderTop: `1px solid ${dark ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.08)'}`,
         }}

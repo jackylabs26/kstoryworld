@@ -20,15 +20,15 @@ export function StatsBand({ dramaCount, totalPages }: Props) {
 
   return (
     <section
+      className="px-5 py-8 md:px-8 md:py-14"
       style={{
-        padding: '56px 32px',
         borderTop: `1px solid ${dark ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.08)'}`,
         borderBottom: `1px solid ${dark ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.08)'}`,
         background: dark ? '#010120' : '#fff',
         color: dark ? '#fff' : '#000',
       }}
     >
-      <div className="ksw-container" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 32 }}>
+      <div className="ksw-container grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
         {stats.map((st, i) => (
           <div
             key={i}
