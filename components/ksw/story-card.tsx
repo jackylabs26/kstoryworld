@@ -31,13 +31,7 @@ export function StoryCard({ href, title, excerpt, image, num, season, category, 
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       className="ksw-card"
-      style={{
-        display: 'block',
-        textDecoration: 'none',
-        color: dark ? '#fff' : '#000',
-        background: dark ? '#0a0a2e' : '#fff',
-        border: `1px solid ${dark ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.08)'}`,
-      }}
+      style={{ display: 'block', textDecoration: 'none' }}
     >
       <div style={{ height: large ? 260 : 200, background: s.grad, position: 'relative', overflow: 'hidden' }}>
         {image && (
@@ -95,7 +89,7 @@ export function StoryCard({ href, title, excerpt, image, num, season, category, 
           }}
         />
       </div>
-      <div style={{ padding: '22px 24px 26px' }}>
+      <div style={{ padding: '20px 24px 24px' }}>
         <div className="t-mono-sm" style={{ color: dark ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.55)' }}>
           {lang === 'ko' ? labelKo : labelEn.toUpperCase()}
         </div>

@@ -9,8 +9,8 @@ export function SeasonCarousel() {
 
   return (
     <section
+      className="px-5 py-12 md:px-8 md:py-20"
       style={{
-        padding: '80px 32px',
         background: dark ? '#010120' : '#fff',
         color: dark ? '#fff' : '#000',
         borderTop: `1px solid ${dark ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.08)'}`,

@@ -29,7 +29,7 @@ export function HeroBold() {
       )}
 
       {/* meta line */}
-      <div style={{ position: 'relative', padding: '48px 32px 0' }}>
+      <div className="px-5 md:px-8" style={{ position: 'relative', paddingTop: 48 }}>
         <div className="ksw-container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 32, padding: 0 }}>
           <span className="t-mono-sm" style={{ color: dark ? 'rgba(255,255,255,0.55)' : 'rgba(0,0,0,0.55)' }}>
             VOL.04 · {s.en.toUpperCase()} · KSTORYWORLD
@@ -41,7 +41,7 @@ export function HeroBold() {
       </div>
 
       {/* Giant hangul wordmark */}
-      <div style={{ position: 'relative', padding: '24px 32px 0' }}>
+      <div className="px-5 md:px-8" style={{ position: 'relative', paddingTop: 24 }}>
         <div className="ksw-container" style={{ position: 'relative', padding: 0 }}>
           <div
             style={{
@@ -82,9 +82,10 @@ export function HeroBold() {
 
       {/* Featured headline + story tiles */}
       <div
+        className="px-5 md:px-8 pb-14 md:pb-20"
         style={{
           position: 'relative',
-          padding: '40px 32px 80px',
+          paddingTop: 40,
           borderTop: `1px solid ${dark ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.08)'}`,
           marginTop: 40,
         }}

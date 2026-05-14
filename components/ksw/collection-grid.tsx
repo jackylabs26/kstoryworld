@@ -32,7 +32,7 @@ export function CollectionGrid({ items }: Props) {
   return (
     <>
       <CategoryTabs active={activeCat} onChange={setActiveCat} />
-      <section style={{ padding: '80px 32px', background: dark ? '#010120' : '#fff', color: dark ? '#fff' : '#000' }}>
+      <section className="px-5 py-12 md:px-8 md:py-20" style={{ background: dark ? '#010120' : '#fff', color: dark ? '#fff' : '#000' }}>
         <div className="ksw-container">
           <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 36, gap: 20, flexWrap: 'wrap' }}>
             <div>

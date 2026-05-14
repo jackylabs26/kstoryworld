@@ -23,6 +23,7 @@ const LANG_OPTS: { c: Lang; l: string }[] = [
 export default function Navigation() {
   const { season, lang, setLang, dark, setDark } = useKSWTheme();
   const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -94,7 +95,7 @@ export default function Navigation() {
           </nav>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }} className="hidden md:flex">
           {/* Language toggle */}
           <div style={{ display: 'flex', border: `1px solid ${dark ? 'rgba(255,255,255,0.16)' : 'rgba(0,0,0,0.10)'}`, borderRadius: 4, overflow: 'hidden' }}>
             {LANG_OPTS.map((o) => (
@@ -151,7 +152,119 @@ export default function Navigation() {
             {lang === 'ko' ? '구독하기' : 'Subscribe'}
           </Link>
         </div>
+
+        {/* Mobile hamburger */}
+        <button
+          onClick={() => setMobileOpen(!mobileOpen)}
+          aria-label="Menu"
+          className="md:hidden"
+          style={{
+            width: 36,
+            height: 36,
+            border: `1px solid ${dark ? 'rgba(255,255,255,0.16)' : 'rgba(0,0,0,0.10)'}`,
+            borderRadius: 4,
+            background: dark ? 'transparent' : '#fff',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 3,
+            cursor: 'pointer',
+          }}
+        >
+          <span style={{ width: 14, height: 1.5, background: fg }} />
+          <span style={{ width: 14, height: 1.5, background: fg }} />
+          <span style={{ width: 14, height: 1.5, background: fg }} />
+        </button>
       </div>
+
+      {/* Mobile dropdown */}
+      {mobileOpen && (
+        <div
+          className="md:hidden"
+          style={{
+            position: 'absolute',
+            top: scrolled ? 52 : 64,
+            left: 0,
+            right: 0,
+            background: dark ? '#010120' : '#fff',
+            borderBottom: `1px solid ${border}`,
+            padding: '16px 16px 20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 4,
+            zIndex: 29,
+          }}
+        >
+          {NAV.map((l) => (
+            <Link
+              key={l.href}
+              href={l.href}
+              onClick={() => setMobileOpen(false)}
+              style={{
+                fontSize: 18,
+                letterSpacing: '-0.18px',
+                color: fg,
+                textDecoration: 'none',
+                padding: '10px 0',
+                borderBottom: `1px solid ${dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)'}`,
+              }}
+            >
+              {lang === 'ko' ? l.ko : l.en}
+            </Link>
+          ))}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 12 }}>
+            {LANG_OPTS.map((o) => (
+              <button
+                key={o.c}
+                onClick={() => setLang(o.c)}
+                className="t-mono-sm"
+                style={{
+                  padding: '8px 10px',
+                  background: lang === o.c ? (dark ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.06)') : 'transparent',
+                  color: fg,
+                  border: `1px solid ${dark ? 'rgba(255,255,255,0.16)' : 'rgba(0,0,0,0.10)'}`,
+                  borderRadius: 4,
+                  cursor: 'pointer',
+                }}
+              >
+                {o.l}
+              </button>
+            ))}
+            <button
+              onClick={() => setDark(!dark)}
+              aria-label="theme"
+              style={{
+                width: 36,
+                height: 36,
+                border: `1px solid ${dark ? 'rgba(255,255,255,0.16)' : 'rgba(0,0,0,0.10)'}`,
+                borderRadius: 4,
+                background: 'transparent',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: fg,
+                fontSize: 14,
+              }}
+            >
+              {dark ? (
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M14.3 10.5A6.5 6.5 0 015.5 1.7a7 7 0 108.8 8.8z" fill="currentColor"/></svg>
+              ) : (
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3.5" fill="currentColor"/><path d="M8 0v2m0 12v2m8-8h-2M2 8H0m13.66-5.66L12.24 3.76M3.76 12.24l-1.42 1.42m11.32 0l-1.42-1.42M3.76 3.76L2.34 2.34" stroke="currentColor" strokeWidth="1.2"/></svg>
+              )}
+            </button>
+          </div>
+          <Link
+            href="/reviews"
+            onClick={() => setMobileOpen(false)}
+            className="btn btn-dark"
+            style={{ marginTop: 14, justifyContent: 'center', background: dark ? '#fff' : '#010120', color: dark ? '#010120' : '#fff' }}
+          >
+            {lang === 'ko' ? '구독하기' : 'Subscribe'}
+          </Link>
+        </div>
+      )}
     </header>
   );
 }
