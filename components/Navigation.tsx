@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { KSWLogoMark } from './ksw/logo-mark';
 import { SEASONS, useKSWTheme, type Lang } from './ksw/theme-provider';
@@ -21,7 +22,8 @@ const LANG_OPTS: { c: Lang; l: string }[] = [
 ];
 
 export default function Navigation() {
-  const { season, lang, setLang, dark, setDark } = useKSWTheme();
+  const { season, lang, setLang, dark, setDark, siblingHref } = useKSWTheme();
+  const router = useRouter();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -100,7 +102,14 @@ export default function Navigation() {
             {LANG_OPTS.map((o) => (
               <button
                 key={o.c}
-                onClick={() => setLang(o.c)}
+                onClick={() => {
+                  if (o.c === lang) return;
+                  if (siblingHref) {
+                    router.push(siblingHref);
+                  } else {
+                    setLang(o.c);
+                  }
+                }}
                 className="t-mono-sm"
                 style={{
                   padding: '8px 10px',

@@ -1,7 +1,9 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
@@ -74,6 +76,8 @@ interface ThemeContextValue {
   setLang: (l: Lang) => void;
   dark: boolean;
   setDark: (d: boolean) => void;
+  siblingHref: string | null;
+  setSiblingHref: (href: string | null) => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
@@ -85,9 +89,12 @@ export function useKSWTheme() {
 }
 
 export function KSWThemeProvider({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
   const [season, setSeasonState] = useState<Season>('winter');
   const [lang, setLangState] = useState<Lang>('ko');
   const [dark, setDarkState] = useState(false);
+  const [siblingHref, setSiblingHrefState] = useState<string | null>(null);
+  const setSiblingHref = useCallback((href: string | null) => setSiblingHrefState(href), []);
 
   // load persisted prefs
   useEffect(() => {
@@ -101,6 +108,18 @@ export function KSWThemeProvider({ children }: { children: ReactNode }) {
     } catch {}
   }, []);
 
+  // URL → lang sync: article slugs ending in -en/-ko determine lang
+  useEffect(() => {
+    const slug = pathname.replace(/\/$/, '').split('/').pop() || '';
+    if (slug.endsWith('-en')) {
+      setLangState('en');
+      try { localStorage.setItem('ksw-lang', 'en'); } catch {}
+    } else if (slug.endsWith('-ko')) {
+      setLangState('ko');
+      try { localStorage.setItem('ksw-lang', 'ko'); } catch {}
+    }
+  }, [pathname]);
+
   // sync DOM attrs
   useEffect(() => {
     document.documentElement.setAttribute('data-season', season);
@@ -113,6 +132,8 @@ export function KSWThemeProvider({ children }: { children: ReactNode }) {
       season,
       lang,
       dark,
+      siblingHref,
+      setSiblingHref,
       setSeason: (s) => {
         setSeasonState(s);
         try { localStorage.setItem('ksw-season', s); } catch {}
@@ -126,7 +147,7 @@ export function KSWThemeProvider({ children }: { children: ReactNode }) {
         try { localStorage.setItem('ksw-dark', String(d)); } catch {}
       },
     }),
-    [season, lang, dark]
+    [season, lang, dark, siblingHref, setSiblingHref]
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
