@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <div className="ksw-container" style={{ padding: '80px 32px 120px' }}>
+    <div className="ksw-container" style={{ padding: 'clamp(40px, 8vw, 80px) var(--gutter) clamp(60px, 10vw, 120px)' }}>
       <article className="review-body" style={{ maxWidth: 720, margin: '0 auto' }}>
         <h1>About KStoryWorld</h1>
         <p className="meta">EDITOR-CURATED &middot; BILINGUAL &middot; SEOUL</p>

@@ -28,8 +28,8 @@ export function ReviewsBoard({ items }: { items: Item[] }) {
     <>
       {/* Header */}
       <section
+        className="px-5 py-10 md:px-8 md:py-16"
         style={{
-          padding: '64px 32px',
           background: dark ? 'linear-gradient(180deg, rgba(58,74,125,0.10) 0%, transparent 100%)' : 'linear-gradient(180deg, rgba(58,74,125,0.05) 0%, transparent 100%)',
           borderBottom: `1px solid ${dark ? 'rgba(255,255,255,0.10)' : 'rgba(0,0,0,0.08)'}`,
         }}
@@ -87,7 +87,7 @@ export function ReviewsBoard({ items }: { items: Item[] }) {
       </section>
 
       {/* Reviews grid */}
-      <section style={{ padding: '64px 32px', background: dark ? '#010120' : '#fff' }}>
+      <section className="px-5 py-10 md:px-8 md:py-16" style={{ background: dark ? '#010120' : '#fff' }}>
         <div className="ksw-container">
           {visible.length === 0 ? (
             <div

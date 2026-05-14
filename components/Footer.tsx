@@ -40,12 +40,12 @@ export default function Footer() {
         <div>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
             <KSWLogoMark season={season} size={36} />
-            <span style={{ fontFamily: 'var(--font-display)', fontSize: 23, fontWeight: 500, letterSpacing: '-0.46px', color: '#fff' }}>
+            <span style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(18px, 4vw, 23px)', fontWeight: 500, letterSpacing: '-0.46px', color: '#fff' }}>
               kstoryworld
             </span>
             <span style={{ display: 'inline-block', width: 6, height: 6, borderRadius: '50%', background: accent, transform: 'translateY(-1px)' }} />
           </div>
-          <p style={{ marginTop: 18, maxWidth: 340, fontSize: 14, color: 'rgba(255,255,255,0.7)', letterSpacing: '-0.07px', lineHeight: 1.55 }}>
+          <p style={{ marginTop: 18, maxWidth: 'min(340px, 100%)', fontSize: 14, color: 'rgba(255,255,255,0.7)', letterSpacing: '-0.07px', lineHeight: 1.55 }}>
             {lang === 'ko'
               ? '한국의 모든 이야기, 세계의 언어로. JackyLabs가 만듭니다.'
               : 'Every Korean story, in world languages. Made by JackyLabs.'}

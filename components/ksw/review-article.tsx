@@ -42,7 +42,7 @@ export function ReviewArticle({ bodyHtml, slug, season, title, lang: reviewLang,
         style={{
           position: 'relative',
           overflow: 'hidden',
-          padding: '64px 32px 48px',
+          padding: 'clamp(32px, 6vw, 64px) var(--gutter) clamp(24px, 5vw, 48px)',
           background: dark ? 'rgba(255,255,255,0.03)' : undefined,
         }}
       >
@@ -159,7 +159,7 @@ export function ReviewArticle({ bodyHtml, slug, season, title, lang: reviewLang,
       <div style={{ borderTop: `1px solid ${dark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'}` }} />
 
       {/* Article body */}
-      <div style={{ maxWidth: 800, margin: '0 auto', padding: '48px 32px 80px' }}>
+      <div style={{ maxWidth: 800, margin: '0 auto', padding: 'clamp(24px, 5vw, 48px) var(--gutter) clamp(40px, 8vw, 80px)' }}>
         <article
           className="review-body"
           dangerouslySetInnerHTML={{ __html: bodyHtml }}

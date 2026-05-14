@@ -47,9 +47,9 @@ export function HeroBold() {
             style={{
               fontFamily: 'var(--font-display)',
               fontWeight: 500,
-              fontSize: 'clamp(140px, 26vw, 340px)',
+              fontSize: 'clamp(80px, 26vw, 340px)',
               lineHeight: 0.82,
-              letterSpacing: '-12px',
+              letterSpacing: 'clamp(-5px, -1.5vw, -12px)',
               color: dark ? '#fff' : '#000',
               whiteSpace: 'nowrap',
               userSelect: 'none',

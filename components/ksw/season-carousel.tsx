@@ -82,7 +82,7 @@ export function SeasonCarousel() {
                   </span>
                 </div>
                 <div style={{ position: 'absolute', left: 16, bottom: 14, right: 16, textAlign: 'left' }}>
-                  <div style={{ fontFamily: 'var(--font-display)', fontSize: 64, fontWeight: 500, letterSpacing: '-1.5px', lineHeight: 0.9, color: '#000' }}>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(40px, 10vw, 64px)', fontWeight: 500, letterSpacing: '-1.5px', lineHeight: 0.9, color: '#000' }}>
                     {ss.kor}
                   </div>
                   <div className="t-mono-sm" style={{ marginTop: 10, color: 'rgba(0,0,0,0.7)' }}>

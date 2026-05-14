@@ -68,7 +68,7 @@ export default function Navigation() {
             style={{ display: 'inline-flex', alignItems: 'center', gap: 10, textDecoration: 'none', color: fg }}
           >
             <KSWLogoMark season={season} size={36} />
-            <span style={{ fontFamily: 'var(--font-display)', fontSize: 21, fontWeight: 500, letterSpacing: '-0.42px' }}>
+            <span style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(18px, 4vw, 21px)', fontWeight: 500, letterSpacing: '-0.42px' }}>
               kstoryworld
             </span>
             <span
@@ -189,7 +189,7 @@ export default function Navigation() {
             right: 0,
             background: dark ? '#010120' : '#fff',
             borderBottom: `1px solid ${border}`,
-            padding: '16px 16px 20px',
+            padding: '16px var(--gutter) 20px',
             display: 'flex',
             flexDirection: 'column',
             gap: 4,
