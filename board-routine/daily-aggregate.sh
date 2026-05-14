@@ -9,14 +9,14 @@
 # Pipeline:
 #   1. resolve yesterday in KST.
 #   2. count `n8n-workflows/_dryrun-samples/{kpop|kdrama|kfood|kbeauty}-YYYY-MM-DD-*.json`.
-#   3. if total == 0 → PATCH ALERT_ISSUE_ID (default JAC-1737) to priority=critical
+#   3. if total == 0 → PATCH ALERT_ISSUE_ID (default JAC-2233) to priority=critical
 #      and POST a comment naming the affected date.
 #      else        → POST a counts summary comment on the current task.
 #   4. PATCH the current task to status=done with a short summary.
 #
 # Inputs:
 #   $1 / PAPERCLIP_TASK_ID — the routine's own issue identifier (UUID or JAC-…).
-#   ALERT_ISSUE_ID         — override the 0-publish alert target (default JAC-1737).
+#   ALERT_ISSUE_ID         — override the 0-publish alert target (default JAC-2233).
 #   DAILY_AGGREGATE_DRYRUN=1 — print intended HTTP calls, don't touch the API.
 #   DAILY_AGGREGATE_DATE   — override "yesterday" (YYYY-MM-DD, KST). Default = today_KST - 1 day.
 #
@@ -33,7 +33,7 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 source "$SCRIPT_DIR/lib.sh"
 
 TASK_ID="${1:-${PAPERCLIP_TASK_ID:-}}"
-ALERT_ISSUE_ID="${ALERT_ISSUE_ID:-JAC-1737}"
+ALERT_ISSUE_ID="${ALERT_ISSUE_ID:-JAC-2233}"
 DRYRUN="${DAILY_AGGREGATE_DRYRUN:-0}"
 
 if [[ -n "${DAILY_AGGREGATE_DATE:-}" ]]; then
