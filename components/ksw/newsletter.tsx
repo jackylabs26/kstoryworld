@@ -9,7 +9,7 @@ export function NewsletterCTA() {
   return (
     <section
       style={{
-        padding: '88px 32px',
+        padding: 'clamp(40px, 8vw, 88px) var(--gutter)',
         background: dark ? '#010120' : '#fff',
         color: dark ? '#fff' : '#000',
         position: 'relative',
@@ -59,7 +59,7 @@ export function NewsletterCTA() {
                 type="email"
                 placeholder={lang === 'ko' ? '이메일 주소' : 'your@email.com'}
                 style={{
-                  flex: '1 1 240px',
+                  flex: '1 1 200px',
                   padding: '14px 16px',
                   border: `1px solid ${dark ? 'rgba(255,255,255,0.16)' : 'rgba(0,0,0,0.10)'}`,
                   borderRadius: 4,

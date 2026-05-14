@@ -37,13 +37,13 @@ export default function HomePage() {
         <HeroSwitch fallback="bold" />
       </Suspense>
       <CollectionGrid items={collectionItems} />
-      <div className="ksw-container" style={{ padding: '40px 32px' }}>
+      <div className="ksw-container" style={{ padding: 'clamp(24px, 5vw, 40px) var(--gutter)' }}>
         <AdSlot variant="banner" />
       </div>
       <StatsBand dramaCount={dramaCount} totalPages={totalPages} />
       <SeasonCarousel />
       <NewsletterCTA />
-      <div className="ksw-container" style={{ padding: '0 32px 48px' }}>
+      <div className="ksw-container" style={{ padding: '0 var(--gutter) clamp(24px, 5vw, 48px)' }}>
         <AdSlot variant="banner" />
       </div>
     </>

@@ -116,10 +116,10 @@ body[data-dark="true"] {
 }
 
 /* ===================== Type ===================== */
-.t-display { font-family: var(--font-display); font-size: 64px; font-weight: 500; line-height: 1.05; letter-spacing: -1.92px; }
-.t-h1 { font-family: var(--font-display); font-size: 48px; font-weight: 500; line-height: 1.10; letter-spacing: -1.20px; }
-.t-h2 { font-family: var(--font-display); font-size: 40px; font-weight: 500; line-height: 1.20; letter-spacing: -0.80px; }
-.t-h3 { font-family: var(--font-display); font-size: 28px; font-weight: 500; line-height: 1.15; letter-spacing: -0.42px; }
+.t-display { font-family: var(--font-display); font-size: clamp(36px, 8vw, 64px); font-weight: 500; line-height: 1.05; letter-spacing: -1.92px; }
+.t-h1 { font-family: var(--font-display); font-size: clamp(28px, 6vw, 48px); font-weight: 500; line-height: 1.10; letter-spacing: -1.20px; }
+.t-h2 { font-family: var(--font-display); font-size: clamp(24px, 5vw, 40px); font-weight: 500; line-height: 1.20; letter-spacing: -0.80px; }
+.t-h3 { font-family: var(--font-display); font-size: clamp(20px, 3.5vw, 28px); font-weight: 500; line-height: 1.15; letter-spacing: -0.42px; }
 .t-h4 { font-family: var(--font-display); font-size: 22px; font-weight: 500; line-height: 1.15; letter-spacing: -0.22px; }
 .t-body-l { font-size: 18px; line-height: 1.45; letter-spacing: -0.18px; }
 .t-body { font-size: 16px; line-height: 1.30; letter-spacing: -0.16px; }
@@ -185,6 +185,10 @@ body[data-dark="true"] .ksw-card { background: #0a0a2e; border-color: rgba(255,2
 /* Container utility */
 .ksw-container { max-width: var(--container-max); margin: 0 auto; padding: 0 var(--gutter); }
 
+@media (max-width: 768px) {
+  :root { --gutter: 20px; }
+}
+
 /* Scrollbars */
 *::-webkit-scrollbar { width: 10px; height: 10px; }
 *::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.18); border-radius: 4px; }
@@ -201,7 +205,7 @@ body[data-dark="true"] input::placeholder { color: rgba(255,255,255,0.4); }
 .review-body { line-height: 1.70; font-size: 17px; letter-spacing: -0.16px; }
 .review-body h1 { font-family: var(--font-display); font-size: clamp(24px, 3vw, 36px); font-weight: 500; letter-spacing: -0.6px; line-height: 1.15; margin: 48px 0 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border-light); }
 .review-body h2 { font-family: var(--font-display); font-size: clamp(20px, 2.5vw, 28px); font-weight: 500; letter-spacing: -0.4px; line-height: 1.2; margin: 40px 0 14px; color: var(--season-ink); }
-.review-body h3 { font-family: var(--font-display); font-size: 20px; font-weight: 500; letter-spacing: -0.2px; margin: 32px 0 10px; }
+.review-body h3 { font-family: var(--font-display); font-size: clamp(18px, 2vw, 20px); font-weight: 500; letter-spacing: -0.2px; margin: 32px 0 10px; }
 .review-body p { margin: 0 0 18px; }
 .review-body img { max-width: 100%; height: auto; border-radius: var(--radius-card); margin: 28px 0; box-shadow: var(--shadow-1); }
 .review-body ul, .review-body ol { margin: 0 0 18px; padding-left: 24px; }

@@ -34,7 +34,7 @@ export function StatsBand({ dramaCount, totalPages }: Props) {
             key={i}
             style={{
               borderLeft: i === 0 ? 'none' : `1px solid ${dark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'}`,
-              paddingLeft: i === 0 ? 0 : 32,
+              paddingLeft: i === 0 ? 0 : 'clamp(16px, 3vw, 32px)',
             }}
           >
             <div
